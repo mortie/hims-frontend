@@ -1,0 +1,32 @@
+{
+    "version": "0.1.0",
+    "name": "HIMS Frontend",
+    "description": "New UI for OpenMRS",
+    "icons":
+    {
+        "16": "null",
+        "48": "logo192.png",
+        "128": "logo512.png"
+    },
+    "developer":
+    {
+        "url": null,
+        "name": "Shubham",
+        "company": "HISP India",
+        "email": "shubham.goyal@hispindia.org"
+    },
+    "activities":
+    {
+        "openmrs":
+        {
+            "href": "/owa"
+        }
+    },
+    "folderName": "hims-frontend",
+    "baseUrl": "/owa",
+    "launchUrl": "/owa/hims-frontend/index.html",
+    "launch_path": "index.html",
+    "installs_allowed_from": null,
+    "default_locale": "en",
+    "deployed.owa.name": null
+}
