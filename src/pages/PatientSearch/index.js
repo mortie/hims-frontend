@@ -126,26 +126,26 @@ class PatientSearch extends Component {
     field: 'gender',
     headerName: 'Gender',
     type: 'number',
-    width: 130,
+    width: 80,
   },
   {
     field: 'age',
     headerName: 'Age',
     type: 'number',
-    width: 90,
+    width: 80,
     },
     {
     field: 'address',
     headerName: 'Address',
     type: 'string',
-      width: 300,
+      width: 200,
     height:300,
     },
         {
     field: 'lvd',
     headerName: 'Last Visited',
     type: 'string',
-    width: 200,
+    width: 120,
     },
             {
     field: 'action',
@@ -186,85 +186,109 @@ rowsData : [
 
   
   search = (key) => {
-    const { firstName, lastName, phone, age, gender, lvd } = this.state;
-    let param = firstName;
-    var searchdatanew = [];
-    var storedata = [];
-    var username = "admin"
-    var password = "Admin123"
-    if (firstName) {
-      param = firstName
+    const { firstName, lastName, phone, age, gender, lvd, searchData } = this.state;
+    let isDataAlready = false;
+    let alreadystoredata = [];
+    if (searchData.length > 0) {
+      isDataAlready = true;
     }
-    if (phone) {
-      param = phone;
-    }
-    if (firstName && phone) {
-      param = phone
-    }
-    if (firstName || phone) {
-      this.setState({ nameData: false })
-      this.setState({ phoneData : false})
-
-      const headers = {
-        'Authorization': 'Basic ' + btoa(`${username}:${password}`),
-      };
-      const url = `https://ln3.hispindia.org/openmrs/ws/hisp/rest/patient_search?name=${param}`
-      axios
-        .get(url, { headers: headers })
-        .then((response) => {
-          var phone = '';
-          var addressrarr = [];
-          var visitdate = ''
-          this.setState({ searchData: [] });
-          searchdatanew = this.state.searchData;
-
-          for (let i = 0; i < response.data.length; i++) {
-            searchdatanew.push(response.data)
-            let identifierid = searchdatanew[0][i]["identifier"];
-            let nameval = searchdatanew[0][i]["name"]
-            let genval = searchdatanew[0][i]["gender"]
-            let ageval = searchdatanew[0][i]["age"]
-            if (searchdatanew[0][i]["address"]) {
-              let ho_no = searchdatanew[0][i]["address"]["Address1"]
-              let district = searchdatanew[0][i]["address"]["City Village"]
-              let country = searchdatanew[0][i]["address"]["Country"]
-              let pincode = searchdatanew[0][i]["address"]["Postal Code"]
-              let statecode = searchdatanew[0][i]["address"]["State Province"]
-              let addr = ho_no + " " + district + " - " + statecode + " " + country + " " + pincode
-              addressrarr.push(addr)
-            }
-            if (searchdatanew[0][i]["person_attributes"]) {
-              phone = searchdatanew[0][i]["person_attributes"]["Telephone Number"]
-            }
-            if (searchdatanew[0][i]["visit_date"] != undefined) {
-              visitdate = searchdatanew[0][i]["visit_date"]
-            }
-            let id = i
-            visitdate = "2021-12-12"
-
-            storedata.push(this.createData(identifierid, nameval, phone,
-              genval, ageval, addressrarr[0], visitdate, "",id
-            ))
+    if (isDataAlready) {
+      for (let k = 0; k < searchData.length; k++) {
+          if (phone && searchData[k]["phone"].includes(phone)) {
+            alreadystoredata.push(searchData[k])
           }
-
-          if (searchdatanew.length > 0) {
-            this.setState({ searchData: storedata })
-            this.setState({ isDataPresent: true })
-
+          else if (firstName && searchData[k]["name"].includes(firstName)) {
+              alreadystoredata.push(searchData[k])
           }
-          else {
-            this.setState({ isDataPresent: false })
-          }
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+      }
+      this.setState({ searchData: alreadystoredata })
+      this.setState({ isDataPresent: true })
+
     }
     else {
-      this.setState({ nameData: true })
-      this.setState({ phoneData : true})
-    }
+      let param = firstName;
+      var username = "admin"
+      var password = "Admin123"
+      if (firstName) {
+        param = firstName
+      }
+      if (phone) {
+        param = phone;
+      }
+      if (firstName && phone) {
+        param = phone
+      }
+      if (firstName || phone) {
+        this.setState({ nameData: false })
+        this.setState({ phoneData: false })
 
+        const headers = {
+          'Authorization': 'Basic ' + btoa(`${username}:${password}`),
+        };
+        const url = `https://ln3.hispindia.org/openmrs/ws/hisp/rest/patient_search?name=${param}`
+        axios
+          .get(url, { headers: headers })
+          .then((response) => {
+            var phone = '';
+            var searchdatanew = [];
+            var visitdate = ''
+            this.setState({ searchData: [] });
+            searchdatanew = this.state.searchData;
+            var storedata = [];
+
+            for (let i = 0; i < response.data.length; i++) {
+              var addressrarr = [];
+              searchdatanew.push(response.data)
+              let identifierid = searchdatanew[0][i]["identifier"];
+              let nameval = searchdatanew[0][i]["name"]
+              let genval = searchdatanew[0][i]["gender"]
+              let ageval = searchdatanew[0][i]["age"]
+              if (searchdatanew[0][i]["address"]) {
+                let addr1 = searchdatanew[0][i]["address"]["Address1"]
+                let addr2 = searchdatanew[0][i]["address"]["Address2"]
+                let district = searchdatanew[0][i]["address"]["City Village"]
+                let country = searchdatanew[0][i]["address"]["Country"]
+                let pincode = searchdatanew[0][i]["address"]["Postal Code"]
+                let statecode = searchdatanew[0][i]["address"]["State Province"]
+                // let addr = ho_no + " " + district + " - " + statecode + " " + country + " " + pincode
+                let addr = district + " - " + statecode
+                addressrarr.push(addr)
+              }
+              if (searchdatanew[0][i]["person_attributes"]) {
+                phone = searchdatanew[0][i]["person_attributes"]["Telephone Number"]
+              }
+              if (searchdatanew[0][i]["visit_date"] != undefined) {
+                visitdate = searchdatanew[0][i]["visit_date"]
+              }
+              else {
+                visitdate = "N-A"
+              }
+              let id = i
+
+              storedata.push(this.createData(identifierid, nameval, phone,
+                genval, ageval, addressrarr[0], visitdate, "", id
+              ))
+            }
+
+            if (storedata.length > 0) {
+              this.setState({ searchData: [] });
+              this.setState({ searchData: storedata })
+              this.setState({ isDataPresent: true })
+
+            }
+            else {
+              this.setState({ isDataPresent: false })
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      }
+      else {
+        this.setState({ nameData: true })
+        this.setState({ phoneData: true })
+      }
+    }
   }
   render() {
     const { classes } = this.state;
@@ -391,7 +415,7 @@ rowsData : [
 
 
 <div style={{ height: 500, width: '100%' }}>
-      <DataGrid rowHeight={115} wrap="wrap" rows={searchdat} columns={this.state.columnsNew} pageSize={5} />
+      <DataGrid rowHeight={50} wrap="wrap" rows={searchdat} columns={this.state.columnsNew} pageSize={5} />
     </div>
      
             {/* <Paper className={classes.root}>
