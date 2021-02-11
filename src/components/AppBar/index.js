@@ -19,14 +19,14 @@ function AppBar(props) {
   const { drawer, handleDrawer, handleLogout, routes } = props;
 
   const appTitle = () => {
-    let name;
+    let title;
     routes.map((prop) => {
-      if (window.location.href.indexOf(prop.layout + prop.path) !== -1) {
-        name = prop.name;
+      if (window.location.href.indexOf(prop.path) !== -1) {
+        title = prop.title;
       }
       return null;
     });
-    return name;
+    return title;
   };
 
   return (

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { getAPI } from "../../services";
+import { login, encrypt, decrypt, getRandomNumber } from "../../utils";
 import {
   Avatar,
   Button,
@@ -13,10 +15,8 @@ import {
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import { Alert } from "@material-ui/lab";
-import { login } from "../../utils";
 import Footer from "../../components/Footer";
 import styles from "./styles";
-import { getAPI } from "../../services";
 
 const useStyles = makeStyles(styles);
 
@@ -43,7 +43,15 @@ export default function SignIn(props) {
     if (validateForm()) {
       setLoading(true);
       // timer.current = window.setTimeout(() => {
-      getAPI("/session", loginDetails.username, loginDetails.password)
+      getAPI(
+        "/session",
+        decrypt(
+          encrypt(
+            `${loginDetails.username}:${loginDetails.password}`,
+            getRandomNumber(0, 9)
+          )
+        )
+      )
         .then((response) => {
           setLoading(false);
           if (response.data.authenticated) {
@@ -55,9 +63,11 @@ export default function SignIn(props) {
             );
           } else {
             setLoginError(true);
+            setLoading(false);
           }
         })
         .catch((e) => {
+          setLoading(false);
           console.log(e);
         });
       // }, 2000);

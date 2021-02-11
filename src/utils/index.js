@@ -1,4 +1,4 @@
-// import { encrypt, decrypt, toBase64 } from "./encryption";
+import { encrypt, decrypt, getRandomNumber } from "./encryption";
 import {
   login,
   logout,
@@ -8,9 +8,9 @@ import {
 } from "./authentication";
 
 export {
-  // encrypt,
-  // decrypt,
-  // toBase64,
+  encrypt,
+  decrypt,
+  getRandomNumber,
   login,
   logout,
   isLogin,

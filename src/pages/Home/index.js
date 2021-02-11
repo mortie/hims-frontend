@@ -15,7 +15,7 @@ function Home() {
   return (
     <GridContainer>
       {appRoutes.map((prop, key) => {
-        if (prop.view && hasAccess(prop.roles)) {
+        if (prop.visibleOnSidebar && hasAccess(prop.roles)) {
           return (
             <GridItem item xs={12} sm={6} md={3} key={key}>
               <Card>
@@ -27,7 +27,7 @@ function Home() {
                       <prop.icon />
                     )}
                   </CardIcon>
-                  <h4 className={classes.cardTitle}>{prop.name}</h4>
+                  <h4 className={classes.cardTitle}>{prop.title}</h4>
                 </CardHeader>
                 <CardFooter stats>
                   <Button

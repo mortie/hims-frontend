@@ -41,7 +41,7 @@ function SideBar(props) {
   var links = (
     <List>
       {routes.map((prop, key) => {
-        if (prop.view && hasAccess(prop.roles)) {
+        if (prop.visibleOnSidebar && hasAccess(prop.roles)) {
           let listItemClasses = clsx({
             [" " + classes[color]]: activeRoute(prop.layout + prop.path),
           });
@@ -56,7 +56,7 @@ function SideBar(props) {
               to={prop.layout + prop.path}
               className={classes.item + listItemClasses + listFontClasses}
               key={key}
-              title={prop.name}
+              title={prop.title}
             >
               <ListItemIcon>
                 {typeof prop.icon === "string" ? (
@@ -68,7 +68,7 @@ function SideBar(props) {
                   <prop.icon className={listFontClasses} />
                 )}
               </ListItemIcon>
-              <ListItemText primary={prop.name} />
+              <ListItemText primary={prop.title} />
             </MenuItem>
           );
         } else {

@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Switch, Route, Redirect, useHistory } from "react-router-dom";
+import {
+  Switch,
+  Route,
+  Redirect,
+  useHistory,
+  useRouteMatch,
+} from "react-router-dom";
+import { SnackbarProvider } from "notistack";
 import { makeStyles, CssBaseline, Container } from "@material-ui/core";
 import { logout, hasAccess } from "../../utils";
 import { appRoutes as routes } from "../../routes";
@@ -10,7 +17,8 @@ const useStyles = makeStyles(styles);
 
 function App({ ...rest }) {
   const classes = useStyles();
-  let history = useHistory();
+  const history = useHistory();
+  const match = useRouteMatch();
   const [drawer, setDrawer] = useState(true);
 
   const handleDrawer = () => {
@@ -43,27 +51,30 @@ function App({ ...rest }) {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AppBar
-        handleDrawer={handleDrawer}
-        handleLogout={handleLogout}
-        routes={routes}
-        drawer={drawer}
-        {...rest}
-      />
-      <SideBar
-        handleDrawer={handleDrawer}
-        routes={routes}
-        drawer={drawer}
-        color="blue"
-        {...rest}
-      />
-      <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
-          {switchRoutes}
-        </Container>
-        <Footer />
-      </main>
+      <SnackbarProvider>
+        <AppBar
+          handleDrawer={handleDrawer}
+          handleLogout={handleLogout}
+          routes={routes}
+          drawer={drawer}
+          {...rest}
+        />
+        <SideBar
+          handleDrawer={handleDrawer}
+          match={match}
+          routes={routes}
+          drawer={drawer}
+          color="blue"
+          {...rest}
+        />
+        <main className={classes.content}>
+          <div className={classes.appBarSpacer} />
+          <Container maxWidth="lg" className={classes.container}>
+            {switchRoutes}
+          </Container>
+          <Footer />
+        </main>
+      </SnackbarProvider>
     </div>
   );
 }

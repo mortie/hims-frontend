@@ -1,24 +1,46 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
 import clsx from "clsx";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { Typography, Button, makeStyles, Avatar } from "@material-ui/core";
 import { getAuthenticatedUser } from "../../utils";
+import { getImageAPI } from "../../services";
+import { addAvatar } from "../../actions/avatarActions";
 
-import { Avatar, Typography, Button, makeStyles } from "@material-ui/core";
 import styles from "./styles";
-import avatar from "../../assets/images/shubham.jpg";
 
 const useStyles = makeStyles(styles);
 
 function UserAvatar(props) {
   const classes = useStyles();
+  const avatar = useSelector((state) => state.avatar);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    getImageAPI(
+      `/personimage/${getAuthenticatedUser().person.uuid}`,
+      abortController.signal
+    )
+      .then((response) => {
+        const url = URL.createObjectURL(response.data);
+        dispatch(addAvatar(url));
+      })
+      .catch((e) => {
+        dispatch(addAvatar(null));
+      });
+    return () => {
+      abortController.abort();
+    };
+  }, [dispatch]);
   return (
     <div className={clsx(classes.root, classes.flexRow)}>
-      <Avatar alt="A" src={avatar}>
-        SH
+      <Avatar src={avatar} alt={getAuthenticatedUser().display}>
+        {getAuthenticatedUser().display.slice(0, 1).toUpperCase()}
       </Avatar>
       <div className={classes.flexColumn}>
         <Typography component="h6">{getAuthenticatedUser().display}</Typography>
-        
+
         <div className={classes.flexRow}>
           <Button
             color="primary"

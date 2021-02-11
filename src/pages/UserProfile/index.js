@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { getAPI } from "../../services";
+import React from "react";
 import { makeStyles } from "@material-ui/core";
 import { GridContainer, GridItem } from "../../components/Grid";
 import {
@@ -10,23 +9,11 @@ import {
   CardAvatar,
 } from "../../components/Card";
 import Button from "../../components/CustomButton";
-import avatar from "../../assets/images/shubham.jpg";
 import styles from "./styles";
 
 const useStyles = makeStyles(styles);
 function UserProfile() {
   const classes = useStyles();
-  const [image, setImage] = useState();
-
-  useEffect(() => {
-    getAPI("/personimage/3a8e9e70-250a-4deb-99da-e6789d537f01")
-      .then((response) => {
-        setImage(response.data);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }, []);
 
   return (
     <div>
@@ -47,11 +34,7 @@ function UserProfile() {
         </GridItem>
         <GridItem xs={12} sm={12} md={4}>
           <Card profile>
-            <CardAvatar profile>
-              <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                <img src={avatar} alt="..." />
-              </a>
-            </CardAvatar>
+            <CardAvatar profile />
             <CardBody profile>
               <h6 className={classes.cardCategory}>Admin</h6>
               <h4 className={classes.cardTitle}>Shubham Goyal</h4>

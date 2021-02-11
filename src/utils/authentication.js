@@ -1,8 +1,5 @@
 import Cookies from "js-cookie";
-
-const USER_TOKEN = "authenticatedUser";
-const JSESSIONID = "JSESSIONID";
-const SESSION_TIME_OUT = 1 / 48; // equals to 30 minutes
+import { USER_TOKEN, JSESSIONID, SESSION_TIME_OUT } from "./constants";
 
 /**
  * Start login session by setting user and authorization cookie for 30 minutes
@@ -19,7 +16,7 @@ export const login = (
   from = { pathname: "/app/home" }
 ) => {
   Cookies.set(JSESSIONID, authorization, { expires: SESSION_TIME_OUT });
-  Cookies.set(USER_TOKEN, JSON.stringify(user), { expires: SESSION_TIME_OUT });
+  localStorage.setItem(USER_TOKEN, JSON.stringify(user));
   history.push(from);
 };
 
@@ -30,9 +27,6 @@ export const updateSession = () => {
   Cookies.set(JSESSIONID, Cookies.get(JSESSIONID), {
     expires: SESSION_TIME_OUT,
   });
-  Cookies.set(USER_TOKEN, JSON.stringify(Cookies.get(USER_TOKEN)), {
-    expires: SESSION_TIME_OUT,
-  });
 };
 
 /**
@@ -41,7 +35,7 @@ export const updateSession = () => {
  */
 export const logout = (history) => {
   Cookies.remove(JSESSIONID);
-  Cookies.remove(USER_TOKEN);
+  localStorage.removeItem(USER_TOKEN);
   history.push("/signin");
 };
 
@@ -49,7 +43,7 @@ export const logout = (history) => {
  * Returns true if both user and authorization cookies are set else false.
  */
 export const isLogin = () => {
-  if (Cookies.get(JSESSIONID) && Cookies.get(USER_TOKEN)) {
+  if (Cookies.get(JSESSIONID) && localStorage.getItem(USER_TOKEN)) {
     return true;
   }
   return false;
@@ -60,12 +54,12 @@ export const isLogin = () => {
  */
 export const getAuthenticatedUser = () => {
   if (isLogin()) {
-    return JSON.parse(Cookies.get(USER_TOKEN));
+    return JSON.parse(localStorage.getItem(USER_TOKEN));
   }
 };
 
 /**
- * returns true if user role(s) has access to view the screen else returns false.
+ * returns true if user role(s) has access to visibleOnSidebar the screen else returns false.
  * @param {Array<String>} roles list of roles
  * @returns {Boolean} found
  */

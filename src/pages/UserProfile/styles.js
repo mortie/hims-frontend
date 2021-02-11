@@ -15,6 +15,17 @@ const userProfileStyles = (theme) => ({
     marginBottom: "3px",
     textDecoration: "none",
   },
+  cardAvatarText: {
+    width: "150px",
+    height: "150px",
+    borderRadius: "50%",
+    fontSize: "50px",
+    color: "#fff",
+    lineHeight: "150px",
+    textAlign: "center",
+    background: "#bdbdbd",
+    margin: "-50px auto 0",
+  },
 });
 
 export default userProfileStyles;
