@@ -3,7 +3,7 @@ import Home from "./Home";
 import IPD from "./IPD";
 import Laboratory from "./Laboratory";
 import OPD from "./OPD";
-import PatientRegistration from "./PatientRegistration";
+import PatientSearch from "./PatientSearch";
 import Pharmacy from "./Pharmacy";
 import Radiology from "./Radiology";
 import SignIn from "./SignIn";
@@ -15,7 +15,7 @@ export {
   IPD,
   Laboratory,
   OPD,
-  PatientRegistration,
+  PatientSearch,
   Pharmacy,
   Radiology,
   SignIn,
