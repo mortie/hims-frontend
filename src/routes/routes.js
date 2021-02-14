@@ -1,6 +1,6 @@
 import {
   Home,
-  PatientRegistration,
+  PatientSearch,
   OPD,
   IPD,
   Pharmacy,
@@ -24,8 +24,8 @@ export const appRoutes = [
     layout: "/app",
   },
   {
-    path: "/registration",
-    title: "Registration",
+    path: "/patient-search",
+    title: "Patient Search",
     roles: [
       "System Developer",
       "Organizational: Registration clerk",
@@ -35,7 +35,7 @@ export const appRoutes = [
     ],
     visibleOnSidebar: true,
     icon: "fa fa-user-plus",
-    component: PatientRegistration,
+    component: PatientSearch,
     layout: "/app",
   },
   {

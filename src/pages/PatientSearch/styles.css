@@ -1,0 +1,20 @@
+.SearchIcon {
+  padding-left: 50%;
+}
+.MuiTypography-h5 {
+  font-weight: 600 !important;
+  margin-top: 10px !important;
+}
+.MuiFormGroup-root {
+  display: inline !important;
+}
+.MuiTypography-displayBlock {
+  display: inline !important;
+  line-height: 2.66 !important;
+}
+.searchbtn {
+  margin-top: 15px !important;
+}
+body {
+  background-color: ghostwhite !important;
+}
