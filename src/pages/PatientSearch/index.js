@@ -189,7 +189,7 @@ rowsData : [
     const { firstName, lastName, phone, age, gender, lvd, searchData } = this.state;
     let isDataAlready = false;
     let alreadystoredata = [];
-    if (searchData.length > 0) {
+    if (searchData.length > 0 && this.state.isDataPresent == true) {
       isDataAlready = true;
     }
     if (isDataAlready) {
@@ -201,9 +201,13 @@ rowsData : [
               alreadystoredata.push(searchData[k])
           }
       }
+      if (alreadystoredata.length > 0) {
       this.setState({ searchData: alreadystoredata })
       this.setState({ isDataPresent: true })
-
+      }
+      else {
+          this.setState({ isDataPresent: false })
+      }
     }
     else {
       let param = firstName;
