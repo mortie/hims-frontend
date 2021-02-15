@@ -33,7 +33,8 @@ class PatientSearch extends Component {
       searchData: [],
       isDataPresent: false,
       nameData: false,
-      phoneData:false,
+      phoneData: false,
+      apihit : false,
       classes: makeStyles((theme) => ({
               paper: {
               marginTop: theme.spacing(10),
@@ -194,20 +195,108 @@ rowsData : [
     }
     if (isDataAlready) {
       for (let k = 0; k < searchData.length; k++) {
-          if (phone && searchData[k]["phone"].includes(phone)) {
+        if (phone && searchData[k]["phone"].includes(phone)) {
+          alreadystoredata.push(searchData[k])
+        }
+        else if (firstName && searchData[k]["name"].toLowerCase().includes(firstName.toLowerCase())) {
+          if (age && searchData[k]["age"].includes(age)) {
+            alreadystoredata = [];
             alreadystoredata.push(searchData[k])
           }
-          else if (firstName && searchData[k]["name"].includes(firstName)) {
-              alreadystoredata.push(searchData[k])
+          else { 
+          alreadystoredata.push(searchData[k])
           }
+        }
+
       }
       if (alreadystoredata.length > 0) {
       this.setState({ searchData: alreadystoredata })
       this.setState({ isDataPresent: true })
       }
       else {
-          this.setState({ isDataPresent: false })
+      let param = firstName;
+      var username = "admin"
+      var password = "Admin123"
+      if (firstName) {
+        param = firstName
       }
+      if (phone) {
+        param = phone;
+      }
+      if (firstName && phone) {
+        param = phone
+      }
+      if (firstName || phone) {
+        this.setState({ nameData: false })
+        this.setState({ phoneData: false })
+
+        const headers = {
+          'Authorization': 'Basic ' + btoa(`${username}:${password}`),
+        };
+        const url = `https://ln3.hispindia.org/openmrs/ws/hisp/rest/patient_search?name=${param}`
+        axios
+          .get(url, { headers: headers })
+          .then((response) => {
+            this.setState({apihit:true})
+            var phone = '';
+            var searchdatanew = [];
+            var visitdate = ''
+            this.setState({ searchData: [] });
+            searchdatanew = this.state.searchData;
+            var storedata = [];
+
+            for (let i = 0; i < response.data.length; i++) {
+              var addressrarr = [];
+              searchdatanew.push(response.data)
+              let identifierid = searchdatanew[0][i]["identifier"];
+              let nameval = searchdatanew[0][i]["name"]
+              let genval = searchdatanew[0][i]["gender"]
+              let ageval = searchdatanew[0][i]["age"]
+              if (searchdatanew[0][i]["address"]) {
+                let addr1 = searchdatanew[0][i]["address"]["Address1"]
+                let addr2 = searchdatanew[0][i]["address"]["Address2"]
+                let district = searchdatanew[0][i]["address"]["City Village"]
+                let country = searchdatanew[0][i]["address"]["Country"]
+                let pincode = searchdatanew[0][i]["address"]["Postal Code"]
+                let statecode = searchdatanew[0][i]["address"]["State Province"]
+                // let addr = ho_no + " " + district + " - " + statecode + " " + country + " " + pincode
+                let addr = district + " - " + statecode
+                addressrarr.push(addr)
+              }
+              if (searchdatanew[0][i]["person_attributes"]) {
+                phone = searchdatanew[0][i]["person_attributes"]["Telephone Number"]
+              }
+              if (searchdatanew[0][i]["visit_date"] != undefined) {
+                visitdate = searchdatanew[0][i]["visit_date"]
+              }
+              else {
+                visitdate = "N-A"
+              }
+              let id = i
+
+              storedata.push(this.createData(identifierid, nameval, phone,
+                genval, ageval, addressrarr[0], visitdate, "", id
+              ))
+            }
+
+            if (storedata.length > 0) {
+              this.setState({ searchData: [] });
+              this.setState({ searchData: storedata })
+              this.setState({ isDataPresent: true })
+
+            }
+            else {
+              this.setState({ isDataPresent: false })
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      }
+      else {
+        this.setState({ nameData: true })
+        this.setState({ phoneData: true })
+      }      }
     }
     else {
       let param = firstName;
@@ -233,6 +322,7 @@ rowsData : [
         axios
           .get(url, { headers: headers })
           .then((response) => {
+            this.setState({apihit:true})
             var phone = '';
             var searchdatanew = [];
             var visitdate = ''
@@ -298,8 +388,8 @@ rowsData : [
     const { classes } = this.state;
     const isDataPresent = this.state.isDataPresent;
     const searchdat = this.state.searchData
-    console.log("This type typeof ", searchdat)
-    
+    console.log(isDataPresent)
+    console.log(this.state.apihit)
     if (isDataPresent) {
           return (
             <React.Fragment>  
@@ -585,7 +675,14 @@ rowsData : [
                 </Grid>
               </form>
             </div>
-          </Container>   
+              </Container>  
+              <br></br>
+              {this.state.apihit &&
+              <Typography variant="overline" display="block" gutterBottom>
+                No Results Found
+      </Typography>
+      }
+
 
         </React.Fragment>
 
