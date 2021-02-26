@@ -121,8 +121,8 @@ class PatientSearch extends Component {
     
   columnsNew : [
   { field: 'identifier', headerName: 'Patiend ID', width: 150 },
-  { field: 'name', headerName: 'Name', width: 230 },
-    { field: 'phone', headerName: 'Phone', width: 120 },
+  { field: 'name', headerName: 'Name', width: 200 },
+    { field: 'phone', headerName: 'Phone', width: 115 },
     {
     field: 'gender',
     headerName: 'Gender',
@@ -133,7 +133,7 @@ class PatientSearch extends Component {
     field: 'age',
     headerName: 'Age',
     type: 'number',
-    width: 80,
+    width: 70,
     },
     {
     field: 'address',
@@ -152,7 +152,19 @@ class PatientSearch extends Component {
     field: 'action',
     headerName: 'Action',
     type: 'string',
-    width: 200,
+    width: 100,
+    renderCell: () => (
+      <strong>
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          style={{ marginLeft: 16 }}
+        >
+          Action
+        </Button>
+      </strong>
+    ),
   },
 
 
@@ -197,6 +209,7 @@ rowsData : [
       for (let k = 0; k < searchData.length; k++) {
         if (phone && searchData[k]["phone"].includes(phone)) {
           alreadystoredata.push(searchData[k])
+          break;
         }
         else if (firstName && searchData[k]["name"].toLowerCase().includes(firstName.toLowerCase())) {
           if (age && searchData[k]["age"].includes(age)) {
