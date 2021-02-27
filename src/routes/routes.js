@@ -9,6 +9,7 @@ import {
   Billing,
   UserProfile,
 } from "../pages";
+import ProviderScheduling from "../pages/ProviderScheduling";
 
 /**
  * list of available routes for the entire application.
@@ -29,7 +30,7 @@ export const appRoutes = [
     roles: [
       "System Developer",
       "Organizational: Registration clerk",
-      "Application: Registers patients",
+      "Application: Registers Patients",
       "Application: Schedules appointments",
       "Application: Sees appointment schedule",
     ],
@@ -130,6 +131,15 @@ export const appRoutes = [
     visibleOnSidebar: false,
     icon: "",
     component: UserProfile,
+    layout: "/app",
+  },
+  {
+    path: "/schedule-provider",
+    title: "Provider Schedule",
+    roles: ["*"],
+    visibleOnSidebar: true,
+    icon: "fa fa-calendar-alt",
+    component: ProviderScheduling,
     layout: "/app",
   },
 ];

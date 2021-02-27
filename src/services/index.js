@@ -1,29 +1,24 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import { JSESSIONID } from "../utils/constants";
-
-const BASE_URI_PROD = "https://ln3.hispindia.org/openmrs/ws/rest/v1";
-const BASE_URI_DEV = "http://localhost:8080/openmrs-new/ws/rest/v1";
+import { JSESSIONID, BASE_URL } from "../utils/constants";
 
 export function getAPI(endpoint, authorization = Cookies.get(JSESSIONID)) {
   const config = {
-    // signal: signal,
     headers: {
       Authorization: authorization,
     },
   };
-  return axios.get(BASE_URI_PROD + endpoint, config);
+  return axios.get(BASE_URL + endpoint, config);
 }
 
-export function getImageAPI(endpoint, signal, authorization = Cookies.get(JSESSIONID)) {
+export function getImageAPI(endpoint, authorization = Cookies.get(JSESSIONID)) {
   const config = {
-    signal: signal,
     responseType: "blob",
     headers: {
       Authorization: authorization,
     },
   };
-  return axios.get(BASE_URI_PROD + endpoint, config);
+  return axios.get(BASE_URL + endpoint, config);
 }
 
 export function postAPI(
@@ -36,5 +31,5 @@ export function postAPI(
       Authorization: authorization,
     },
   };
-  return axios.post(BASE_URI_PROD + endpoint, data, config);
+  return axios.post(BASE_URL + endpoint, data, config);
 }
