@@ -52,7 +52,7 @@ export default function PatientSearch(props) {
   var [apihit, setapihit] = useState(false);
 
   const columns = [
-    { field: 'identifier', headerName: 'Patiend ID', width: 150 },
+    { field: 'identifier', headerName: 'Patiend ID', width: 120 },
     { field: 'name', headerName: 'Name', width: 200 },
     { field: 'phone', headerName: 'Phone', width: 115 },
     {
@@ -416,6 +416,7 @@ export default function PatientSearch(props) {
                     setsearchDetails({ ...searchDetails, phone: e.target.value })
                   }
                   value={searchDetails.phone}
+                  className="phoneID"
                 />
               </Grid>
               <Grid item sm={3} >
@@ -434,6 +435,7 @@ export default function PatientSearch(props) {
                     setsearchDetails({ ...searchDetails, firstName: e.target.value })
                   }
                   value={classes.firstName}
+                  className="firstName"
                 />
               </Grid>
               <Grid item xs={3} >
@@ -448,6 +450,7 @@ export default function PatientSearch(props) {
                     setsearchDetails({ ...searchDetails, lastName: e.target.value })
                   }
                   value={classes.lastName}
+                  className="lastName"
                 />
               </Grid>
 
@@ -463,6 +466,7 @@ export default function PatientSearch(props) {
                     setsearchDetails({ ...searchDetails, age: e.target.value })
                   }
                   value={classes.age}
+                  className="age"
                 />
               </Grid>
               <Grid item xs={4}>
@@ -521,7 +525,7 @@ export default function PatientSearch(props) {
         </div>
         <br></br>
 <div style={{ height: 500, width: '100%' }}>
-      <DataGrid rowHeight={40} wrap="wrap" rows={searchdat} columns={columns} pageSize={10} density="standard" />
+      <DataGrid rowHeight={40} wrap="wrap" rows={searchdat} columns={columns} pageSize={10} density="compact" />
     </div>
       </Container>
       
@@ -552,6 +556,7 @@ export default function PatientSearch(props) {
                     setsearchDetails({ ...searchDetails, phone: e.target.value })
                   }
                   value={searchDetails.phone}
+                  className="phoneID"
                 />
               </Grid>
               <Grid item sm={3} >
@@ -570,6 +575,7 @@ export default function PatientSearch(props) {
                     setsearchDetails({ ...searchDetails, firstName: e.target.value })
                   }
                   value={classes.firstName}
+                  className="firstName"
                 />
               </Grid>
               <Grid item xs={3} >
@@ -584,6 +590,7 @@ export default function PatientSearch(props) {
                     setsearchDetails({ ...searchDetails, lastName: e.target.value })
                   }
                   value={classes.lastName}
+                  className="lastName"
                 />
               </Grid>
 
@@ -599,6 +606,7 @@ export default function PatientSearch(props) {
                     setsearchDetails({ ...searchDetails, age: e.target.value })
                   }
                   value={classes.age}
+                  className="age"
                 />
               </Grid>
               <Grid item xs={4}>
