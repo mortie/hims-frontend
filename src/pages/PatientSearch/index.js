@@ -55,7 +55,7 @@ export default function PatientSearch(props) {
   var [apihit, setapihit] = useState(false);
 
   const columns = [
-    { field: "identifier", headerName: "Patiend ID", width: 150 },
+    { field: "identifier", headerName: "Patiend ID", width: 120 },
     { field: "name", headerName: "Name", width: 200 },
     { field: "phone", headerName: "Phone", width: 115 },
     {
