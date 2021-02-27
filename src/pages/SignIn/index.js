@@ -33,11 +33,11 @@ export default function SignIn(props) {
   const [loginError, setLoginError] = useState(false);
   const [errors, setErrors] = useState({ usr: true, pwd: true });
 
-  useEffect(() => {
-    if (localStorage.getItem("rememberMe") && localStorage.getItem("username") !== "" && localStorage.getItem("password") !==) {
+  // useEffect(() => {
+  //   if (localStorage.getItem("rememberMe") && localStorage.getItem("username") !== "" && localStorage.getItem("password") !==) {
       
-    }
-  }, []);
+  //   }
+  // }, []);
 
   const submitForm = (e) => {
     e.preventDefault();
@@ -141,7 +141,7 @@ export default function SignIn(props) {
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
-              checked={}
+              checked={loginDetails.remember}
               label="Remember me"
             />
             <div className={classes.wrapper}>

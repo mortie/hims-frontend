@@ -40,17 +40,22 @@ const StyledMenuItem = withStyles((theme) => ({
   },
 }))(MenuItem);
 
-export default function CustomizedMenus() {
+export default function CustomizedMenus(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+    const handleClose = () => {
+      
     setAnchorEl(null);
   };
 
+    const gotopage = (event) => {
+console.log("BUTTON CLICKED")
+
+    }
   return (
     <div>
       <Button
@@ -69,10 +74,11 @@ export default function CustomizedMenus() {
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
+        onClick={gotopage}      
       >
         <StyledMenuItem>
           <ListItemIcon>
-            <AddCircleOutlineIcon fontSize="small" />
+            <AddCircleOutlineIcon fontSize="small" className="AddCirclebtm" />
           </ListItemIcon>
         </StyledMenuItem>
         <StyledMenuItem>
