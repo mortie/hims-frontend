@@ -15,3 +15,16 @@
 body {
   background-color: ghostwhite !important;
 }
+.phoneID > div > input,
+.firstName > div > input,
+.lastName > div > input,
+.age > div > input {
+  padding: 6px 2px 10.5px 8px !important;
+}
+.phoneID > label#phone-label,
+.firstName > label#firstName-label,
+.lastName > label#lastName-label,
+.age > label#age-label {
+  font-size: 11px;
+  top: -7px;
+}
