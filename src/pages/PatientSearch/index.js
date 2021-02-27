@@ -85,9 +85,9 @@ export default function PatientSearch(props) {
       headerName: 'Action',
       type: 'string',
       width: 80,
-      renderCell: () => (
+      renderCell: (params) => (
         <strong>
-          <CustomizedMenus/>
+          <CustomizedMenus patiendData={params}/>
         </strong>
       ),
     },
@@ -521,7 +521,7 @@ export default function PatientSearch(props) {
         </div>
         <br></br>
 <div style={{ height: 500, width: '100%' }}>
-      <DataGrid rowHeight={40} wrap="wrap" rows={searchdat} columns={columns} pageSize={10} />
+      <DataGrid rowHeight={40} wrap="wrap" rows={searchdat} columns={columns} pageSize={10} density="standard" />
     </div>
       </Container>
       
