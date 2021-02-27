@@ -439,6 +439,7 @@ export default function PatientSearch(props) {
                     })
                   }
                   value={searchDetails.phone}
+                  className="phoneID"
                 />
               </Grid>
               <Grid item sm={3}>
@@ -462,6 +463,7 @@ export default function PatientSearch(props) {
                     })
                   }
                   value={classes.firstName}
+                  className="firstName"
                 />
               </Grid>
               <Grid item xs={3}>
@@ -479,6 +481,7 @@ export default function PatientSearch(props) {
                     })
                   }
                   value={classes.lastName}
+                  className="lastName"
                 />
               </Grid>
 
@@ -494,6 +497,7 @@ export default function PatientSearch(props) {
                     setsearchDetails({ ...searchDetails, age: e.target.value })
                   }
                   value={classes.age}
+                  className="age"
                 />
               </Grid>
               <Grid item xs={4}>
@@ -602,6 +606,7 @@ export default function PatientSearch(props) {
                     })
                   }
                   value={searchDetails.phone}
+                  className="phoneID"
                 />
               </Grid>
               <Grid item sm={3}>
@@ -625,6 +630,7 @@ export default function PatientSearch(props) {
                     })
                   }
                   value={classes.firstName}
+                  className="firstName"
                 />
               </Grid>
               <Grid item xs={3}>
@@ -642,6 +648,7 @@ export default function PatientSearch(props) {
                     })
                   }
                   value={classes.lastName}
+                  className="lastName"
                 />
               </Grid>
 
@@ -657,6 +664,7 @@ export default function PatientSearch(props) {
                     setsearchDetails({ ...searchDetails, age: e.target.value })
                   }
                   value={classes.age}
+                  className="age"
                 />
               </Grid>
               <Grid item xs={4}>
