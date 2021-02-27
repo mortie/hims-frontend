@@ -14,7 +14,7 @@ const useStyles = makeStyles(styles);
 
 export default function CardAvatar(props) {
   const classes = useStyles();
-  const avatar = useSelector((state) => state.avatar);
+  const avatar = useSelector((state) => state.avatar.avatar);
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const { className, small, profile, ...rest } = props;

@@ -13,15 +13,11 @@ const useStyles = makeStyles(styles);
 
 function UserAvatar(props) {
   const classes = useStyles();
-  const avatar = useSelector((state) => state.avatar);
+  const avatar = useSelector((state) => state.avatar.avatar);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const abortController = new AbortController();
-    getImageAPI(
-      `/personimage/${getAuthenticatedUser().person.uuid}`,
-      abortController.signal
-    )
+    getImageAPI(`/personimage/${getAuthenticatedUser().person.uuid}`)
       .then((response) => {
         const url = URL.createObjectURL(response.data);
         dispatch(addAvatar(url));
@@ -29,10 +25,7 @@ function UserAvatar(props) {
       .catch((e) => {
         dispatch(addAvatar(null));
       });
-    return () => {
-      abortController.abort();
-    };
-  }, [dispatch]);
+  }, []);
   return (
     <div className={clsx(classes.root, classes.flexRow)}>
       <Avatar src={avatar} alt={getAuthenticatedUser().display}>

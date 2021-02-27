@@ -6,6 +6,8 @@ import {
   Button,
   CssBaseline,
   TextField,
+  FormControlLabel,
+  Checkbox,
   Link,
   Typography,
   makeStyles,
@@ -25,16 +27,16 @@ export default function SignIn(props) {
   const [loginDetails, setLoginDetails] = useState({
     username: "",
     password: "",
+    remember: false
   });
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [errors, setErrors] = useState({ usr: true, pwd: true });
-  // const timer = useRef();
 
   // useEffect(() => {
-  //   return () => {
-  //     clearTimeout(timer.current);
-  //   };
+  //   if (localStorage.getItem("rememberMe") && localStorage.getItem("username") !== "" && localStorage.getItem("password") !==) {
+      
+  //   }
   // }, []);
 
   const submitForm = (e) => {
@@ -42,7 +44,6 @@ export default function SignIn(props) {
 
     if (validateForm()) {
       setLoading(true);
-      // timer.current = window.setTimeout(() => {
       getAPI(
         "/session",
         decrypt(
@@ -70,7 +71,6 @@ export default function SignIn(props) {
           setLoading(false);
           console.log(e);
         });
-      // }, 2000);
     }
   };
 
@@ -138,6 +138,11 @@ export default function SignIn(props) {
               onChange={(e) =>
                 setLoginDetails({ ...loginDetails, password: e.target.value })
               }
+            />
+            <FormControlLabel
+              control={<Checkbox value="remember" color="primary" />}
+              checked={loginDetails.remember}
+              label="Remember me"
             />
             <div className={classes.wrapper}>
               <Button

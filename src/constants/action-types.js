@@ -1,2 +1,5 @@
 export const ADD_AVATAR = "ADD_AVATAR";
 export const REMVOE_AVATAR = "REMOVE_AVATAR";
+export const ADD_PROVIDERS = "ADD_PROVIDERS";
+export const ADD_LOCATIONS = "ADD_LOCATIONS";
+export const ADD_SERVICES = "ADD_SERVICES";

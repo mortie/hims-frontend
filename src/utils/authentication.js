@@ -65,7 +65,7 @@ export const getAuthenticatedUser = () => {
  */
 export const hasAccess = (roles) => {
   let found = false;
-  getAuthenticatedUser().roles.forEach((role) => {
+  getAuthenticatedUser()?.roles.forEach((role) => {
     if (roles.includes(role.name) || roles.includes("*")) {
       found = true;
     }
