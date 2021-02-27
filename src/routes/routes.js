@@ -8,8 +8,8 @@ import {
   Laboratory,
   Billing,
   UserProfile,
+  ProviderScheduling,
 } from "../pages";
-import ProviderScheduling from "../pages/ProviderScheduling";
 
 /**
  * list of available routes for the entire application.

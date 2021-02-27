@@ -8,6 +8,7 @@ import Pharmacy from "./Pharmacy";
 import Radiology from "./Radiology";
 import SignIn from "./SignIn";
 import UserProfile from "./UserProfile";
+import ProviderScheduling from "./ProviderScheduling";
 
 export {
   Billing,
@@ -20,4 +21,5 @@ export {
   Radiology,
   SignIn,
   UserProfile,
+  ProviderScheduling,
 };
