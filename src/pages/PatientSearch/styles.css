@@ -1,14 +1,11 @@
 .SearchIcon {
   padding-left: 50%;
 }
-.MuiTypography-h5 {
-  font-weight: 600 !important;
-  margin-top: 10px !important;
-}
-.MuiFormGroup-root {
+
+.gendergroup {
   display: inline !important;
 }
-.MuiTypography-displayBlock {
+.genderLabel {
   display: inline !important;
   line-height: 2.66 !important;
 }

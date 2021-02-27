@@ -1,6 +1,6 @@
 const patientSearchStyles = (theme) => ({
     paper: {
-        marginTop: theme.spacing(10),
+        marginTop: theme.spacing(1),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -17,5 +17,21 @@ const patientSearchStyles = (theme) => ({
         margin: theme.spacing(3, 0, 2),
 
     },
+                    container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: 200,
+        },
+    root: {
+    width: '92%',
+    marginLeft:'4%'
+  },
+  containerTable: {
+    maxHeight: 440,
+  },
 });
 export default patientSearchStyles;
