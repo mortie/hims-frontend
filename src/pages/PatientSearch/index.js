@@ -498,7 +498,7 @@ export default function PatientSearch(props) {
               <Grid item xs={4}>
                 <TextField
                   id="date"
-                  label="Late visited"
+                  label="Last visited"
                   type="date"
                   defaultValue=""
                   className={classes.textField}
@@ -638,7 +638,7 @@ export default function PatientSearch(props) {
               <Grid item xs={4}>
                 <TextField
                   id="date"
-                  label="Late visited"
+                  label="Last visited"
                   type="date"
                   defaultValue=""
                   className={classes.textField}
