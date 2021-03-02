@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { getAPI } from "../../services";
 import { login, encrypt, decrypt, getRandomNumber } from "../../utils";
+import { REMEMBER_ME } from "../../utils/constants";
 import {
   Avatar,
   Button,
@@ -27,17 +28,25 @@ export default function SignIn(props) {
   const [loginDetails, setLoginDetails] = useState({
     username: "",
     password: "",
-    remember: false
+    remember: false,
   });
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [errors, setErrors] = useState({ usr: true, pwd: true });
 
-  // useEffect(() => {
-  //   if (localStorage.getItem("rememberMe") && localStorage.getItem("username") !== "" && localStorage.getItem("password") !==) {
-      
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (localStorage.getItem(REMEMBER_ME)) {
+      try {
+        const jsonLoginDetails = JSON.parse(localStorage.getItem(REMEMBER_ME));
+        setLoginDetails({
+          ...jsonLoginDetails,
+          password: atob(decrypt(jsonLoginDetails?.password).slice(6)),
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }, []);
 
   const submitForm = (e) => {
     e.preventDefault();
@@ -56,6 +65,18 @@ export default function SignIn(props) {
         .then((response) => {
           setLoading(false);
           if (response.data.authenticated) {
+            if (loginDetails.remember) {
+              localStorage.setItem(
+                REMEMBER_ME,
+                JSON.stringify({
+                  ...loginDetails,
+                  password: encrypt(loginDetails.password),
+                })
+              );
+            } else {
+              localStorage.removeItem(REMEMBER_ME);
+            }
+
             login(
               response.data.user,
               response.config.headers.Authorization,
@@ -142,6 +163,12 @@ export default function SignIn(props) {
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               checked={loginDetails.remember}
+              onChange={(e) =>
+                setLoginDetails({
+                  ...loginDetails,
+                  remember: !loginDetails.remember,
+                })
+              }
               label="Remember me"
             />
             <div className={classes.wrapper}>
