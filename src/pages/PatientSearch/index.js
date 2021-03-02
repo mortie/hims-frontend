@@ -41,14 +41,14 @@ export default function PatientSearch(props) {
   var [searchDetails, setsearchDetails] = useState({
     phone: "",
     firstName: "",
-    lastName: "",
+    identifier: "",
     age: 0,
     gender: "",
     lvd: "",
   });
   var [searchData, setsearchData] = useState([]);
   var [loading, setLoading] = useState(false);
-  var [errors, setErrors] = useState({ phoneData: true, nameData: true });
+  var [errors, setErrors] = useState({ phoneData: true, nameData: true,identifierData:true });
   var [isDataPresent, setisDataPresent] = useState(false);
   var [phoneData, setphoneData] = useState(false);
   var [nameData, setnameData] = useState(false);
@@ -100,13 +100,18 @@ export default function PatientSearch(props) {
     setErrors({
       phoneData: !searchDetails.phone ? false : true,
       nameData: !searchDetails.firstName ? false : true,
+      identifierData:!searchDetails.identifier?false:true,
     });
 
     if (searchDetails.phone) {
       return false;
     } else if (searchDetails.firstName) {
       return false;
-    } else {
+    }
+    else if (searchDetails.identifier) {
+      return false;
+    }
+    else {
       return true;
     }
   };
@@ -144,11 +149,11 @@ export default function PatientSearch(props) {
     validateForm();
 
     let firstName = searchDetails.firstName.toUpperCase();
-    const phone = searchDetails.phone;
-    const lastName = searchDetails.lastName;
-    const age = searchDetails.age;
-    const gender = searchDetails.gender;
-    const lvd = searchDetails.lvd;
+    let phone = searchDetails.phone;
+    let identifier = searchDetails.identifier;
+    let age = searchDetails.age;
+    let gender = searchDetails.gender;
+    let lvd = searchDetails.lvd;
 
     let searchDataAlready = searchData;
 
@@ -190,7 +195,10 @@ export default function PatientSearch(props) {
         if (firstName && phone) {
           param = phone;
         }
-        if (firstName || phone) {
+        if (identifier) {
+          param = identifier;
+        }
+        if (firstName || phone || identifier) {
           setnameData(false);
           setphoneData(false);
 
@@ -306,7 +314,10 @@ export default function PatientSearch(props) {
       if (firstName && phone) {
         param = phone;
       }
-      if (firstName || phone) {
+      if (identifier) {
+        param = identifier
+      }
+      if (firstName || phone || identifier) {
         setnameData(false);
         setphoneData(false);
 
@@ -470,18 +481,18 @@ export default function PatientSearch(props) {
                 <TextField
                   variant="outlined"
                   fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
+                  id="identifier"
+                  label="Identifier"
+                  name="identifier"
                   autoComplete="lname"
                   onChange={(e) =>
                     setsearchDetails({
                       ...searchDetails,
-                      lastName: e.target.value,
+                      identifier: e.target.value,
                     })
                   }
-                  value={classes.lastName}
-                  className="lastName"
+                  value={classes.identifier}
+                  className="identifier"
                 />
               </Grid>
 
@@ -586,10 +597,11 @@ export default function PatientSearch(props) {
             <Grid container spacing={2}>
               <Grid item xs={3}>
                 <TextField
-                  error={!errors.phoneData && !errors.nameData}
+                  error={!errors.phoneData && !errors.nameData && !errors.identifierData }
                   helperText={
                     !errors.phoneData &&
                     !errors.nameData &&
+                    !errors.identifierData &&
                     "Phone is required!"
                   }
                   variant="outlined"
@@ -611,9 +623,9 @@ export default function PatientSearch(props) {
               </Grid>
               <Grid item sm={3}>
                 <TextField
-                  error={!errors.phoneData && !errors.nameData}
+                  error={!errors.phoneData && !errors.nameData && !errors.identifierData}
                   helperText={
-                    !errors.phoneData && !errors.nameData && "Name is required!"
+                    !errors.phoneData && !errors.nameData && !errors.identifierData && "Name is required!"
                   }
                   autoComplete="fname"
                   name="firstName"
@@ -621,7 +633,7 @@ export default function PatientSearch(props) {
                   required
                   fullWidth
                   id="firstName"
-                  label="First Name/Identifier"
+                  label="Name"
                   autoFocus
                   onChange={(e) =>
                     setsearchDetails({
@@ -635,20 +647,24 @@ export default function PatientSearch(props) {
               </Grid>
               <Grid item xs={3}>
                 <TextField
+                  error={!errors.phoneData && !errors.nameData && !errors.identifierData}
+                  helperText={
+                    !errors.phoneData && !errors.nameData && !errors.identifierData && "Identifier is required!"
+                  }
                   variant="outlined"
                   fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
+                  id="identifier"
+                  label="Identifier"
+                  name="identifier"
                   autoComplete="lname"
                   onChange={(e) =>
                     setsearchDetails({
                       ...searchDetails,
-                      lastName: e.target.value,
+                      identifier: e.target.value,
                     })
                   }
-                  value={classes.lastName}
-                  className="lastName"
+                  value={classes.identifier}
+                  className="identifier"
                 />
               </Grid>
 
