@@ -32,5 +32,18 @@ const patientSearchStyles = (theme) => ({
   containerTable: {
     maxHeight: 440,
   },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
+  rootage: {
+    width: 300,
+  },
+  input: {
+    width: 42,
+  },
 });
 export default patientSearchStyles;

@@ -430,10 +430,10 @@ export default function PatientSearch(props) {
             <Grid container spacing={2}>
               <Grid item xs={3}>
                 <TextField
-                  error={!errors.phoneData && !errors.nameData}
+                  error={!errors.phoneData && !errors.nameData && !errors.identifierData}
                   helperText={
                     !errors.phoneData &&
-                    !errors.nameData &&
+                    !errors.nameData && !errors.identifierData &&
                     "Phone is required!"
                   }
                   variant="outlined"
@@ -455,9 +455,9 @@ export default function PatientSearch(props) {
               </Grid>
               <Grid item sm={3}>
                 <TextField
-                  error={!errors.phoneData && !errors.nameData}
+                  error={!errors.phoneData && !errors.nameData  && !errors.identifierData }
                   helperText={
-                    !errors.phoneData && !errors.nameData && "Name is required!"
+                    !errors.phoneData && !errors.nameData && !errors.identifierData && "Name is required!"
                   }
                   autoComplete="fname"
                   name="firstName"
