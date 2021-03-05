@@ -1,4 +1,4 @@
-import { ADD_LOCATIONS } from "../constants/action-types";
+import { FETCH_LOCATIONS } from "../constants/action-types";
 
 const initialState = {
   locations: null,
@@ -6,7 +6,7 @@ const initialState = {
 
 function locationReducer(state = initialState, action) {
   switch (action.type) {
-    case ADD_LOCATIONS:
+    case FETCH_LOCATIONS:
       state.locations = action.payload;
       return state;
     default:

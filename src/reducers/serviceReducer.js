@@ -1,4 +1,4 @@
-import { ADD_SERVICES } from "../constants/action-types";
+import { FETCH_SERVICES } from "../constants/action-types";
 
 const initialState = {
   services: null
@@ -6,7 +6,7 @@ const initialState = {
 
 function serviceReducer(state = initialState, action) {
   switch (action.type) {
-    case ADD_SERVICES:
+    case FETCH_SERVICES:
       state.services = action.payload;
       return state;
     default:

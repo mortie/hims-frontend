@@ -12,6 +12,7 @@ import { logout, hasAccess } from "../../utils";
 import { appRoutes as routes } from "../../routes";
 import { AppBar, SideBar, Footer } from "../../components";
 import styles from "./styles";
+import { deleteAPI } from "../../services";
 
 const useStyles = makeStyles(styles);
 
@@ -26,7 +27,7 @@ function App({ ...rest }) {
   };
 
   const handleLogout = () => {
-    logout(history);
+    deleteAPI("/loginaudit").then((response) => logout(history));
   };
 
   const switchRoutes = (

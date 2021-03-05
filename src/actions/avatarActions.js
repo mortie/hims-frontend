@@ -1,7 +1,7 @@
-import { ADD_AVATAR, REMVOE_AVATAR } from "../constants/action-types";
+import { FETCH_AVATAR, REMVOE_AVATAR } from "../constants/action-types";
 
 export function addAvatar(payload) {
-  return { type: ADD_AVATAR, payload };
+  return { type: FETCH_AVATAR, payload };
 }
 
 export function removeAvatar() {

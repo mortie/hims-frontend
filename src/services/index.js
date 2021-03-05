@@ -33,3 +33,13 @@ export function postAPI(
   };
   return axios.post(BASE_URL + endpoint, data, config);
 }
+
+
+export function deleteAPI(endpoint, authorization = Cookies.get(JSESSIONID)) {
+  const config = {
+    headers: {
+      Authorization: authorization,
+    },
+  };
+  return axios.delete(BASE_URL + endpoint, config);
+}

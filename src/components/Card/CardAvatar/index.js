@@ -27,7 +27,7 @@ export default function CardAvatar(props) {
 
   function uploadImage(img) {
     const data = {
-      person: getAuthenticatedUser().person.uuid,
+      person: getAuthenticatedUser()?.person.uuid,
       base64EncodedImage: img.base64.split(",")[1],
     };
     postAPI(`/personimage`, data)
