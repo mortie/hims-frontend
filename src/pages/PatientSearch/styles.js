@@ -40,7 +40,7 @@ const patientSearchStyles = (theme) => ({
     marginTop: theme.spacing(2),
   },
   rootage: {
-    width: 300,
+    width: 200,
   },
   input: {
     width: 42,
