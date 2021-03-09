@@ -48,13 +48,13 @@ export default function PatientSearch(props) {
     phone: "",
     firstName: "",
     identifier: "",
-    age: 0,
+    age: "",
     gender: "",
     lvd: "",
   });
   var [searchData, setsearchData] = useState([]);
-  var [minage, setminage] = useState();
-  var [maxage, setmaxage] = useState();
+  var [minage, setminage] = useState(1);
+  var [maxage, setmaxage] = useState(100);
   var [loading, setLoading] = useState(false);
   var [errors, setErrors] = useState({ phoneData: true, nameData: true,identifierData:true });
   var [isDataPresent, setisDataPresent] = useState(false);
@@ -124,20 +124,28 @@ export default function PatientSearch(props) {
   };
 
   const handleInputChange = (event) => {
+    var ageRange = 5;
+    var ageMin = 0;
+    var ageMax = 10;
+    var handleValues = Number(event.target.value);
+    setsearchDetails({
+      ...searchDetails,
+      age: handleValues === '' ? '' : handleValues,
+    })
+    setminage(handleValues - 5)
+    setmaxage(handleValues + 5)
+    if ((handleValues - 5) < 0) {
+      setminage(1);
+    }
+    
 
-                            setsearchDetails({
-                      ...searchDetails,
-                      age: event.target.value === '' ? '' : Number(event.target.value),
-                    })
-    // setminage(Number(event.target.value) - 5)
-    // setmaxage(Number(event.target.value) + 5)
   };
 
   const handleBlur = () => {
-    if (searchDetails.age < 0) {
+    if (searchDetails.age <= 0) {
                  setsearchDetails({
                       ...searchDetails,
-                      age: 0,
+                      age: 1,
                     })
     } else if (searchDetails.age > 100) {
                  setsearchDetails({
@@ -1149,6 +1157,7 @@ export default function PatientSearch(props) {
                   name="lvd"
                   defaultValue=""
                   className={classes.textField}
+                  maxDate={new Date()}
                   InputLabelProps={{
                     shrink: true,
                   }}
