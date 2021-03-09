@@ -6,7 +6,7 @@ import { PublicRoute, PrivateRoute } from "./routes";
 import App from "./layouts/App";
 import SignIn from "./pages/SignIn";
 import "./assets/css/styles.css";
-import store from "./store";
+import { store } from "./store";
 
 ReactDOM.render(
   <React.StrictMode>

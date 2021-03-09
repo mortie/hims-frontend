@@ -1,5 +1,5 @@
-import { ADD_SERVICES } from "../constants/action-types";
+import { FETCH_SERVICES } from "../constants/action-types";
 
 export function addServices(payload) {
-  return { type: ADD_SERVICES, payload };
+  return { type: FETCH_SERVICES, payload };
 }

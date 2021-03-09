@@ -1,4 +1,4 @@
-import { ADD_PROVIDERS } from "../constants/action-types";
+import { FETCH_PROVIDERS } from "../constants/action-types";
 
 const initialState = {
   providers: null
@@ -6,7 +6,7 @@ const initialState = {
 
 function providersReducer(state = initialState, action) {
   switch (action.type) {
-    case ADD_PROVIDERS:
+    case FETCH_PROVIDERS:
       state.providers = action.payload;
       return state;
     default:

@@ -54,7 +54,7 @@ export default function SignIn(props) {
     if (validateForm()) {
       setLoading(true);
       getAPI(
-        "/session",
+        "/loginaudit",
         decrypt(
           encrypt(
             `${loginDetails.username}:${loginDetails.password}`,
