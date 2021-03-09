@@ -870,11 +870,14 @@ export default function PatientSearch(props) {
             <Grid container spacing={2}>
               <Grid item xs={3}>
                 <TextField
-                  error={!errors.phoneData && !errors.nameData && !errors.identifierData}
+                  error={(!errors.phoneData && !errors.nameData && !errors.identifierData)
+                  }
                   helperText={
-                    !errors.phoneData &&
+                    (!errors.phoneData &&
                     !errors.nameData && !errors.identifierData &&
-                    "Phone is required!"
+                      PhoneErrorMsj)
+                    ||
+                    (errors.phoneData && PhoneErrorMsj)
                   }
                   variant="outlined"
                   required
@@ -883,21 +886,20 @@ export default function PatientSearch(props) {
                   label="Phone"
                   name="phone"
                   autoComplete="phone"
-                  onChange={(e) =>
-                    setsearchDetails({
-                      ...searchDetails,
-                      phone: e.target.value,
-                    })
-                  }
-                  value={searchDetails.phone}
+                  onKeyUp={(e)=>searchOnKey(e,"phone","press")}
+                  value={classes.phone}
+
                   className="phoneID"
                 />
               </Grid>
               <Grid item sm={3}>
                 <TextField
-                  error={!errors.phoneData && !errors.nameData  && !errors.identifierData }
+                  error={(!errors.phoneData && !errors.nameData && !errors.identifierData)}
                   helperText={
-                    !errors.phoneData && !errors.nameData && !errors.identifierData && "Name is required!"
+                    (!errors.phoneData && !errors.nameData && !errors.identifierData && 
+                      NameErrorMsj) ||
+                    (errors.nameData && 
+                      NameErrorMsj)
                   }
                   autoComplete="fname"
                   name="firstName"
@@ -907,30 +909,26 @@ export default function PatientSearch(props) {
                   id="firstName"
                   label="Name"
                   autoFocus
-                  onChange={(e) =>
-                    setsearchDetails({
-                      ...searchDetails,
-                      firstName: e.target.value,
-                    })
-                  }
+                  onKeyUp={(e)=>searchOnKey(e,"firstName","press")}
                   value={classes.firstName}
                   className="firstName"
                 />
               </Grid>
               <Grid item xs={3}>
                 <TextField
+                  error={!errors.phoneData && !errors.nameData && !errors.identifierData}
+                  helperText={
+                    (!errors.phoneData && !errors.nameData && !errors.identifierData &&
+                      IdenErrorMsj) ||
+                    (errors.identifierData && IdenErrorMsj)
+                  }
                   variant="outlined"
                   fullWidth
                   id="identifier"
                   label="Identifier"
                   name="identifier"
                   autoComplete="lname"
-                  onChange={(e) =>
-                    setsearchDetails({
-                      ...searchDetails,
-                      identifier: e.target.value,
-                    })
-                  }
+                  onKeyUp={(e)=>searchOnKey(e,"identifier","press")}
                   value={classes.identifier}
                   className="identifier"
                 />
@@ -940,33 +938,19 @@ export default function PatientSearch(props) {
                   id="date"
                   label="Last visited"
                   type="date"
+                  name="lvd"
                   defaultValue=""
                   className={classes.textField}
+                  maxDate={new Date()}
                   InputLabelProps={{
                     shrink: true,
                   }}
-                  onChange={(e) =>
-                    setsearchDetails({ ...searchDetails, lvd: e.target.value })
-                  }
+                  onKeyUp={(e)=>searchOnKey(e,"lvd","press")}
+
                 />
               </Grid>
 
-              {/* <Grid item xs={3}>
-                <TextField
-                  variant="outlined"
-                  fullWidth
-                  id="age"
-                  label="Age"
-                  name="age"
-                  autoComplete="age"
-                  onChange={(e) =>
-                    setsearchDetails({ ...searchDetails, age: e.target.value })
-                  }
-                  value={classes.age}
-                  className="age"
-                />
-              </Grid> */}
-              <Grid item >
+            <Grid item >
 
             <Typography id="input-slider" variant="body2" display="block" gutterBottom>
             Age
@@ -1019,18 +1003,14 @@ export default function PatientSearch(props) {
                   gutterBottom
                   className="genderLabel"
                 >
-                  Gender &nbsp;
+                  Gender &nbsp;&nbsp;
                 </Typography>
                 <FormControl>
                   <RadioGroup
                     className="gendergroup"
                     value={classes.gender}
-                    onChange={(e) =>
-                      setsearchDetails({
-                        ...searchDetails,
-                        gender: e.target.value,
-                      })
-                    }
+                  onKeyUp={(e)=>searchOnKey(e,"gender","press")}
+
                   >
                     <FormControlLabel
                       control={<Radio />}
@@ -1056,14 +1036,22 @@ export default function PatientSearch(props) {
                 color="primary"
                 className="searchbtn"
                 size="small"
-                onClick={() => search()}
+                onClick={(e) => searchOnKey(e,{searchDetails},"clicked")}
               >
                 Search
               </Button>
             </Grid>
           </form>
+          <br></br>
+          {loading && (
+            <CircularProgress size={24} className={classes.buttonProgress} />
+          )}
         </div>
-        <br></br>
+        {apihit && (
+          <Typography variant="overline" display="block" gutterBottom>
+            No Results Found
+          </Typography>
+        )}
         <div style={{ height: 500, width: "100%" }}>
           <DataGrid
             rowHeight={40}
