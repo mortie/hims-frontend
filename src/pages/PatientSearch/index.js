@@ -110,9 +110,6 @@ export default function PatientSearch(props) {
     },
   ];
 
-  const validateForm = () => {
-
-  };
 
   const handleChange = (event, newValue) => {
                         setsearchDetails({
@@ -141,19 +138,7 @@ export default function PatientSearch(props) {
 
   };
 
-  const handleBlur = () => {
-    if (searchDetails.age <= 0) {
-                 setsearchDetails({
-                      ...searchDetails,
-                      age: 1,
-                    })
-    } else if (searchDetails.age > 100) {
-                 setsearchDetails({
-                      ...searchDetails,
-                      age: 100,
-                    })
-    }
-  };
+
 
   var isValueEntered = (event, name, eventName) => {
     var charLen = 2;
@@ -256,18 +241,23 @@ export default function PatientSearch(props) {
         
         return false
       }
+    }
+    else if (name == "gender" && eventName == "press") {
+            if ((searchDetails.phone && searchDetails.phone.length) > charLen ||
+        (searchDetails.firstName && searchDetails.firstName.length > charLen) ||
+        (searchDetails.identifier && searchDetails.identifier.length>charLen)) {
+              return true;
+      }    
     }     
-      
     else {
       return false;
     }
     
   }
 
-
   var multiFilter = (products, filters) => {
-    return products.filter((product) => {
-      return Object.entries(filters).every(([filterProperty, filterValues]) => {
+    var searchObj = products.filter((product) => {
+      var filterObj = Object.entries(filters).every(([filterProperty, filterValues]) => {
         switch (Object.prototype.toString.call(product[filterProperty])) {
           case "[object Object]":
             return Object.entries(filterValues).every(
@@ -287,7 +277,9 @@ export default function PatientSearch(props) {
             return filterValues.includes(product[filterProperty]);
         }
       });
+      return filterObj;
     });
+    return searchObj;
   };
 
   var filters = {};
@@ -331,14 +323,12 @@ export default function PatientSearch(props) {
 
   
   const searchOnKey = (event, name, eventName) => {
-
     setsearchDetails({
       ...searchDetails,
       [name]: event.target.value,
-    })
+    });
     
     if (isValueEntered(event,name, eventName)) {
-    validateForm();    
 
     setLoading(true);
 
@@ -602,7 +592,6 @@ export default function PatientSearch(props) {
   const search = (key) => {
     setLoading(true);
 
-    validateForm();
 
     if (searchDetails.firstName) {
       var firstName = searchDetails.firstName.toUpperCase();
@@ -981,7 +970,6 @@ export default function PatientSearch(props) {
             value={searchDetails.age}
             margin="dense"
             onChange={handleInputChange}
-            onBlur={handleBlur}
             inputProps={{
               step: 10,
               min: {minage},
@@ -1008,24 +996,24 @@ export default function PatientSearch(props) {
                 <FormControl>
                   <RadioGroup
                     className="gendergroup"
-                    value={classes.gender}
-                  onKeyUp={(e)=>searchOnKey(e,"gender","press")}
+                    value={searchDetails.gender}
+                  onChange={(e)=>searchOnKey(e,"gender","press")}
 
                   >
                     <FormControlLabel
                       control={<Radio />}
                       label="Female"
-                      value="f"
+                      value="F"
                     />
                     <FormControlLabel
                       control={<Radio />}
                       label="Male"
-                      value="m"
+                      value="M"
                     />
                     <FormControlLabel
                       control={<Radio />}
                       label="Other"
-                      value="o"
+                      value="O"
                     />
                   </RadioGroup>
                 </FormControl>
@@ -1185,7 +1173,6 @@ export default function PatientSearch(props) {
             value={searchDetails.age}
             margin="dense"
             onChange={handleInputChange}
-            onBlur={handleBlur}
             inputProps={{
               step: 10,
               min: {minage},
@@ -1212,24 +1199,24 @@ export default function PatientSearch(props) {
                 <FormControl>
                   <RadioGroup
                     className="gendergroup"
-                    value={classes.gender}
-                  onKeyUp={(e)=>searchOnKey(e,"gender","press")}
+                    value={searchDetails.gender}
+                  onChange={(e)=>searchOnKey(e,"gender","press")}
 
                   >
                     <FormControlLabel
                       control={<Radio />}
                       label="Female"
-                      value="f"
+                      value="F"
                     />
                     <FormControlLabel
                       control={<Radio />}
                       label="Male"
-                      value="m"
+                      value="M"
                     />
                     <FormControlLabel
                       control={<Radio />}
                       label="Other"
-                      value="o"
+                      value="O"
                     />
                   </RadioGroup>
                 </FormControl>
