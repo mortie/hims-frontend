@@ -847,7 +847,7 @@ export default function PatientSearch(props) {
                   autoComplete="phone"
                   onKeyUp={(e)=>searchOnKey(e,"phone","press")}
                   value={classes.phone}
-
+                  type = "number"
                   className="phoneID"
                 />
               </Grid>
