@@ -256,8 +256,8 @@ export default function PatientSearch(props) {
   }
 
   var multiFilter = (products, filters) => {
-    var searchObj = products.filter((product) => {
-      var filterObj = Object.entries(filters).every(([filterProperty, filterValues]) => {
+    return products.filter((product) => {
+      return Object.entries(filters).every(([filterProperty, filterValues]) => {
         switch (Object.prototype.toString.call(product[filterProperty])) {
           case "[object Object]":
             return Object.entries(filterValues).every(
@@ -274,12 +274,26 @@ export default function PatientSearch(props) {
               return filterValues.includes(productValue);
             });
           default:
-            return filterValues.includes(product[filterProperty]);
+            if (filterProperty != "name") {
+              console.log("compare this :", filterValues, " to ", product[filterProperty], "results :", filterValues.includes(product[filterProperty]))
+              return filterValues.includes(product[filterProperty]);
+            }
+            else{
+              var searchTokens = filterValues[0].split(" ");
+              var searchString = product[filterProperty];
+              var searchRegex = new RegExp(searchTokens.join('|'), 'g');
+              var numOfMatches = searchString.match(searchRegex);
+              console.log("compare this for Name :", filterValues, " to ", product[filterProperty], "results :", numOfMatches)
+              if (numOfMatches.length > 0) {
+                return true;
+              }
+              else {
+                return false;
+              }
+            }
         }
       });
-      return filterObj;
     });
-    return searchObj;
   };
 
   var filters = {};
@@ -339,7 +353,13 @@ export default function PatientSearch(props) {
     let phone = searchDetails.phone;
     let identifier = searchDetails.identifier;
     let age = searchDetails.age;
-    let gender = searchDetails.gender;
+    let gender = "";
+    if (name == "gender") {
+            gender = event.target.value;
+      }
+    else if (searchDetails.gender) {
+        gender = searchDetails.gender;
+    }
     let lvd = searchDetails.lvd;
 
     let searchDataAlready = searchData;
@@ -353,8 +373,13 @@ export default function PatientSearch(props) {
       if (age) {
         filters["age"] = [age];
       }
-      if (gender) {
-        filters["gender"] = [gender.toUpperCase()];
+      if (name == "gender") {
+        filters["gender"] = event.target.value;
+      }
+      else if (searchDetails.gender) {
+        if (searchDetails.gender) {
+          filters["gender"] = [searchDetails.gender.toUpperCase()];
+        }
       }
       if (firstName) {
         filters["name"] = [firstName.toUpperCase()];
@@ -582,267 +607,9 @@ export default function PatientSearch(props) {
         setLoading(false);
       }
     }
-  
-    }
-    
-
-
-
+     } 
   }
-  const search = (key) => {
-    setLoading(true);
 
-
-    if (searchDetails.firstName) {
-      var firstName = searchDetails.firstName.toUpperCase();
-    }
-    let phone = searchDetails.phone;
-    let identifier = searchDetails.identifier;
-    let age = searchDetails.age;
-    let gender = searchDetails.gender;
-    let lvd = searchDetails.lvd;
-
-    let searchDataAlready = searchData;
-
-    let isDataAlready = false;
-    let alreadystoredata = [];
-    if (searchDataAlready.length > 0 && isDataPresent == true) {
-      isDataAlready = true;
-    }
-    if (isDataAlready) {
-      if (age) {
-        filters["age"] = [age];
-      }
-      if (gender) {
-        filters["gender"] = [gender.toUpperCase()];
-      }
-      if (firstName) {
-        filters["name"] = [firstName.toUpperCase()];
-      }
-      if (phone) {
-        filters["phone"] = [phone];
-      }
-      let filterOutput = multiFilter(searchDataAlready, filters);
-      if (filterOutput.length > 0) {
-        alreadystoredata = filterOutput;
-      }
-      if (alreadystoredata.length > 0) {
-        setsearchData(alreadystoredata);
-        setisDataPresent(true);
-      } else {
-        let param = firstName;
-        var username = "admin";
-        var password = "Admin123";
-        param = checkData(param,firstName,phone,identifier,age)
-        if (firstName || phone || identifier) {
-          setnameData(false);
-          setphoneData(false);
-
-          const headers = {
-            Authorization: "Basic " + btoa(`${username}:${password}`),
-          };
-          const url = `https://ln3.hispindia.org/openmrs/ws/hisp/rest/patient_search?name=${param}`;
-          axios
-            .get(url, { headers: headers })
-            .then((response) => {
-              setapihit(true);
-              var phoneNo = "";
-              var searchdatanew = [];
-              var visitdate = "";
-              setsearchData([]);
-              var storedata = [];
-              // searchdatanew = searchData;
-
-              for (let i = 0; i < response.data.length; i++) {
-                var addressrarr = [];
-                searchdatanew.push(response.data);
-                let identifierid = searchdatanew[0][i]["identifier"];
-                let nameval = searchdatanew[0][i]["name"].toUpperCase();
-                let genval = searchdatanew[0][i]["gender"];
-                let ageval = searchdatanew[0][i]["age"];
-                if (searchdatanew[0][i]["address"]) {
-                  let addr1 = searchdatanew[0][i]["address"]["Address1"];
-                  let addr2 = searchdatanew[0][i]["address"]["Address2"];
-                  let district = searchdatanew[0][i]["address"]["City Village"];
-                  let country = searchdatanew[0][i]["address"]["Country"];
-                  let pincode = searchdatanew[0][i]["address"]["Postal Code"];
-                  let statecode =
-                    searchdatanew[0][i]["address"]["State Province"];
-                  // let addr = ho_no + " " + district + " - " + statecode + " " + country + " " + pincode
-                  let addr = district + " - " + statecode;
-                  addressrarr.push(addr);
-                }
-                if (searchdatanew[0][i]["person_attributes"]) {
-                  phoneNo =
-                    searchdatanew[0][i]["person_attributes"][
-                      "Telephone Number"
-                    ];
-                }
-                if (searchdatanew[0][i]["visit_date"] != undefined) {
-                  visitdate = searchdatanew[0][i]["visit_date"];
-                } else {
-                  visitdate = "N-A";
-                }
-                let id = i;
-
-                storedata.push(
-                  createData(
-                    identifierid,
-                    nameval,
-                    phoneNo,
-                    genval,
-                    ageval,
-                    addressrarr[0],
-                    visitdate,
-                    "",
-                    id
-                  )
-                );
-              }
-
-              if (storedata.length > 0) {
-                setsearchData([]);
-                if (age) {
-                  filters["age"] = [age];
-                }
-                if (gender) {
-                  filters["gender"] = [gender.toUpperCase()];
-                }
-                if (firstName) {
-                  filters["name"] = [firstName];
-                }
-                if (phone) {
-                  filters["phone"] = [phone];
-                }
-                let filterOutput = multiFilter(storedata, filters);
-                if (filterOutput.length > 0) {
-                  storedata = filterOutput;
-                  setsearchData(storedata);
-                } else {
-                  setsearchData(storedata);
-                }
-                setisDataPresent(true);
-                setLoading(false);
-              } else {
-                setisDataPresent(false);
-              }
-              setLoading(false);
-            })
-            .catch(function (error) {
-              console.log(error);
-            });
-        } else {
-          setnameData(true);
-          setphoneData(true);
-          setLoading(false);
-        }
-      }
-    } else {
-      let param = firstName;
-      var username = "admin";
-      var password = "Admin123";
-      param = checkData(param,firstName,phone,identifier,age)
-      if (firstName || phone || identifier) {
-        setnameData(false);
-        setphoneData(false);
-
-        const headers = {
-          Authorization: "Basic " + btoa(`${username}:${password}`),
-        };
-        const url = `https://ln3.hispindia.org/openmrs/ws/hisp/rest/patient_search?name=${param}`;
-        axios
-          .get(url, { headers: headers })
-          .then((response) => {
-            setapihit(true);
-            var phoneNo = "";
-            var searchdatanew = [];
-            var visitdate = "";
-            setsearchData([]);
-            searchdatanew = searchData;
-            var storedata = [];
-
-            for (let i = 0; i < response.data.length; i++) {
-              var addressrarr = [];
-              searchdatanew.push(response.data);
-              let identifierid = searchdatanew[0][i]["identifier"];
-              let nameval = searchdatanew[0][i]["name"].toUpperCase();
-              let genval = searchdatanew[0][i]["gender"];
-              let ageval = searchdatanew[0][i]["age"];
-              if (searchdatanew[0][i]["address"]) {
-                let addr1 = searchdatanew[0][i]["address"]["Address1"];
-                let addr2 = searchdatanew[0][i]["address"]["Address2"];
-                let district = searchdatanew[0][i]["address"]["City Village"];
-                let country = searchdatanew[0][i]["address"]["Country"];
-                let pincode = searchdatanew[0][i]["address"]["Postal Code"];
-                let statecode =
-                  searchdatanew[0][i]["address"]["State Province"];
-                // let addr = ho_no + " " + district + " - " + statecode + " " + country + " " + pincode
-                let addr = district + " - " + statecode;
-                addressrarr.push(addr);
-              }
-              if (searchdatanew[0][i]["person_attributes"]) {
-                phoneNo =
-                  searchdatanew[0][i]["person_attributes"]["Telephone Number"];
-              }
-              if (searchdatanew[0][i]["visit_date"] != undefined) {
-                visitdate = searchdatanew[0][i]["visit_date"];
-              } else {
-                visitdate = "N-A";
-              }
-              let id = i;
-
-              storedata.push(
-                createData(
-                  identifierid,
-                  nameval,
-                  phoneNo,
-                  genval,
-                  ageval,
-                  addressrarr[0],
-                  visitdate,
-                  "",
-                  id
-                )
-              );
-            }
-
-            if (storedata.length > 0) {
-              setsearchData([]);
-              if (age) {
-                filters["age"] = [age];
-              }
-              if (gender) {
-                filters["gender"] = [gender.toUpperCase()];
-              }
-              if (firstName) {
-                filters["name"] = [firstName];
-              }
-              if (phone) {
-                filters["phone"] = [phone];
-              }
-              let filterOutput = multiFilter(storedata, filters);
-              if (filterOutput.length > 0) {
-                storedata = filterOutput;
-                setsearchData(storedata);
-              } else {
-                setsearchData(storedata);
-              }
-              setisDataPresent(true);
-            } else {
-              setisDataPresent(false);
-            }
-            setLoading(false);
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-      } else {
-        setnameData(true);
-        setphoneData(true);
-        setLoading(false);
-      }
-    }
-  };
 
   function valuetext(value) {
   return `${value}°C`;
@@ -850,7 +617,7 @@ export default function PatientSearch(props) {
 
   const classes = useStyles();
   const searchdat = searchData;
-  console.log("SEARCH DATA", searchdat);
+  
   if (isDataPresent) {
     return (
       <Container component="main" maxWidth="lg">
