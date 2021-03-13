@@ -15,6 +15,8 @@ import { withStyles } from "@material-ui/core/styles";
 import { CircularProgress } from "@material-ui/core";
 import Slider from '@material-ui/core/Slider';
 import Input from '@material-ui/core/Input';
+import Box from '@material-ui/core/Box';
+
 
 
 
@@ -53,8 +55,9 @@ export default function PatientSearch(props) {
     lvd: "",
   });
   var [searchData, setsearchData] = useState([]);
-  var [minage, setminage] = useState(1);
-  var [maxage, setmaxage] = useState(100);
+  var [minage, setminage] = useState(0);
+  var [maxage, setmaxage] = useState(5);
+  var [resultAge, setresultAge] = useState(minage);
   var [loading, setLoading] = useState(false);
   var [errors, setErrors] = useState({ phoneData: true, nameData: true,identifierData:true });
   var [isDataPresent, setisDataPresent] = useState(false);
@@ -76,13 +79,13 @@ export default function PatientSearch(props) {
       field: "gender",
       headerName: "Gender",
       type: "number",
-      width: 80,
+      width: 100,
     },
     {
       field: "age",
       headerName: "Age",
       type: "number",
-      width: 70,
+      width: 100,
     },
     {
       field: "address",
@@ -95,13 +98,13 @@ export default function PatientSearch(props) {
       field: "lvd",
       headerName: "Last Visited",
       type: "string",
-      width: 120,
+      width: 150,
     },
     {
       field: "action",
       headerName: "Action",
       type: "string",
-      width: 80,
+      width: 100,
       renderCell: (params) => (
         <strong>
           <CustomizedMenus patiendData={params} />
@@ -112,29 +115,22 @@ export default function PatientSearch(props) {
 
 
   const handleChange = (event, newValue) => {
-                        setsearchDetails({
-                      ...searchDetails,
-                      age: newValue,
-                    })
+                    //     setsearchDetails({
+                    //   ...searchDetails,
+                    //   age: newValue,
+                    // })
     //     setminage(Number(newValue) - 5)
     // setmaxage(Number(newValue) + 5)
+    setresultAge(newValue)
   };
 
   const handleInputChange = (event) => {
-    var ageRange = 5;
-    var ageMin = 0;
-    var ageMax = 10;
+
     var handleValues = Number(event.target.value);
     setsearchDetails({
       ...searchDetails,
       age: handleValues === '' ? '' : handleValues,
-    })
-    setminage(handleValues - 5)
-    setmaxage(handleValues + 5)
-    if ((handleValues - 5) < 0) {
-      setminage(1);
-    }
-    
+    })    
 
   };
 
@@ -144,7 +140,7 @@ export default function PatientSearch(props) {
     var charLen = 2;
     var charLength = 2;
 
-    if (event.key === isEnter && event.target.value.length > charLen) {     
+    if ((event.key === isEnter && event.target.value.length > charLen) || (event.key === isEnter && name == "age")) {     
       return true;
     }
     else if (event.key === isEnter && event.target.value.length <= charLen) {
@@ -242,13 +238,13 @@ export default function PatientSearch(props) {
         return false
       }
     }
-    else if (name == "gender" && eventName == "press") {
+    else if ((name == "gender" && eventName == "press") || (name == "lvd" && eventName == "press")) {
             if ((searchDetails.phone && searchDetails.phone.length) > charLen ||
         (searchDetails.firstName && searchDetails.firstName.length > charLen) ||
         (searchDetails.identifier && searchDetails.identifier.length>charLen)) {
               return true;
       }    
-    }     
+    }
     else {
       return false;
     }
@@ -350,17 +346,34 @@ export default function PatientSearch(props) {
     if (searchDetails.firstName) {
       var firstName = searchDetails.firstName.toUpperCase();
     }
-    let phone = searchDetails.phone;
-    let identifier = searchDetails.identifier;
-    let age = searchDetails.age;
+      let phone = searchDetails.phone;
+      let identifier = searchDetails.identifier;
+      let age = "";
+      var minageRange = "";
+      var maxageRange = "";
+      if (name == "age") {
+        age = event.target.value;
+      }
+      else if (searchDetails.age) {
+        age = searchDetails.age;
+      }
+      let ageRange = resultAge;
+      var rangeToSend = [];
     let gender = "";
     if (name == "gender") {
             gender = event.target.value;
       }
     else if (searchDetails.gender) {
         gender = searchDetails.gender;
-    }
-    let lvd = searchDetails.lvd;
+      }
+      if (name == "lvd") {
+            let lvd = event.target.value;
+
+      }
+      else if(searchDetails.lvd) {
+            let lvd = searchDetails.lvd;
+
+      }
 
     let searchDataAlready = searchData;
 
@@ -369,10 +382,34 @@ export default function PatientSearch(props) {
     if (searchDataAlready.length > 0 && isDataPresent == true) {
       isDataAlready = true;
     }
-    if (isDataAlready) {
-      if (age) {
-        filters["age"] = [age];
-      }
+      if (isDataAlready) {
+        if (name == "age") {
+          if (ageRange) {
+            minageRange = Number(event.target.value) - Number(ageRange);
+            maxageRange = Number(event.target.value) + Number(ageRange);
+            for (let k = minageRange; k <= maxageRange; k++) {
+                  rangeToSend.push(String(k));
+            }
+            filters["age"] = rangeToSend
+          }
+          else {
+            filters["age"] = [String(event.target.value)];
+          }
+
+        }
+        else if (searchDetails.age) {
+          if (ageRange) {
+            minageRange = Number(searchDetails.age) - Number(ageRange);
+            maxageRange = Number(searchDetails.age) + Number(ageRange);
+            for (let k = minageRange; k <= maxageRange; k++){
+                  rangeToSend.push(String(k));
+            }
+            filters["age"] = rangeToSend
+          }
+          else {
+            filters["age"] = [String(searchDetails.age)];
+          }
+        }
       if (name == "gender") {
         filters["gender"] = event.target.value;
       }
@@ -380,13 +417,22 @@ export default function PatientSearch(props) {
         if (searchDetails.gender) {
           filters["gender"] = [searchDetails.gender.toUpperCase()];
         }
+        }
+        if (name == "lvd") {
+        let lvdVal = event.target.value.split("-").reverse().join("-")
+        filters["lvd"] = [lvdVal];
+      }
+        else if (searchDetails.lvd) {    
+          let lvdVal = searchDetails.lvd.split("-").reverse().join("-")  
+          filters["lvd"] = [lvdVal];
+        
       }
       if (firstName) {
         filters["name"] = [firstName.toUpperCase()];
       }
       if (phone) {
         filters["phone"] = [phone];
-      }
+        }
       let filterOutput = multiFilter(searchDataAlready, filters);
       if (filterOutput.length > 0) {
         alreadystoredata = filterOutput;
@@ -689,7 +735,7 @@ export default function PatientSearch(props) {
                   className="identifier"
                 />
               </Grid>
-                            <Grid item xs={3}>
+              <Grid item xs={3}>
                 <TextField
                   id="date"
                   label="Last visited"
@@ -701,56 +747,52 @@ export default function PatientSearch(props) {
                   InputLabelProps={{
                     shrink: true,
                   }}
-                  onKeyUp={(e)=>searchOnKey(e,"lvd","press")}
+                  onChange={(e)=>searchOnKey(e,"lvd","press")}
 
                 />
               </Grid>
-
             <Grid item >
 
             <Typography id="input-slider" variant="body2" display="block" gutterBottom>
             Age
             </Typography>
-            </Grid>
+              </Grid>
               <Grid item xs={3}>
 
-              <div className={classes.rootage}>
-
+                <div className={classes.rootage}>
                   <Grid container spacing={2} alignItems="center">
-
-
-        <Grid item xs>
-              <Slider
-              value={searchDetails.age}
-              onChange={handleChange}
-              valueLabelDisplay="auto"
-              aria-labelledby="range-slider"
-                        getAriaValueText={valuetext}
-                        min={minage}
-                        max={maxage}
-                        step="1"
+                    <Grid item>
+                      <Input
+                      className={classes.input}
+                      margin="dense"
+                      onKeyUp={(e)=>searchOnKey(e,"age","press")}
+                      type="number"
+                      />
+                    </Grid>
+                    &nbsp;&nbsp;
+                <Typography id="input-slider" variant="body2" display="block" gutterBottom>
+                Range  &nbsp;&nbsp;
+                </Typography>
+                <Grid item xs>
+                <Slider
+                value={resultAge}
+                onChange={handleChange}
+                valueLabelDisplay="auto"
+                aria-labelledby="range-slider"
+                getAriaValueText={valuetext}
+                min={minage}
+                max={maxage}
+                step="1"
                 />
-                    </Grid>
-                                                <Grid item>
-          <Input
-            className={classes.input}
-            value={searchDetails.age}
-            margin="dense"
-            onChange={handleInputChange}
-            inputProps={{
-              step: 10,
-              min: {minage},
-              max: {maxage},
-              type: 'number',
-              'aria-labelledby': 'input-slider',
-            }}
-          />
-                    </Grid>
-
-      </Grid>
-    </div>
-
-</Grid>
+                </Grid>
+                <Grid item>
+                <Box component="div" display="inline" p={1} m={1} bgcolor="background.paper">
+                {resultAge}
+                </Box>
+                </Grid>
+              </Grid>
+            </div>
+            </Grid>
               <Grid item xs={4}>
                 <Typography
                   variant="body2"
@@ -892,7 +934,7 @@ export default function PatientSearch(props) {
                   className="identifier"
                 />
               </Grid>
-                            <Grid item xs={3}>
+                <Grid item xs={3}>
                 <TextField
                   id="date"
                   label="Last visited"
@@ -904,7 +946,7 @@ export default function PatientSearch(props) {
                   InputLabelProps={{
                     shrink: true,
                   }}
-                  onKeyUp={(e)=>searchOnKey(e,"lvd","press")}
+                  onChange={(e)=>searchOnKey(e,"lvd","press")}
 
                 />
               </Grid>
@@ -914,44 +956,49 @@ export default function PatientSearch(props) {
             <Typography id="input-slider" variant="body2" display="block" gutterBottom>
             Age
             </Typography>
-            </Grid>
-              <Grid item xs={3}>
+              </Grid>
+              
 
-              <div className={classes.rootage}>
+<Grid item xs={3}>
 
-                  <Grid container spacing={2} alignItems="center">
+<div className={classes.rootage}>
+
+<Grid container spacing={2} alignItems="center">
+
+                        <Grid item>
+<Input
+className={classes.input}
+margin="dense"
+onKeyUp={(e)=>searchOnKey(e,"age","press")}
+type="number"
+/>
+</Grid>
+&nbsp;&nbsp;
+        <Typography id="input-slider" variant="body2" display="block" gutterBottom>
+Range  &nbsp;&nbsp;
+</Typography>
+<Grid item xs>
+<Slider
+value={resultAge}
+onChange={handleChange}
+valueLabelDisplay="auto"
+aria-labelledby="range-slider"
+getAriaValueText={valuetext}
+min={minage}
+max={maxage}
+step="1"
+/>
+</Grid>
+<Grid item>
+<Box component="div" display="inline" p={1} m={1} bgcolor="background.paper">
+{resultAge}
+</Box>
+
+</Grid>
 
 
-        <Grid item xs>
-              <Slider
-              value={searchDetails.age}
-              onChange={handleChange}
-              valueLabelDisplay="auto"
-              aria-labelledby="range-slider"
-                        getAriaValueText={valuetext}
-                        min={minage}
-                        max={maxage}
-                        step="1"
-                />
-                    </Grid>
-                                                <Grid item>
-          <Input
-            className={classes.input}
-            value={searchDetails.age}
-            margin="dense"
-            onChange={handleInputChange}
-            inputProps={{
-              step: 10,
-              min: {minage},
-              max: {maxage},
-              type: 'number',
-              'aria-labelledby': 'input-slider',
-            }}
-          />
-                    </Grid>
-
-      </Grid>
-    </div>
+</Grid>
+</div>
 
 </Grid>
               <Grid item xs={4}>
