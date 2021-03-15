@@ -572,23 +572,30 @@ export default function PatientSearch(props) {
                 }         
                 filterOutput = multiFilter(storedata, filters);
 
-                if (filterOutput.length > 0) {
-                  storedata = filterOutput;
-                  setsearchData(storedata);
-                } else {
-                  setsearchData(storedata);
-                }
-                setisDataPresent(true);
+              if (filterOutput.length > 0) {
+                storedata = filterOutput;
+                setsearchData(storedata);
                 setLoading(false);
                 setapihit(false);
+                setisDataPresent(true);
               } else {
+                // setsearchData(storedata);
+                setsearchData([]);
+                setLoading(false);
+                setapihit(true);
                 setisDataPresent(false);
               }
-                setLoading(false);
-                                }
-                catch (e) {
-                    setLoading(false);
-                }
+            } else {
+              setisDataPresent(false);
+              setLoading(false);
+              setapihit(true);
+            }
+
+              }
+          catch (e) {
+            setLoading(false);
+            setapihit(true);
+              }
 
             })
             .catch(function (error) {
@@ -705,15 +712,22 @@ export default function PatientSearch(props) {
               if (filterOutput.length > 0) {
                 storedata = filterOutput;
                 setsearchData(storedata);
+                setLoading(false);
+                setapihit(false);
+                setisDataPresent(true);
               } else {
-                setsearchData(storedata);
+                // setsearchData(storedata);
+                setsearchData([]);
+                setLoading(false);
+                setapihit(true);
+                setisDataPresent(false);
               }
-              setisDataPresent(true);
             } else {
               setisDataPresent(false);
+              setLoading(false);
+              setapihit(true);
             }
-                        setLoading(false);
-            setapihit(false);
+
               }
           catch (e) {
             setLoading(false);
