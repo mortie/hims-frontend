@@ -115,12 +115,6 @@ export default function PatientSearch(props) {
 
 
   const handleChange = (event, newValue) => {
-                    //     setsearchDetails({
-                    //   ...searchDetails,
-                    //   age: newValue,
-                    // })
-    //     setminage(Number(newValue) - 5)
-    // setmaxage(Number(newValue) + 5)
     setresultAge(newValue)
   };
 
@@ -164,7 +158,7 @@ export default function PatientSearch(props) {
         setPhoneErrorMsj("Atleast 10 characters is required")
         }
         else if (errors.phoneData) {
-        setNameErrorMsj("Phone is required")
+        setPhoneErrorMsj("Phone is required")
         }
       }
       if (name == "identifier") {
