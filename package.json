@@ -26,7 +26,8 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
     "redux": "^4.0.5",
-    "redux-logger": "^3.0.6"
+    "redux-logger": "^3.0.6",
+    "rrule": "^2.6.8"
   },
   "scripts": {
     "start": "set PORT=3006 && react-scripts start",
