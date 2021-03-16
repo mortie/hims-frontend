@@ -28,6 +28,7 @@ import {
   AppointmentForm,
   EditRecurrenceMenu,
   DragDropProvider,
+  CurrentTimeIndicator,
 } from "@devexpress/dx-react-scheduler-material-ui";
 import { addProviders } from "../../actions/providersActions";
 import { addLocations } from "../../actions/locationActions";
@@ -52,6 +53,34 @@ const messages = {
   repeatLabel: "Select Days",
 };
 
+const Layout = (props) => {
+  return <AppointmentForm.Layout style={{ marginLeft: "0px" }} {...props} />;
+};
+
+const BasicLayout = (props) => {
+  return (
+    <AppointmentForm.BasicLayout
+      style={{ width: "550px", marginTop: "-30px" }}
+      {...props}
+    />
+  );
+};
+
+const RecurrenceLayout = (props) => {
+  return (
+    <AppointmentForm.RecurrenceLayout
+      style={{ width: "450px", marginTop: "-20px" }}
+      {...props}
+    />
+  );
+};
+
+const CommandLayout = (props) => {
+  return (
+    <AppointmentForm.CommandLayout style={{ width: "550px" }} {...props} />
+  );
+};
+
 const TextEditor = (props) => {
   return null;
 };
@@ -74,22 +103,25 @@ const useStyles = makeStyles(styles);
 export default function ProviderScheduling() {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
-  const appointmentBlockWithTimeSlots = useSelector(
-    (state) => state.appointmentBlockWithTimeSlots.appointmentBlockWithTimeSlot
-  );
-  const [data, setData] = useState(appointmentBlockWithTimeSlots || []);
-  const [department, setDepartment] = useState(null);
+  const classes = useStyles();
+
   const providers = useSelector((state) => state.providers.providers);
   const locations = useSelector((state) => state.locations.locations);
   const services = useSelector((state) => state.services.services);
+  const appointmentBlockWithTimeSlots = useSelector(
+    (state) => state.appointmentBlockWithTimeSlots.appointmentBlockWithTimeSlot
+  );
 
-  const [currentViewName, setCurrentViewName] = useState("Month");
+  const [data, setData] = useState(appointmentBlockWithTimeSlots || []);
+  const [department, setDepartment] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentViewName, setCurrentViewName] = useState("Week");
   const [resources, setResources] = useState([
     {
       fieldName: "types",
       title: "Department",
       instances: services || [],
-      allowMultiple: true,
     },
     {
       fieldName: "location",
@@ -102,42 +134,6 @@ export default function ProviderScheduling() {
       instances: providers || [],
     },
   ]);
-  const [loading, setLoading] = useState(false);
-  const classes = useStyles();
-
-  function convertResponseData(response) {
-    return response.data.results.map((item) => {
-      return { id: item.uuid, text: item.display };
-    });
-  }
-
-  function convertAppointmentData(response) {
-    return response.data.results.map((item) => getAppointmentDataObject(item));
-  }
-
-  function getAppointmentDataObject(item) {
-    return {
-      id: item.uuid,
-      title: `${item.provider.display} - ${item.location.display}`,
-      startDate: new Date(item.startDate),
-      endDate: new Date(item.endDate),
-      provider: item.provider.uuid,
-      location: item.location.uuid,
-      types: item.types.map((type) => type.uuid),
-    };
-  }
-
-  function getDifferenceInDays(startDate, endDate) {
-    return (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24);
-  }
-
-  function getFilteredAppointments(value) {
-    return value
-      ? appointmentBlockWithTimeSlots.filter(
-          (element) => element.types.includes(value.id) && element
-        )
-      : appointmentBlockWithTimeSlots;
-  }
 
   useEffect(() => {
     if (appointmentBlockWithTimeSlots.length === 0) {
@@ -146,12 +142,11 @@ export default function ProviderScheduling() {
         "/provider",
         "/location",
         "/appointmentscheduling/appointmenttype",
-        "/appointmentscheduling/appointmentblockwithtimeslot?v=full",
+        `/appointmentscheduling/appointmentblockwithtimeslot?v=full&limit=100&fromDate=${new Date().toISOString()}`,
       ];
       const requests = urls.map((url) => getAPI(url));
 
       Promise.all(requests).then((responses) => {
-        setLoading(false);
         const provider = convertResponseData(responses[0]);
         const location = convertResponseData(responses[1]);
         const service = convertResponseData(responses[2]);
@@ -172,6 +167,7 @@ export default function ProviderScheduling() {
           fetchAppointmentBlockWithTimeSlot(appointmentBlockWithTimeSlot)
         );
         setData(appointmentBlockWithTimeSlot);
+        setLoading(false);
       });
     }
 
@@ -179,19 +175,73 @@ export default function ProviderScheduling() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appointmentBlockWithTimeSlots]);
 
-  const commitChanges = ({ added, changed, deleted }) => {
-    if (added) {
-      delete added.allDay;
-      const differenceInDays = getDifferenceInDays(
-        added.startDate,
-        added.endDate
-      );
+  function currentDateChange(currentDate) {
+    if (getDifferenceInDays(currentDate, new Date()) > 1) {
+      enqueueSnackbar("Sorry! You can not visit past dates.");
+      return;
+    }
+    setCurrentDate(currentDate);
+  }
 
-      if (differenceInDays < 0) {
-        enqueueSnackbar("End date can not be smaller then start date.");
-      } else if (differenceInDays > 1) {
+  function convertResponseData(response) {
+    return response.data.results.map((item) => ({
+      id: item.uuid,
+      text: item.display,
+    }));
+  }
+
+  function convertAppointmentData(response) {
+    return response.data.results.map((item) => getAppointmentDataObject(item));
+  }
+
+  function getAppointmentDataObject(item) {
+    return {
+      id: item.uuid,
+      title: `${item.provider.display} - ${item.location.display}`,
+      startDate: new Date(item.startDate),
+      endDate: new Date(item.endDate),
+      provider: item.provider.uuid,
+      location: item.location.uuid,
+      types: item.types[0].uuid,
+    };
+  }
+
+  function getDifferenceInDays(startDate, endDate) {
+    return (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24);
+  }
+
+  function getFilteredAppointments(value) {
+    return value
+      ? appointmentBlockWithTimeSlots.filter(
+          (element) => element.types === value.id && element
+        )
+      : appointmentBlockWithTimeSlots;
+  }
+
+  function commitChanges({ added, changed, deleted }) {
+    if (added) {
+      setLoading(true);
+
+      if (added.startDate < new Date()) {
+        setLoading(false);
+        enqueueSnackbar(
+          "Sorry! you can not create appointment(s) for past datetime."
+        );
+        return;
+      }
+
+      if (added.startDate > added.endDate) {
+        setLoading(false);
+        enqueueSnackbar(
+          "Sorry! you can not set appointment(s) End datetime smaller then Start datetime."
+        );
+        return;
+      }
+
+      delete added.allDay;
+      if (getDifferenceInDays(added.startDate, added.endDate) > 1) {
         let daysToSchedule = [1, 2, 3, 4, 5, 6, 7];
-        if (added?.rRule) {
+        if (added.rRule) {
           const { freq, byweekday } = rrulestr(added.rRule).options;
           if (RRule.FREQUENCIES.indexOf("WEEKLY") === freq) {
             daysToSchedule = byweekday.map((weekday) =>
@@ -209,6 +259,7 @@ export default function ProviderScheduling() {
           "/appointmentscheduling/recurringappointmentblockwithtimeslot",
           {
             ...added,
+            types: [added.types],
             startDate: added.startDate.toISOString(),
             endDate: added.endDate.toISOString(),
             daysToSchedule: daysToSchedule,
@@ -216,18 +267,23 @@ export default function ProviderScheduling() {
           }
         )
           .then((response) => {
-            getAPI("/appointmentscheduling/appointmentblockwithtimeslot?v=full")
+            getAPI(
+              `/appointmentscheduling/appointmentblockwithtimeslot?v=full&limit=100&fromDate=${new Date().toISOString()}`
+            )
               .then((res) => {
                 enqueueSnackbar("Appointments added successfully.");
                 dispatch(
                   fetchAppointmentBlockWithTimeSlot(convertAppointmentData(res))
                 );
+                setLoading(false);
               })
               .catch((err) => {
+                setLoading(false);
                 console.log(err);
               });
           })
           .catch((error) => {
+            setLoading(false);
             enqueueSnackbar(
               "An error occured while saving the appointments. Please try again."
             );
@@ -237,6 +293,7 @@ export default function ProviderScheduling() {
         delete added.rRule;
         postAPI("/appointmentscheduling/appointmentblockwithtimeslot", {
           ...added,
+          types: [added.types],
           startDate: new Date(added.startDate).toISOString(),
           endDate: new Date(added.endDate).toISOString(),
         })
@@ -258,53 +315,61 @@ export default function ProviderScheduling() {
           });
       }
     }
+
     if (changed) {
-      console.log(changed);
       setLoading(true);
-      for (const key in changed) {
-        const updatedValues = changed[key];
-        const startDate = Object.hasOwnProperty.call(updatedValues, "startDate")
-          ? updatedValues.startDate
-          : appointmentBlockWithTimeSlots.find((element) => element.id === key)
-              .startDate;
-        const endDate = Object.hasOwnProperty.call(updatedValues, "endDate")
-          ? updatedValues.endDate
-          : appointmentBlockWithTimeSlots.find((element) => element.id === key)
-              .endDate;
-        const differenceInDays = getDifferenceInDays(startDate, endDate);
-        if (differenceInDays <= 0 && differenceInDays >= 1) {
-          setLoading(false);
-          enqueueSnackbar(
-            "Start date and End date can not be different. However you can change the time."
-          );
-        } else {
-          if (Object.hasOwnProperty.call(changed, key)) {
-            postAPI(
-              `/appointmentscheduling/appointmentblockwithtimeslot/${key}`,
-              {
-                ...changed[key],
-              }
-            )
-              .then((response) => {
-                dispatch(
-                  updateAppointmentBlockWithTimeSlot(
-                    getAppointmentDataObject(response.data)
-                  )
-                );
-                enqueueSnackbar("Appointment updated successfully.");
-                setLoading(false);
-              })
-              .catch((error) => {
-                enqueueSnackbar(
-                  "An error occured while updating the appointment. Please try again."
-                );
-                setLoading(false);
-                console.log(error);
-              });
-          }
-        }
+      const key = Object.keys(changed)[0];
+      let updatedValues = changed[key];
+      const startDate = updatedValues.startDate
+        ? updatedValues.startDate
+        : appointmentBlockWithTimeSlots.find((element) => element.id === key)
+            .startDate;
+      const endDate = updatedValues.endDate
+        ? updatedValues.endDate
+        : appointmentBlockWithTimeSlots.find((element) => element.id === key)
+            .endDate;
+      const differenceInDays = getDifferenceInDays(startDate, endDate);
+      updatedValues = updatedValues.types
+        ? { ...updatedValues, types: [updatedValues.types] }
+        : { ...updatedValues };
+
+      if (startDate < new Date()) {
+        setLoading(false);
+        enqueueSnackbar(
+          "Sorry! you can not update this appointment to past datetime."
+        );
+        return;
       }
+
+      if (differenceInDays <= 0 && differenceInDays >= 1) {
+        setLoading(false);
+        enqueueSnackbar(
+          "Start date and End date can not be different. However you can change the time."
+        );
+        return;
+      }
+
+      postAPI(`/appointmentscheduling/appointmentblockwithtimeslot/${key}`, {
+        ...updatedValues,
+      })
+        .then((response) => {
+          dispatch(
+            updateAppointmentBlockWithTimeSlot(
+              getAppointmentDataObject(response.data)
+            )
+          );
+          enqueueSnackbar("Appointment updated successfully.");
+          setLoading(false);
+        })
+        .catch((error) => {
+          enqueueSnackbar(
+            "An error occured while updating the appointment. Please try again."
+          );
+          setLoading(false);
+          console.log(error);
+        });
     }
+
     if (deleted !== undefined) {
       setLoading(true);
       deleteAPI(
@@ -323,20 +388,22 @@ export default function ProviderScheduling() {
           console.log(error);
         });
     }
-  };
+  }
 
-  return (
-    <>
-      <Paper className={classes.paper}>
+  function FlexibleSpace({ classes, ...restProps }) {
+    return (
+      <Toolbar.FlexibleSpace {...restProps}>
         <Autocomplete
-          id="combo-box-demo"
+          id="search-department-combo"
           options={services || []}
           getOptionLabel={(option) => option.text}
           onChange={(e, newValue) => {
             setDepartment(newValue);
             setData(getFilteredAppointments(newValue));
           }}
-          style={{ width: 300 }}
+          value={department}
+          size="small"
+          style={{ width: 200 }}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -345,39 +412,54 @@ export default function ProviderScheduling() {
             />
           )}
         />
-      </Paper>
-      <Paper>
-        <Scheduler data={data} height={500}>
-          <ViewState
-            currentViewName={currentViewName}
-            onCurrentViewNameChange={(currentViewName) =>
-              setCurrentViewName(currentViewName)
-            }
-          />
-          <EditingState onCommitChanges={commitChanges} />
-          <EditRecurrenceMenu />
-          <DayView />
-          <WeekView excludedDays={[0, 6]} />
-          <MonthView />
-          <Toolbar
-            {...(loading ? { rootComponent: ToolbarWithLoading } : null)}
-          />
-          <ViewSwitcher />
-          <DateNavigator />
-          <TodayButton />
-          <Appointments />
-          <AppointmentTooltip showDeleteButton showCloseButton showOpenButton />
-          <AppointmentForm
-            textEditorComponent={TextEditor}
-            messages={messages}
-            radioGroupComponent={RadioGroupComponent}
-          />
-          {providers && services && locations && (
-            <Resources data={resources} mainResourceName="location" />
-          )}
-          <DragDropProvider />
-        </Scheduler>
-      </Paper>
-    </>
+      </Toolbar.FlexibleSpace>
+    );
+  }
+
+  return (
+    <Paper>
+      <Scheduler data={data} height={500}>
+        <ViewState
+          currentDate={currentDate}
+          onCurrentDateChange={currentDateChange}
+          currentViewName={currentViewName}
+          onCurrentViewNameChange={(currentViewName) =>
+            setCurrentViewName(currentViewName)
+          }
+        />
+        <EditingState onCommitChanges={commitChanges} />
+        <EditRecurrenceMenu />
+        <DayView />
+        <WeekView />
+        <MonthView />
+        <Toolbar
+          {...(loading ? { rootComponent: ToolbarWithLoading } : null)}
+          flexibleSpaceComponent={FlexibleSpace}
+        />
+        <ViewSwitcher />
+        <DateNavigator />
+        <TodayButton />
+        <Appointments />
+        <AppointmentTooltip showDeleteButton showCloseButton showOpenButton />
+        <AppointmentForm
+          layoutComponent={Layout}
+          basicLayoutComponent={BasicLayout}
+          commandLayoutComponent={CommandLayout}
+          recurrenceLayoutComponent={RecurrenceLayout}
+          textEditorComponent={TextEditor}
+          messages={messages}
+          radioGroupComponent={RadioGroupComponent}
+        />
+        {providers && services && locations && (
+          <Resources data={resources} mainResourceName="location" />
+        )}
+        <DragDropProvider />
+        <CurrentTimeIndicator
+          shadePreviousAppointments
+          shadePreviousCells
+          updateInterval={100}
+        />
+      </Scheduler>
+    </Paper>
   );
 }
