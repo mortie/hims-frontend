@@ -5,6 +5,9 @@ const patientSearchStyles = (theme) => ({
     flexDirection: "column",
     alignItems: "center",
   },
+  rootElement: {
+    flexGrow: 1,
+  },
   avatar: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
@@ -20,11 +23,6 @@ const patientSearchStyles = (theme) => ({
     display: "flex",
     flexWrap: "wrap",
   },
-  textField: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    width: 200,
-  },
   root: {
     width: "92%",
     marginLeft: "4%",
@@ -34,13 +32,13 @@ const patientSearchStyles = (theme) => ({
   },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 120,
+    minWidth: 10,
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(1),
   },
   rootage: {
-    width: 250,
+    width: 200,
   },
   input: {
     width: 42,

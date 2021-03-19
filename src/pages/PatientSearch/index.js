@@ -17,9 +17,6 @@ import Slider from '@material-ui/core/Slider';
 import Input from '@material-ui/core/Input';
 import Box from '@material-ui/core/Box';
 
-
-
-
 import { DataGrid } from "@material-ui/data-grid";
 import CustomizedMenus from "./ActionButton";
 
@@ -55,11 +52,22 @@ export default function PatientSearch(props) {
     lvd: "",
   });
   var [searchData, setsearchData] = useState([]);
+
+  var [firstNameVal, setfirstNameVal] = useState("");
+
+  var [firstName, setfirstName] = useState("");
+  var [phone, setphone] = useState("");
+  var [identifier, setidentifier] = useState("");
+  var [age, setage] = useState("");
+  var [lvd, setlvd] = useState("");
+  var [genderValue, setgenderValue] = useState("");
+  var [resultAge, setresultAge] = useState(minage);
+
+
   var [minage, setminage] = useState(0);
   var [maxage, setmaxage] = useState(5);
-  var [resultAge, setresultAge] = useState(minage);
   var [loading, setLoading] = useState(false);
-  var [errors, setErrors] = useState({ phoneData: true, nameData: true,identifierData:true });
+  var [errors, setErrors] = useState({ phoneData: true, nameData: true, identifierData: true });
   var [isDataPresent, setisDataPresent] = useState(false);
   var [phoneData, setphoneData] = useState(false);
   var [nameData, setnameData] = useState(false);
@@ -118,113 +126,103 @@ export default function PatientSearch(props) {
     setresultAge(newValue)
   };
 
-  const handleInputChange = (event) => {
-
-    var handleValues = Number(event.target.value);
-    setsearchDetails({
-      ...searchDetails,
-      age: handleValues === '' ? '' : handleValues,
-    })    
-
-  };
-
-  const isEnteredPressed = (charLen,event, name, eventName) => {
+  const isEnteredPressed = (charLen, event, name, eventName) => {
     
-    if ((event.key === isEnter && event.target.value.length > charLen) || (event.key === isEnter && name == "age")) {     
-      if ((name != "phone") ||((name == "phone" ) && (event.target.value.length > 9))) {
+    if ((event.key === isEnter && event.target.value.length > charLen) || (event.key === isEnter && name == "age")) {
+      if ((name != "phone") || ((name == "phone") && (event.target.value.length > 9))) {
         return true
       }
     }
     else if (event.key === isEnter && event.target.value.length <= charLen) {
       if (name == "firstName") {
-        setErrors({nameData: !searchDetails.firstName ? false : true})
-        if (searchDetails.firstName) {
-          var nameLen = searchDetails.firstName.length;
+        setErrors({ nameData: !firstName ? false : true })
+        if (firstName) {
+          var nameLen = firstName.length;
         }
         if (nameLen && (nameLen <= charLen) && (nameLen > 0)) {
-        setNameErrorMsj("Atleast 3 characters is required")
+          setNameErrorMsj("Atleast 3 characters is required")
         }
         else if (errors.nameData) {
-        setNameErrorMsj("Name is required")
+          setNameErrorMsj("Name is required")
         }
       }
 
       if (name == "phone") {
-        setErrors({phoneData: !searchDetails.phone ? false : true})
-        if (searchDetails.phone) {
-        var phoneLen = searchDetails.phone.length;
+        setErrors({ phoneData: !phone ? false : true })
+        if (phone) {
+          var phoneLen = phone.length;
         }
         if (phoneLen && (phoneLen <= charLen) && (phoneLen > 0)) {
-        setPhoneErrorMsj("Atleast 10 characters is required")
+          setPhoneErrorMsj("Atleast 10 characters is required")
         }
         else if (errors.phoneData) {
-        setPhoneErrorMsj("Phone is required")
+          setPhoneErrorMsj("Phone is required")
         }
       }
       if (name == "identifier") {
-      setErrors({identifierData:!searchDetails.identifier?false:true})
-      if (searchDetails.identifier) {
-      var idenLen = searchDetails.identifier.length;
-      }
-      if (idenLen && (idenLen < charLen) && (idenLen > 0)) {
-      setIdenErrorMsj("Atleast 3 characters is required")
-      }
+        setErrors({ identifierData: !identifier ? false : true })
+        if (identifier) {
+          var idenLen = identifier.length;
+        }
+        if (idenLen && (idenLen < charLen) && (idenLen > 0)) {
+          setIdenErrorMsj("Atleast 3 characters is required")
+        }
 
-      else if (errors.identifierData) {
-      setIdenErrorMsj("Identifier is required")
+        else if (errors.identifierData) {
+          setIdenErrorMsj("Identifier is required")
+        }
       }
-      }    
     }
   }
 
   const isSearchClicked = (charLen, event, name, eventName) => {
-      if (eventName =="clicked") {
-      if ((searchDetails.phone && searchDetails.phone.length) > charLen ||
-        (searchDetails.firstName && searchDetails.firstName.length > charLen) ||
-        (searchDetails.identifier && searchDetails.identifier.length>charLen)) {
-              return true;
+    if (eventName == "clicked") {
+      if ((phone && phone.length) > charLen ||
+        (firstName && firstName.length > charLen) ||
+        (identifier && identifier.length > charLen)) {
+        return true;
       }
       else {
         if (Object.keys(name.searchDetails).length != 0) {
           Object.keys(name.searchDetails).forEach(function (previouskey) {
-          if (previouskey == "firstName") {
-        setErrors({nameData: !searchDetails.firstName ? false : true})
-        if (searchDetails.firstName) {
-          var nameLen = searchDetails.firstName.length;
-        }
-        if (nameLen && (nameLen <= charLen) && (nameLen > 0)) {
-        setNameErrorMsj("Atleast 3 characters is required")
-        }
-        else if (errors.nameData) {
-        setNameErrorMsj("Name is required")
-        }
-      }
+            if (previouskey == "firstName") {
+              setErrors({ nameData: !searchDetails.firstName ? false : true })
+              if (searchDetails.firstName) {
+                var nameLen = searchDetails.firstName.length;
+              }
+              if (nameLen && (nameLen <= charLen) && (nameLen > 0)) {
+                setNameErrorMsj("Atleast 3 characters is required")
+              }
+              else if (errors.nameData) {
+                setNameErrorMsj("Name is required")
+              }
+            }
 
-      if (previouskey == "phone") {
-        setErrors({phoneData: !searchDetails.phone ? false : true})
-        if (searchDetails.phone) {
-        var phoneLen = searchDetails.phone.length;
-        }
-        if (phoneLen && (phoneLen <= charLen) && (phoneLen > 0)) {
-        setPhoneErrorMsj("Atleast 10 characters is required")
-        }
-        else if (errors.phoneData) {
-        setPhoneErrorMsj("Phone is required")
-        }
-      }
-      if (previouskey == "identifier") {
-      setErrors({identifierData:!searchDetails.identifier?false:true})
-      if (searchDetails.identifier) {
-      var idenLen = searchDetails.identifier.length;
-      }
-      if (idenLen && (idenLen < charLen) && (idenLen > 0)) {
-      setIdenErrorMsj("Atleast 3 characters is required")
-      }
+            if (previouskey == "phone") {
+              setErrors({ phoneData: !searchDetails.phone ? false : true })
+              if (searchDetails.phone) {
+                var phoneLen = searchDetails.phone.length;
+              }
+              if (phoneLen && (phoneLen <= charLen) && (phoneLen > 0)) {
+                setPhoneErrorMsj("Atleast 10 characters is required")
+              }
+              else if (errors.phoneData) {
+                setPhoneErrorMsj("Phone is required")
+              }
+            }
+            if (previouskey == "identifier") {
+              setErrors({ identifierData: !searchDetails.identifier ? false : true })
+              if (searchDetails.identifier) {
+                var idenLen = searchDetails.identifier.length;
+              }
+              if (idenLen && (idenLen < charLen) && (idenLen > 0)) {
+                setIdenErrorMsj("Atleast 3 characters is required")
+              }
 
-      else if (errors.identifierData) {
-      setIdenErrorMsj("Identifier is required")
-      }
-      }
+              else if (errors.identifierData) {
+                setIdenErrorMsj("Identifier is required")
+              }
+            }
           });
     
           
@@ -233,15 +231,15 @@ export default function PatientSearch(props) {
         return false
       }
     }
-   }
+  }
   
-  const isValueChanged = (charLen,event, name, eventName) => {
-        if ((name == "gender" && eventName == "press") || (name == "lvd" && eventName == "press")) {
-            if ((searchDetails.phone && searchDetails.phone.length) > charLen ||
-        (searchDetails.firstName && searchDetails.firstName.length > charLen) ||
-        (searchDetails.identifier && searchDetails.identifier.length>charLen)) {
-              return true;
-      }    
+  const isValueChanged = (charLen, event, name, eventName) => {
+    if ((name == "gender" && eventName == "press") || (name == "lvd" && eventName == "press")) {
+      if ((phone && phone.length) > charLen ||
+        (firstName && firstName.length > charLen) ||
+        (identifier && identifier.length > charLen)) {
+        return true;
+      }
     }
     else {
       return false;
@@ -251,13 +249,13 @@ export default function PatientSearch(props) {
   var isValueEntered = (event, name, eventName) => {
     var charLen = 2;
     if (event.key === isEnter) {
-          return isEnteredPressed(charLen,event,name,eventName)
+      return isEnteredPressed(charLen, event, name, eventName)
     }
     if (eventName == "clicked") {
-         return isSearchClicked(charLen, event, name, eventName) 
+      return isSearchClicked(charLen, event, name, eventName)
     }
     if (eventName == "press" && event.key != isEnter) {
-        return isValueChanged(charLen,event,name,eventName)
+      return isValueChanged(charLen, event, name, eventName)
     }
     
   }
@@ -281,17 +279,25 @@ export default function PatientSearch(props) {
               return filterValues.includes(productValue);
             });
           default:
-            if (filterProperty != "name") {
+            if (filterProperty == "lvd") {
+              if (filterValues.length > 0) {
+                return true
+              }
+              else {
+                return false
+              }
+            }
+            else if (filterProperty != "name") {
               console.log("compare this :", filterValues, " to ", product[filterProperty], "results :", filterValues.includes(product[filterProperty]))
               return filterValues.includes(product[filterProperty]);
             }
-            else{
+            else {
               var searchTokens = filterValues[0].split(" ");
               var searchString = product[filterProperty];
               var searchRegex = new RegExp(searchTokens.join('|'), 'g');
               var numOfMatches = searchString.match(searchRegex);
               console.log("compare this for Name :", filterValues, " to ", product[filterProperty], "results :", numOfMatches)
-              if (numOfMatches.length > 0) {
+              if (numOfMatches != null) {
                 return true;
               }
               else {
@@ -305,56 +311,56 @@ export default function PatientSearch(props) {
 
   var filters = {};
 
-  function checkData(param,firstNameVal, phoneVal, identifierVal, ageVal,ageRange,lvd) {
-      if (firstNameVal) {
-        if (firstNameVal && ageVal) {
-          param = firstNameVal + "&agerange="+ageRange+"&age=" + ageVal
-        }
-        else if (firstNameVal && lvd) {
-          param = firstNameVal + "&lastvisitapprox="+lvd
-        }
-        else {
-          param = firstNameVal;
-        }
+  function checkData(param, firstNameVal, phoneVal, identifierVal, ageVal, ageRange, lvd) {
+    if (firstNameVal) {
+      if (firstNameVal && ageVal) {
+        param = firstNameVal + "&agerange=" + ageRange + "&age=" + ageVal
       }
-      if (phoneVal) {
-        if (phoneVal && ageVal) {
-          param = phoneVal + "&agerange="+ageRange+"&age=" + ageVal
-        }
-        else if (phoneVal && lvd) {
-          param = phoneVal + "&lastvisitapprox="+lvd
-        }
-        else {
-          param = phoneVal;
-        }
+      else if (firstNameVal && lvd) {
+        param = firstNameVal + "&lastvisitapprox=" + lvd
       }
-      if (firstNameVal && phoneVal) {
-        if (phoneVal && ageVal) {
-          param = phoneVal + "&agerange="+ageRange+"&age=" + ageVal
-        }
-        else if (phoneVal && lvd) {
-          param = phoneVal + "&lastvisitapprox="+lvd
-        }
-        else {
-          param = phoneVal;
-        }
+      else {
+        param = firstNameVal;
       }
-      if (identifierVal) {
-        if (identifierVal && ageVal) {
-          param = identifierVal + "&agerange="+ageRange+"&age=" + ageVal
-        }
-        else if (identifierVal && lvd) {
-          param = identifierVal + "&lastvisitapprox="+lvd
-        }
-        else {
-          param = identifierVal
-        }
+    }
+    if (phoneVal) {
+      if (phoneVal && ageVal) {
+        param = phoneVal + "&agerange=" + ageRange + "&age=" + ageVal
       }
+      else if (phoneVal && lvd) {
+        param = phoneVal + "&lastvisitapprox=" + lvd
+      }
+      else {
+        param = phoneVal;
+      }
+    }
+    if (firstNameVal && phoneVal) {
+      if (phoneVal && ageVal) {
+        param = phoneVal + "&agerange=" + ageRange + "&age=" + ageVal
+      }
+      else if (phoneVal && lvd) {
+        param = phoneVal + "&lastvisitapprox=" + lvd
+      }
+      else {
+        param = phoneVal;
+      }
+    }
+    if (identifierVal) {
+      if (identifierVal && ageVal) {
+        param = identifierVal + "&agerange=" + ageRange + "&age=" + ageVal
+      }
+      else if (identifierVal && lvd) {
+        param = identifierVal + "&lastvisitapprox=" + lvd
+      }
+      else {
+        param = identifierVal
+      }
+    }
 
     return param
   }
 
-  const postSearchKey = () =>{
+  const postSearchKey = () => {
     
   }
   const searchOnKey = (event, name, eventName) => {
@@ -363,43 +369,57 @@ export default function PatientSearch(props) {
       ...searchDetails,
       [name]: event.target.value,
     });
+    var searchValue = event.target.value;
+    if (name == "firstName") {
+      setfirstName(searchValue)
+    }
+    if (name == "phone") {
+      setphone(searchValue)
+    }
+    if (name == "identifier") {
+      setidentifier(searchValue)
+    }
+    if (name == "age") {
+      setage(searchValue)
+    }
+    if (name == "lvd") {
+      setlvd(searchValue)
+    }
     
-    if (isValueEntered(event,name, eventName)) {
+    if (isValueEntered(event, name, eventName)) {
 
       setLoading(true);
       setapihit(false);
 
 
-      if (searchDetails.firstName) {
-      var firstName = searchDetails.firstName.toUpperCase();
+      if (firstName) {
+        var firstNameValue = firstName.toUpperCase();
       }
-      let phone = searchDetails.phone;
-      let identifier = searchDetails.identifier;
-      let age = "";
-      let lvd = "";
+      let phoneValue = phone;
+      let identifierValue = identifier;
+      let ageValue = "";
+      let lvdValue = "";
       var minageRange = "";
       var maxageRange = "";
       let ageRange = resultAge;
       var rangeToSend = [];
-      let gender = "";
+      let genderValue = "";
       if (name == "age") {
-        age = event.target.value;
+        ageValue = event.target.value;
       }
-      else if (searchDetails.age) {
-        age = searchDetails.age;
+      else if (age) {
+        ageValue = age;
       }
       if (name == "gender") {
-      gender = event.target.value;
-      }
-      else if (searchDetails.gender) {
-      gender = searchDetails.gender;
+        genderValue = event.target.value;
+        setgenderValue(genderValue)
       }
       if (name == "lvd") {
-      lvd = event.target.value;
+        lvd = event.target.value;
 
       }
-      else if(searchDetails.lvd) {
-      lvd = searchDetails.lvd;
+      else if (lvd) {
+        lvdValue = lvd;
       }
       let searchDataAlready = searchData;
 
@@ -414,7 +434,7 @@ export default function PatientSearch(props) {
             minageRange = Number(event.target.value) - Number(ageRange);
             maxageRange = Number(event.target.value) + Number(ageRange);
             for (let k = minageRange; k <= maxageRange; k++) {
-                  rangeToSend.push(String(k));
+              rangeToSend.push(String(k));
             }
             filters["age"] = rangeToSend
           }
@@ -423,61 +443,191 @@ export default function PatientSearch(props) {
           }
 
         }
-        else if (searchDetails.age) {
+        else if (age) {
           if (ageRange) {
             minageRange = Number(searchDetails.age) - Number(ageRange);
             maxageRange = Number(searchDetails.age) + Number(ageRange);
-            for (let k = minageRange; k <= maxageRange; k++){
-                  rangeToSend.push(String(k));
+            for (let k = minageRange; k <= maxageRange; k++) {
+              rangeToSend.push(String(k));
             }
             filters["age"] = rangeToSend
           }
           else {
-            filters["age"] = [String(searchDetails.age)];
+            filters["age"] = [String(age)];
           }
         }
-      if (name == "gender") {
-        filters["gender"] = event.target.value;
-      }
-      else if (searchDetails.gender) {
-        if (searchDetails.gender) {
-          filters["gender"] = [searchDetails.gender.toUpperCase()];
-        }
+        if (name == "gender") {
+          filters["gender"] = [event.target.value.toUpperCase()];
         }
         if (name == "lvd") {
-        let lvdVal = event.target.value.split("-").reverse().join("-")
-        filters["lvd"] = [lvdVal];
-      }
-        else if (searchDetails.lvd) {    
-          let lvdVal = searchDetails.lvd.split("-").reverse().join("-")  
+          let lvdVal = event.target.value.split("-").reverse().join("-")
+          filters["lvd"] = [lvdVal];
+        }
+        else if (lvd) {
+          let lvdVal = lvdValue.split("-").reverse().join("-")
           filters["lvd"] = [lvdVal];
         
-      }
-      if (firstName) {
-        filters["name"] = [firstName.toUpperCase()];
-      }
-      if (phone) {
-        filters["phone"] = [phone];
         }
-      if (identifier) {
-        filters["identifier"] = [identifier];
+        if (firstName) {
+          filters["name"] = [firstName.toUpperCase()];
         }
-      let filterOutput = multiFilter(searchDataAlready, filters);
-      if (filterOutput.length > 0) {
-        alreadystoredata = filterOutput;
+        if (phone) {
+          filters["phone"] = [phone];
+        }
+        if (identifier) {
+          filters["identifier"] = [identifier];
+        }
+        let filterOutput = multiFilter(searchDataAlready, filters);
+        if (filterOutput.length > 0) {
+          alreadystoredata = filterOutput;
+        }
+        if (alreadystoredata.length > 0) {
+          setsearchData(alreadystoredata);
+          setisDataPresent(true);
+          setLoading(false);
+        }
+        else {
+          let param = firstNameValue;
+          var username = "admin";
+          var password = "Admin123";
+          param = checkData(param, firstNameValue, phoneValue, identifierValue, ageValue, ageRange, lvdValue)
+          if (firstNameValue || phoneValue || identifierValue) {
+            setnameData(false);
+            setphoneData(false);
+
+            const headers = {
+              Authorization: "Basic " + btoa(`${username}:${password}`),
+            };
+            const url = `https://ln3.hispindia.org/openmrs/ws/hisp/rest/patient_search?name=${param}`;
+            axios
+              .get(url, { headers: headers })
+              .then((response) => {
+                setapihit(true);
+                var phoneNo = "";
+                var searchdatanew = [];
+                var visitdate = "";
+                setsearchData([]);
+                var storedata = [];
+                for (let i = 0; i < response.data.length; i++) {
+                  var addressrarr = [];
+                  searchdatanew.push(response.data);
+                  let identifierid = searchdatanew[0][i]["identifier"];
+                  let nameval = searchdatanew[0][i]["name"].toUpperCase();
+                  let genval = searchdatanew[0][i]["gender"];
+                  let ageval = searchdatanew[0][i]["age"];
+                  if (searchdatanew[0][i]["address"]) {
+                    let addr1 = searchdatanew[0][i]["address"]["Address1"];
+                    let addr2 = searchdatanew[0][i]["address"]["Address2"];
+                    let district = searchdatanew[0][i]["address"]["City Village"];
+                    let country = searchdatanew[0][i]["address"]["Country"];
+                    let pincode = searchdatanew[0][i]["address"]["Postal Code"];
+                    let statecode =
+                      searchdatanew[0][i]["address"]["State Province"];
+                    // let addr = ho_no + " " + district + " - " + statecode + " " + country + " " + pincode
+                    let addr = district + " - " + statecode;
+                    addressrarr.push(addr);
+                  }
+                  if (searchdatanew[0][i]["person_attributes"]) {
+                    phoneNo =
+                      searchdatanew[0][i]["person_attributes"][
+                      "Telephone Number"
+                      ];
+                  }
+                  if (searchdatanew[0][i]["visit_date"] != undefined) {
+                    visitdate = searchdatanew[0][i]["visit_date"];
+                  } else {
+                    visitdate = "N-A";
+                  }
+                  let id = i;
+
+                  storedata.push(
+                    createData(
+                      identifierid,
+                      nameval,
+                      phoneNo,
+                      genval,
+                      ageval,
+                      addressrarr[0],
+                      visitdate,
+                      "",
+                      id
+                    )
+                  );
+                }
+                try {
+                  if (storedata.length > 0) {
+                    let filterOutput = [];
+                    setsearchData([]);
+                    if (age) {
+                      if (ageRange) {
+                        minageRange = Number(searchDetails.age) - Number(ageRange);
+                        maxageRange = Number(searchDetails.age) + Number(ageRange);
+                        for (let i = minageRange; i <= maxageRange; i++) {
+                          rangeToSend.push(String(i));
+                        }
+                        filters["age"] = rangeToSend
+                      }
+                      else {
+                        filters["age"] = [ageValue];
+                      }
+                    }
+                    if (genderValue) {
+                      filters["gender"] = [genderValue.toUpperCase()];
+                    }
+                    if (firstNameValue) {
+                      filters["name"] = [firstNameValue];
+                    }
+                    if (phoneValue) {
+                      filters["phone"] = [phoneValue];
+                    }
+                    if (lvdValue) {
+                      let lvdVal = lvdValue.split("-").reverse().join("-")
+                      filters["lvd"] = [lvdVal];
+                    }
+                    filterOutput = multiFilter(storedata, filters);
+
+                    if (filterOutput.length > 0) {
+                      storedata = filterOutput;
+                      setsearchData(storedata);
+                      setLoading(false);
+                      setapihit(false);
+                      setisDataPresent(true);
+                    } else {
+                      // setsearchData(storedata);
+                      setsearchData([]);
+                      setLoading(false);
+                      setapihit(true);
+                      setisDataPresent(false);
+                    }
+                  } else {
+                    setisDataPresent(false);
+                    setLoading(false);
+                    setapihit(true);
+                  }
+
+                }
+                catch (e) {
+                  setLoading(false);
+                  setapihit(true);
+                }
+
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+          } else {
+            setnameData(true);
+            setphoneData(true);
+            setLoading(false);
+          }
+        }
       }
-      if (alreadystoredata.length > 0) {
-        setsearchData(alreadystoredata);
-        setisDataPresent(true);
-        setLoading(false);
-      }
-      else
-      {
-        let param = firstName;
+      else {
+        let param = firstNameValue;
         var username = "admin";
         var password = "Admin123";
-        param = checkData(param,firstName,phone,identifier,age,ageRange,lvd)
-        if (firstName || phone || identifier) {
+        param = checkData(param, firstNameValue, phoneValue, identifierValue, ageValue, ageRange, lvdValue)
+        if (firstNameValue || phoneValue || identifierValue) {
           setnameData(false);
           setphoneData(false);
 
@@ -493,7 +643,9 @@ export default function PatientSearch(props) {
               var searchdatanew = [];
               var visitdate = "";
               setsearchData([]);
+              searchdatanew = searchData;
               var storedata = [];
+
               for (let i = 0; i < response.data.length; i++) {
                 var addressrarr = [];
                 searchdatanew.push(response.data);
@@ -515,9 +667,7 @@ export default function PatientSearch(props) {
                 }
                 if (searchdatanew[0][i]["person_attributes"]) {
                   phoneNo =
-                    searchdatanew[0][i]["person_attributes"][
-                      "Telephone Number"
-                    ];
+                    searchdatanew[0][i]["person_attributes"]["Telephone Number"];
                 }
                 if (searchdatanew[0][i]["visit_date"] != undefined) {
                   visitdate = searchdatanew[0][i]["visit_date"];
@@ -540,63 +690,64 @@ export default function PatientSearch(props) {
                   )
                 );
               }
-       try {
-              if (storedata.length > 0) {
-                let filterOutput = [];
-                setsearchData([]);
-                if (age) {
-                  if (ageRange) {
-                    minageRange = Number(searchDetails.age) - Number(ageRange);
-                    maxageRange = Number(searchDetails.age) + Number(ageRange);
-                    for (let i = minageRange; i <= maxageRange; i++) {
-                      rangeToSend.push(String(i));
+              try {
+                if (storedata.length > 0) {
+                  let filterOutput = [];
+                  setsearchData([]);
+                  if (ageValue) {
+                    if (ageRange) {
+                      minageRange = Number(searchDetails.age) - Number(ageRange);
+                      maxageRange = Number(searchDetails.age) + Number(ageRange);
+                      for (let i = minageRange; i <= maxageRange; i++) {
+                        rangeToSend.push(String(i));
+                      }
+                      filters["age"] = rangeToSend
                     }
-                    filters["age"] = rangeToSend
+                    else {
+                      filters["age"] = [ageValue];
+                    }
                   }
-                  else {
-                    filters["age"] = [age];
+                  if (genderValue) {
+                    filters["gender"] = [genderValue.toUpperCase()];
                   }
-                }
-                if (gender) {
-                  filters["gender"] = [gender.toUpperCase()];
-                }
-                if (firstName) {
-                  filters["name"] = [firstName];
-                }
-                if (phone) {
-                  filters["phone"] = [phone];
-                }
-                if (lvd) {
-                let lvdVal = lvd.split("-").reverse().join("-")
-                filters["lvd"] = [lvdVal];
-                }         
-                filterOutput = multiFilter(storedata, filters);
+                  if (firstNameValue) {
+                    filters["name"] = [firstNameValue];
+                  }
+                  if (phoneValue) {
+                    filters["phone"] = [phoneValue];
+                  }
+                  if (lvdValue) {
+                    let lvdVal = lvdValue.split("-").reverse().join("-")
+                    filters["lvd"] = [lvdVal];
+                  }
+                  filterOutput = multiFilter(storedata, filters);
 
-              if (filterOutput.length > 0) {
-                storedata = filterOutput;
-                setsearchData(storedata);
-                setLoading(false);
-                setapihit(false);
-                setisDataPresent(true);
-              } else {
-                // setsearchData(storedata);
-                setsearchData([]);
+                  if (filterOutput.length > 0) {
+                    storedata = filterOutput;
+                    setsearchData(storedata);
+                    setLoading(false);
+                    setapihit(false);
+                    setisDataPresent(true);
+                  } else {
+                    // setsearchData(storedata);
+                    setsearchData([]);
+                    setLoading(false);
+                    setapihit(true);
+                    setisDataPresent(false);
+                  }
+                } else {
+                  setisDataPresent(false);
+                  setLoading(false);
+                  setapihit(true);
+                }
+
+              }
+              catch (e) {
                 setLoading(false);
                 setapihit(true);
-                setisDataPresent(false);
-              }
-            } else {
-              setisDataPresent(false);
-              setLoading(false);
-              setapihit(true);
-            }
-
-              }
-          catch (e) {
-            setLoading(false);
-            setapihit(true);
               }
 
+            
             })
             .catch(function (error) {
               console.log(error);
@@ -607,166 +758,28 @@ export default function PatientSearch(props) {
           setLoading(false);
         }
       }
-      }
-      else
-      {
-      let param = firstName;
-      var username = "admin";
-      var password = "Admin123";
-      param = checkData(param,firstName,phone,identifier,age,ageRange,lvd)
-      if (firstName || phone || identifier) {
-        setnameData(false);
-        setphoneData(false);
-
-        const headers = {
-          Authorization: "Basic " + btoa(`${username}:${password}`),
-        };
-        const url = `https://ln3.hispindia.org/openmrs/ws/hisp/rest/patient_search?name=${param}`;
-        axios
-          .get(url, { headers: headers })
-          .then((response) => {
-            setapihit(true);
-            var phoneNo = "";
-            var searchdatanew = [];
-            var visitdate = "";
-            setsearchData([]);
-            searchdatanew = searchData;
-            var storedata = [];
-
-            for (let i = 0; i < response.data.length; i++) {
-              var addressrarr = [];
-              searchdatanew.push(response.data);
-              let identifierid = searchdatanew[0][i]["identifier"];
-              let nameval = searchdatanew[0][i]["name"].toUpperCase();
-              let genval = searchdatanew[0][i]["gender"];
-              let ageval = searchdatanew[0][i]["age"];
-              if (searchdatanew[0][i]["address"]) {
-                let addr1 = searchdatanew[0][i]["address"]["Address1"];
-                let addr2 = searchdatanew[0][i]["address"]["Address2"];
-                let district = searchdatanew[0][i]["address"]["City Village"];
-                let country = searchdatanew[0][i]["address"]["Country"];
-                let pincode = searchdatanew[0][i]["address"]["Postal Code"];
-                let statecode =
-                  searchdatanew[0][i]["address"]["State Province"];
-                // let addr = ho_no + " " + district + " - " + statecode + " " + country + " " + pincode
-                let addr = district + " - " + statecode;
-                addressrarr.push(addr);
-              }
-              if (searchdatanew[0][i]["person_attributes"]) {
-                phoneNo =
-                  searchdatanew[0][i]["person_attributes"]["Telephone Number"];
-              }
-              if (searchdatanew[0][i]["visit_date"] != undefined) {
-                visitdate = searchdatanew[0][i]["visit_date"];
-              } else {
-                visitdate = "N-A";
-              }
-              let id = i;
-
-              storedata.push(
-                createData(
-                  identifierid,
-                  nameval,
-                  phoneNo,
-                  genval,
-                  ageval,
-                  addressrarr[0],
-                  visitdate,
-                  "",
-                  id
-                )
-              );
-            }
-          try {
-            if (storedata.length > 0) {
-              let filterOutput = [];
-              setsearchData([]);
-              if (age) {
-                if (ageRange) {
-                    minageRange = Number(searchDetails.age) - Number(ageRange);
-                    maxageRange = Number(searchDetails.age) + Number(ageRange);
-                    for (let i = minageRange; i <= maxageRange; i++) {
-                      rangeToSend.push(String(i));
-                    }
-                    filters["age"] = rangeToSend
-                  }
-                  else {
-                    filters["age"] = [age];
-                  }
-              }
-              if (gender) {
-                filters["gender"] = [gender.toUpperCase()];
-              }
-              if (firstName) {
-                filters["name"] = [firstName];
-              }
-              if (phone) {
-                filters["phone"] = [phone];
-              }
-                    if (lvd) {
-                let lvdVal = lvd.split("-").reverse().join("-")
-                filters["lvd"] = [lvdVal];
-                }
-                filterOutput = multiFilter(storedata, filters);
-
-              if (filterOutput.length > 0) {
-                storedata = filterOutput;
-                setsearchData(storedata);
-                setLoading(false);
-                setapihit(false);
-                setisDataPresent(true);
-              } else {
-                // setsearchData(storedata);
-                setsearchData([]);
-                setLoading(false);
-                setapihit(true);
-                setisDataPresent(false);
-              }
-            } else {
-              setisDataPresent(false);
-              setLoading(false);
-              setapihit(true);
-            }
-
-              }
-          catch (e) {
-            setLoading(false);
-            setapihit(true);
-              }
-
-            
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-      } else {
-        setnameData(true);
-        setphoneData(true);
-        setLoading(false);
-      }
     }
-     } 
   }
 
 
-  function valuetext(value) {
+function valuetext(value) {
   return `${value}°C`;
 }
 
-  const resetOnKey = (event, name, eventName) => {
-    setsearchDetails({
-      ...searchDetails,
-      [name]: "",
-    });
-    setsearchData([])
-    setisDataPresent(false);
-    document.getElementById("searchForm").reset();
-  }
-  const classes = useStyles();
-  const searchdat = searchData;
-  var fName = searchDetails.firstName;
+const resetOnKey = (event, name, eventName) => {
+  setgenderValue("");
+  setfirstName("");
+  setphone("");
+  setage("");
+  setlvd("");
+  setidentifier("");
+  setsearchData([]);
+  setisDataPresent(false);
+  document.getElementById("searchForm").reset();
   
-  if (isDataPresent) {
+}
+
+function outputScreen(classes, searchdat) {
     return (
       <Container component="main" maxWidth="lg">
         <div className={classes.paper}>
@@ -778,7 +791,7 @@ export default function PatientSearch(props) {
                   }
                   helperText={
                     (!errors.phoneData &&
-                    !errors.nameData && !errors.identifierData &&
+                      !errors.nameData && !errors.identifierData &&
                       PhoneErrorMsj)
                     ||
                     (errors.phoneData && PhoneErrorMsj)
@@ -790,7 +803,7 @@ export default function PatientSearch(props) {
                   label="Phone"
                   name="phone"
                   autoComplete="phone"
-                  onKeyUp={(e)=>searchOnKey(e,"phone","press")}
+                  onKeyUp={(e) => searchOnKey(e, "phone", "press")}
                   value={classes.phone}
 
                   className="phoneID"
@@ -800,9 +813,9 @@ export default function PatientSearch(props) {
                 <TextField
                   error={(!errors.phoneData && !errors.nameData && !errors.identifierData)}
                   helperText={
-                    (!errors.phoneData && !errors.nameData && !errors.identifierData && 
+                    (!errors.phoneData && !errors.nameData && !errors.identifierData &&
                       NameErrorMsj) ||
-                    (errors.nameData && 
+                    (errors.nameData &&
                       NameErrorMsj)
                   }
                   autoComplete="fname"
@@ -813,7 +826,7 @@ export default function PatientSearch(props) {
                   id="firstName"
                   label="Name"
                   autoFocus
-                  onKeyUp={(e)=>searchOnKey(e,"firstName","press")}
+                  onKeyUp={(e) => searchOnKey(e, "firstName", "press")}
                   value={classes.firstName}
                   className="firstName"
                 />
@@ -832,7 +845,7 @@ export default function PatientSearch(props) {
                   label="Identifier"
                   name="identifier"
                   autoComplete="lname"
-                  onKeyUp={(e)=>searchOnKey(e,"identifier","press")}
+                  onKeyUp={(e) => searchOnKey(e, "identifier", "press")}
                   value={classes.identifier}
                   className="identifier"
                 />
@@ -849,14 +862,14 @@ export default function PatientSearch(props) {
                   InputLabelProps={{
                     shrink: true,
                   }}
-                  onChange={(e)=>searchOnKey(e,"lvd","press")}
+                  onChange={(e) => searchOnKey(e, "lvd", "press")}
 
                 />
               </Grid>
-            <Grid item >
+              <Grid item >
 
-            <Typography id="input-slider" variant="subtitle1" display="block" gutterBottom>
-            Age
+                <Typography id="input-slider" variant="subtitle1" display="block" gutterBottom>
+                  Age
             </Typography>
               </Grid>
               <Grid item xs={3}>
@@ -865,36 +878,36 @@ export default function PatientSearch(props) {
                   <Grid container spacing={2} alignItems="center">
                     <Grid item>
                       <Input
-                      className={classes.input}
-                      margin="dense"
-                      onKeyUp={(e)=>searchOnKey(e,"age","press")}
-                      type="number"
+                        className={classes.input}
+                        margin="dense"
+                        onKeyUp={(e) => searchOnKey(e, "age", "press")}
+                        type="number"
                       />
                     </Grid>
                     &nbsp;&nbsp;
                 <Typography id="input-slider" variant="body2" display="block" gutterBottom>
-                Range  &nbsp;&nbsp;
+                      Range  &nbsp;&nbsp;
                 </Typography>
-                <Grid item xs>
-                <Slider
-                value={resultAge}
-                onChange={handleChange}
-                valueLabelDisplay="auto"
-                aria-labelledby="range-slider"
-                getAriaValueText={valuetext}
-                min={minage}
-                max={maxage}
-                step="1"
-                />
-                </Grid>
-                <Grid item>
-                <Box component="div" display="inline" p={1} m={1} bgcolor="background.paper">
-                {resultAge}
-                </Box>
-                </Grid>
+                    <Grid item xs>
+                      <Slider
+                        value={resultAge}
+                        onChange={handleChange}
+                        valueLabelDisplay="auto"
+                        aria-labelledby="range-slider"
+                        getAriaValueText={valuetext}
+                        min={minage}
+                        max={maxage}
+                        step="1"
+                      />
+                    </Grid>
+                    <Grid item>
+                      <Box component="div" display="inline" p={1} m={1} bgcolor="background.paper">
+                        {resultAge}
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </div>
               </Grid>
-            </div>
-            </Grid>
               <Grid item xs={4}>
                 <Typography
                   variant="body2"
@@ -908,7 +921,7 @@ export default function PatientSearch(props) {
                   <RadioGroup
                     className="gendergroup"
                     value={searchDetails.gender}
-                  onChange={(e)=>searchOnKey(e,"gender","press")}
+                    onChange={(e) => searchOnKey(e, "gender", "press")}
 
                   >
                     <FormControlLabel
@@ -935,7 +948,7 @@ export default function PatientSearch(props) {
                 color="primary"
                 className="searchbtn"
                 size="small"
-                onClick={(e) => searchOnKey(e,{searchDetails},"clicked")}
+                onClick={(e) => searchOnKey(e, { searchDetails }, "clicked")}
               >
                 Search
               </Button>
@@ -944,7 +957,7 @@ export default function PatientSearch(props) {
                 variant="contained"
                 size="small"
                 className="searchbtn"
-                onClick={(e) => resetOnKey(e,{searchDetails},"clicked")}
+                onClick={(e) => resetOnKey(e, { searchDetails }, "clicked")}
               >
                 Reset
               </Button>
@@ -972,9 +985,9 @@ export default function PatientSearch(props) {
         </div>
       </Container>
     );
-  } 
-  else 
-  {
+}
+
+function inputScreen(classes, searchdat) {
     return (
       <Container component="main" maxWidth="lg">
         <div className={classes.paper}>
@@ -986,7 +999,7 @@ export default function PatientSearch(props) {
                   }
                   helperText={
                     (!errors.phoneData &&
-                    !errors.nameData && !errors.identifierData &&
+                      !errors.nameData && !errors.identifierData &&
                       PhoneErrorMsj)
                     ||
                     (errors.phoneData && PhoneErrorMsj)
@@ -998,9 +1011,9 @@ export default function PatientSearch(props) {
                   label="Phone"
                   name="phone"
                   autoComplete="phone"
-                  onKeyUp={(e)=>searchOnKey(e,"phone","press")}
+                  onKeyUp={(e) => searchOnKey(e, "phone", "press")}
                   value={classes.phone}
-                  type = "number"
+                  type="number"
                   className="phoneID"
                 />
               </Grid>
@@ -1008,9 +1021,9 @@ export default function PatientSearch(props) {
                 <TextField
                   error={(!errors.phoneData && !errors.nameData && !errors.identifierData)}
                   helperText={
-                    (!errors.phoneData && !errors.nameData && !errors.identifierData && 
+                    (!errors.phoneData && !errors.nameData && !errors.identifierData &&
                       NameErrorMsj) ||
-                    (errors.nameData && 
+                    (errors.nameData &&
                       NameErrorMsj)
                   }
                   autoComplete="fname"
@@ -1022,7 +1035,7 @@ export default function PatientSearch(props) {
                   id="firstName"
                   label="Name"
                   autoFocus
-                  onKeyUp={(e)=>searchOnKey(e,"firstName","press")}
+                  onKeyUp={(e) => searchOnKey(e, "firstName", "press")}
                   className="firstName"
                 />
               </Grid>
@@ -1040,69 +1053,69 @@ export default function PatientSearch(props) {
                   label="Identifier"
                   name="identifier"
                   autoComplete="lname"
-                  onKeyUp={(e)=>searchOnKey(e,"identifier","press")}
+                  onKeyUp={(e) => searchOnKey(e, "identifier", "press")}
                   value={classes.identifier}
                   className="identifier"
                 />
               </Grid>
-                <Grid item xs={3}>
+              <Grid item xs={3}>
                 <TextField
                   id="date"
                   label="Last visited"
                   type="date"
                   name="lvd"
                   defaultValue=""
-                  className={classes.textField}
+                  id="lvd"
                   maxDate={new Date()}
                   InputLabelProps={{
                     shrink: true,
                   }}
-                  onChange={(e)=>searchOnKey(e,"lvd","press")}
+                  onChange={(e) => searchOnKey(e, "lvd", "press")}
 
                 />
               </Grid>
 
-            <Grid item >
+              <Grid item >
 
-            <Typography id="input-slider" variant="subtitle1" display="block" gutterBottom>
-            Age
+                <Typography id="input-slider" variant="subtitle1" display="block" gutterBottom>
+                  Age
             </Typography>
-              </Grid>             
-            <Grid item xs={3}>
-            <div className={classes.rootage}>
-            <Grid container spacing={2} alignItems="center">
-            <Grid item>
-              <Input
-              className={classes.input}
-              margin="dense"
-              onKeyUp={(e)=>searchOnKey(e,"age","press")}
-              type="number"
-              />
-            </Grid>
+              </Grid>
+              <Grid item xs={3}>
+                <div className={classes.rootage}>
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item>
+                      <Input
+                        className={classes.input}
+                        margin="dense"
+                        onKeyUp={(e) => searchOnKey(e, "age", "press")}
+                        type="number"
+                      />
+                    </Grid>
             &nbsp;&nbsp;
           <Typography id="input-slider" variant="body2" display="block" gutterBottom>
-          Range  &nbsp;&nbsp;
+                      Range  &nbsp;&nbsp;
           </Typography>
-          <Grid item xs>
-            <Slider
-            value={resultAge}
-            onChange={handleChange}
-            valueLabelDisplay="auto"
-            aria-labelledby="range-slider"
-            getAriaValueText={valuetext}
-            min={minage}
-            max={maxage}
-            step="1"
-            />
-          </Grid>
-          <Grid item>
-          <Box component="div" display="inline" p={1} m={1} bgcolor="background.paper">
-              {resultAge}
-            </Box>
+                    <Grid item xs>
+                      <Slider
+                        value={resultAge}
+                        onChange={handleChange}
+                        valueLabelDisplay="auto"
+                        aria-labelledby="range-slider"
+                        getAriaValueText={valuetext}
+                        min={minage}
+                        max={maxage}
+                        step="1"
+                      />
+                    </Grid>
+                    <Grid item>
+                      <Box component="div" display="inline" p={1} m={1} bgcolor="background.paper">
+                        {resultAge}
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </div>
               </Grid>
-            </Grid>
-          </div>
-        </Grid>
               <Grid item xs={4}>
                 <Typography
                   variant="body2"
@@ -1115,8 +1128,8 @@ export default function PatientSearch(props) {
                 <FormControl>
                   <RadioGroup
                     className="gendergroup"
-                    value={searchDetails.gender}
-                  onChange={(e)=>searchOnKey(e,"gender","press")}
+                    value={genderValue}
+                    onChange={(e) => searchOnKey(e, "gender", "press")}
 
                   >
                     <FormControlLabel
@@ -1143,7 +1156,7 @@ export default function PatientSearch(props) {
                 color="primary"
                 className="searchbtn"
                 size="small"
-                onClick={(e) => searchOnKey(e,{searchDetails},"clicked")}
+                onClick={(e) => searchOnKey(e, { searchDetails }, "clicked")}
               >
                 Search
               </Button>
@@ -1152,7 +1165,7 @@ export default function PatientSearch(props) {
                 variant="contained"
                 size="small"
                 className="searchbtn"
-                onClick={(e) => resetOnKey(e,{searchDetails},"clicked")}
+                onClick={(e) => resetOnKey(e, { searchDetails }, "clicked")}
               >
                 Reset
               </Button>
@@ -1170,5 +1183,17 @@ export default function PatientSearch(props) {
         )}
       </Container>
     );
-  }
+}
+
+
+const classes = useStyles();
+const searchdat = searchData;
+  
+if (isDataPresent) {
+  return outputScreen(classes, searchdat)
+}
+else {
+  return inputScreen(classes, searchdat)
+}
+
 }
