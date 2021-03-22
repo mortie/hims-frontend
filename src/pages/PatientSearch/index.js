@@ -69,6 +69,7 @@ export default function PatientSearch(props) {
   var [minage, setminage] = useState(0);
   var [maxage, setmaxage] = useState(5);
   var [loading, setLoading] = useState(false);
+
   var [errors, setErrors] = useState({ phoneData: true, nameData: true, identifierData: true });
   var [isDataPresent, setisDataPresent] = useState(false);
   var [phoneData, setphoneData] = useState(false);
@@ -778,8 +779,11 @@ const resetOnKey = (event, name, eventName) => {
   setidentifier("");
   setsearchData([]);
   setisDataPresent(false);
-  document.getElementById("searchForm").reset();
-  
+  setIdenErrorMsj("");
+  setNameErrorMsj("");
+  setPhoneErrorMsj("");
+  setErrors({ phoneData: true, nameData: true, identifierData: true });
+  document.getElementById("searchForm").reset();  
 }
 
 function outputScreen(classes, searchdat,genderValue) {
