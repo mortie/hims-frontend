@@ -29,8 +29,12 @@ body {
   padding: 0 0 3px 0;
 }
 .ageClass {
-  margin-top: 6px;
+  margin: 15px 7px 4px 14px;
 }
 .otherClass {
   margin-left: 0 !important;
+}
+.genderClass {
+  margin: 18px 0 0 -40px;
+  font-size: 16px;
 }

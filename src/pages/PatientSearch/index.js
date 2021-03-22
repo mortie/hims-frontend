@@ -95,20 +95,20 @@ export default function PatientSearch(props) {
       field: "age",
       headerName: "Age",
       type: "number",
-      width: 100,
+      width: 80,
     },
     {
       field: "address",
       headerName: "Address",
       type: "string",
-      width: 200,
+      width: 150,
       height: 300,
     },
     {
       field: "lvd",
       headerName: "Last Visited",
       type: "string",
-      width: 150,
+      width: 120,
     },
     {
       field: "action",
@@ -808,8 +808,8 @@ function outputScreen(classes, searchdat,genderValue) {
                   autoComplete="phone"
                   onKeyUp={(e) => searchOnKey(e, "phone", "press")}
                   value={classes.phone}
-                  className="phoneID"
                   type="number"
+                  className="phoneID"
                   onInput = {(e) =>{
                   e.target.value = Math.max(0, parseInt(e.target.value) ).toString().slice(0,10)
                   }}
@@ -829,11 +829,11 @@ function outputScreen(classes, searchdat,genderValue) {
                   variant="outlined"
                   required
                   fullWidth
+                  type="text"
                   id="firstName"
                   label="Name"
                   autoFocus
                   onKeyUp={(e) => searchOnKey(e, "firstName", "press")}
-                  value={classes.firstName}
                   className="firstName"
                 />
               </Grid>
@@ -863,7 +863,7 @@ function outputScreen(classes, searchdat,genderValue) {
                   type="date"
                   name="lvd"
                   defaultValue=""
-                  className={classes.textField}
+                  id="lvd"
                   maxDate={new Date()}
                   InputLabelProps={{
                     shrink: true,
@@ -872,16 +872,11 @@ function outputScreen(classes, searchdat,genderValue) {
 
                 />
               </Grid>
-              <Grid item >
-
-                {/* <Typography id="input-slider" variant="subtitle1" display="block" gutterBottom>
-                  Age
-            </Typography> */}
-                                  <InputLabel htmlFor="uncontrolled-native">Age</InputLabel>
+<br></br>
+              <Grid item xs={0.5} class="ageClass">
+              <InputLabel htmlFor="uncontrolled-native">Age</InputLabel>
               </Grid>
               <Grid item xs={3}>
-
-                <div className={classes.rootage}>
                   <Grid container spacing={2} alignItems="center">
                     <Grid item>
                       <Input
@@ -891,7 +886,7 @@ function outputScreen(classes, searchdat,genderValue) {
                         type="number"
                       />
                     </Grid>
-                    &nbsp;&nbsp;
+            &nbsp;&nbsp;
                   <InputLabel htmlFor="uncontrolled-native">Range</InputLabel>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                    
                     <FormControl className={classes.formControl}>
@@ -912,17 +907,14 @@ function outputScreen(classes, searchdat,genderValue) {
                       </NativeSelect>
                     </FormControl>
                     </Grid>
-                </div>
+                
               </Grid>
-              <Grid item xs={4}>
-                <Typography
-                  variant="body2"
-                  display="block"
-                  gutterBottom
-                  className="genderLabel"
-                >
-                  Gender &nbsp;&nbsp;
-                </Typography>
+              <Grid item xs={1} class="genderClass">
+                <InputLabel htmlFor="uncontrolled-native" >Gender</InputLabel>
+              </Grid>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+                <Grid item xs={4}>
+
                 <FormControl>
                   <RadioGroup
                     className="gendergroup"
@@ -1083,17 +1075,11 @@ function inputScreen(classes, searchdat,genderValue) {
 
                 />
               </Grid>
-
-              <Grid item >
-{/* 
-                <Typography id="input-slider" variant="subtitle1" display="block" gutterBottom>
-                  Age
-            </Typography> */}
-                                  <InputLabel htmlFor="uncontrolled-native">Age</InputLabel>
-
+<br></br>
+              <Grid item xs={0.5} class="ageClass">
+              <InputLabel htmlFor="uncontrolled-native">Age</InputLabel>
               </Grid>
               <Grid item xs={3}>
-                <div className={classes.rootage}>
                   <Grid container spacing={2} alignItems="center">
                     <Grid item>
                       <Input
@@ -1124,17 +1110,14 @@ function inputScreen(classes, searchdat,genderValue) {
                       </NativeSelect>
                     </FormControl>
                     </Grid>
-                </div>
+                
               </Grid>
-              <Grid item xs={4}>
-                <Typography
-                  variant="body2"
-                  display="block"
-                  gutterBottom
-                  className="genderLabel"
-                >
-                  Gender &nbsp;&nbsp;
-                </Typography>
+              <Grid item xs={1} class="genderClass">
+                <InputLabel htmlFor="uncontrolled-native" >Gender</InputLabel>
+              </Grid>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+                <Grid item xs={4}>
+
                 <FormControl>
                   <RadioGroup
                     className="gendergroup"
