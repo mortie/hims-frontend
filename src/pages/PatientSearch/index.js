@@ -16,6 +16,8 @@ import { CircularProgress } from "@material-ui/core";
 import Slider from '@material-ui/core/Slider';
 import Input from '@material-ui/core/Input';
 import Box from '@material-ui/core/Box';
+import InputLabel from '@material-ui/core/InputLabel';
+import NativeSelect from '@material-ui/core/NativeSelect';
 
 import { DataGrid } from "@material-ui/data-grid";
 import CustomizedMenus from "./ActionButton";
@@ -61,7 +63,7 @@ export default function PatientSearch(props) {
   var [age, setage] = useState("");
   var [lvd, setlvd] = useState("");
   var [genderValue, setgenderValue] = useState("");
-  var [resultAge, setresultAge] = useState(minage);
+  var [resultAge, setresultAge] = useState(0);
 
 
   var [minage, setminage] = useState(0);
@@ -123,7 +125,7 @@ export default function PatientSearch(props) {
 
 
   const handleChange = (event, newValue) => {
-    setresultAge(newValue)
+    setresultAge(event.target.value)
   };
 
   const isEnteredPressed = (charLen, event, name, eventName) => {
@@ -183,51 +185,44 @@ export default function PatientSearch(props) {
         return true;
       }
       else {
-        if (Object.keys(name.searchDetails).length != 0) {
-          Object.keys(name.searchDetails).forEach(function (previouskey) {
-            if (previouskey == "firstName") {
-              setErrors({ nameData: !searchDetails.firstName ? false : true })
-              if (searchDetails.firstName) {
-                var nameLen = searchDetails.firstName.length;
-              }
-              if (nameLen && (nameLen <= charLen) && (nameLen > 0)) {
-                setNameErrorMsj("Atleast 3 characters is required")
-              }
-              else if (errors.nameData) {
-                setNameErrorMsj("Name is required")
-              }
-            }
+        var nameLen = ""
+        var phoneLen = ""
+        var idenLen = ""
+        setErrors({ nameData: !firstName ? false : true })
+        setErrors({ phoneData: !phone ? false : true })
+        setErrors({ identifierData: !identifier ? false : true })
+          if (firstName) {
+          nameLen = firstName.length;
+          }
+          if (nameLen && (nameLen <= charLen) && (nameLen > 0)) {
+          setNameErrorMsj("Atleast 3 characters is required")
+          }
+          else if (errors.nameData) {
+          setNameErrorMsj("Name is required")
+          }
+            
 
-            if (previouskey == "phone") {
-              setErrors({ phoneData: !searchDetails.phone ? false : true })
-              if (searchDetails.phone) {
-                var phoneLen = searchDetails.phone.length;
-              }
-              if (phoneLen && (phoneLen <= charLen) && (phoneLen > 0)) {
-                setPhoneErrorMsj("Atleast 10 characters is required")
-              }
-              else if (errors.phoneData) {
-                setPhoneErrorMsj("Phone is required")
-              }
-            }
-            if (previouskey == "identifier") {
-              setErrors({ identifierData: !searchDetails.identifier ? false : true })
-              if (searchDetails.identifier) {
-                var idenLen = searchDetails.identifier.length;
-              }
-              if (idenLen && (idenLen < charLen) && (idenLen > 0)) {
-                setIdenErrorMsj("Atleast 3 characters is required")
-              }
-
-              else if (errors.identifierData) {
-                setIdenErrorMsj("Identifier is required")
-              }
-            }
-          });
-    
-          
-        }
+          if (phone) {
+            phoneLen = phone.length;
+          }
+          if (phoneLen && (phoneLen <= charLen) && (phoneLen > 0)) {
+            setPhoneErrorMsj("Atleast 10 characters is required")
+          }
+          else if (errors.phoneData) {
+            setPhoneErrorMsj("Phone is required")
+          }
         
+        
+          if (identifier) {
+            idenLen = identifier.length;
+          }
+          if (idenLen && (idenLen < charLen) && (idenLen > 0)) {
+            setIdenErrorMsj("Atleast 3 characters is required")
+          }
+          else if (errors.identifierData) {
+            setIdenErrorMsj("Identifier is required")
+          }   
+
         return false
       }
     }
@@ -239,6 +234,9 @@ export default function PatientSearch(props) {
         (firstName && firstName.length > charLen) ||
         (identifier && identifier.length > charLen)) {
         return true;
+      }
+      else {
+        return false;
       }
     }
     else {
@@ -365,10 +363,7 @@ export default function PatientSearch(props) {
   }
   const searchOnKey = (event, name, eventName) => {
 
-    setsearchDetails({
-      ...searchDetails,
-      [name]: event.target.value,
-    });
+    
     var searchValue = event.target.value;
     if (name == "firstName") {
       setfirstName(searchValue)
@@ -385,35 +380,36 @@ export default function PatientSearch(props) {
     if (name == "lvd") {
       setlvd(searchValue)
     }
+    if (name == "gender") {
+        setgenderValue(searchValue)
+    }
+
     
+    if (firstName) {
+    var firstNameValue = firstName.toUpperCase();
+    }
+    let phoneValue = phone;
+    let identifierValue = identifier;
+    let ageValue = "";
+    let lvdValue = "";
+    var minageRange = "";
+    var maxageRange = "";
+    let ageRange = resultAge;
+    var rangeToSend = [];
+    let genderValue = "";
+
     if (isValueEntered(event, name, eventName)) {
 
       setLoading(true);
       setapihit(false);
 
-
-      if (firstName) {
-        var firstNameValue = firstName.toUpperCase();
-      }
-      let phoneValue = phone;
-      let identifierValue = identifier;
-      let ageValue = "";
-      let lvdValue = "";
-      var minageRange = "";
-      var maxageRange = "";
-      let ageRange = resultAge;
-      var rangeToSend = [];
-      let genderValue = "";
       if (name == "age") {
         ageValue = event.target.value;
       }
       else if (age) {
         ageValue = age;
       }
-      if (name == "gender") {
-        genderValue = event.target.value;
-        setgenderValue(genderValue)
-      }
+
       if (name == "lvd") {
         lvd = event.target.value;
 
@@ -868,9 +864,10 @@ function outputScreen(classes, searchdat) {
               </Grid>
               <Grid item >
 
-                <Typography id="input-slider" variant="subtitle1" display="block" gutterBottom>
+                {/* <Typography id="input-slider" variant="subtitle1" display="block" gutterBottom>
                   Age
-            </Typography>
+            </Typography> */}
+                                  <InputLabel htmlFor="uncontrolled-native">Age</InputLabel>
               </Grid>
               <Grid item xs={3}>
 
@@ -885,27 +882,26 @@ function outputScreen(classes, searchdat) {
                       />
                     </Grid>
                     &nbsp;&nbsp;
-                <Typography id="input-slider" variant="body2" display="block" gutterBottom>
-                      Range  &nbsp;&nbsp;
-                </Typography>
-                    <Grid item xs>
-                      <Slider
-                        value={resultAge}
+                  <InputLabel htmlFor="uncontrolled-native">Range</InputLabel>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                    
+                    <FormControl className={classes.formControl}>
+                      <NativeSelect
+                        defaultValue={resultAge}
+                        inputProps={{
+                        name: 'name',
+                        id: 'uncontrolled-native',
+                        }}
                         onChange={handleChange}
-                        valueLabelDisplay="auto"
-                        aria-labelledby="range-slider"
-                        getAriaValueText={valuetext}
-                        min={minage}
-                        max={maxage}
-                        step="1"
-                      />
+                        >
+                        <option value={0}>0</option>
+                        <option value={1}>1</option>
+                        <option value={2}>2</option>
+                        <option value={3}>3</option>
+                        <option value={4}>4</option>
+                        <option value={5}>5</option>
+                      </NativeSelect>
+                    </FormControl>
                     </Grid>
-                    <Grid item>
-                      <Box component="div" display="inline" p={1} m={1} bgcolor="background.paper">
-                        {resultAge}
-                      </Box>
-                    </Grid>
-                  </Grid>
                 </div>
               </Grid>
               <Grid item xs={4}>
@@ -952,7 +948,7 @@ function outputScreen(classes, searchdat) {
               >
                 Search
               </Button>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <Button
                 variant="contained"
                 size="small"
@@ -1076,10 +1072,12 @@ function inputScreen(classes, searchdat) {
               </Grid>
 
               <Grid item >
-
+{/* 
                 <Typography id="input-slider" variant="subtitle1" display="block" gutterBottom>
                   Age
-            </Typography>
+            </Typography> */}
+                                  <InputLabel htmlFor="uncontrolled-native">Age</InputLabel>
+
               </Grid>
               <Grid item xs={3}>
                 <div className={classes.rootage}>
@@ -1093,27 +1091,26 @@ function inputScreen(classes, searchdat) {
                       />
                     </Grid>
             &nbsp;&nbsp;
-          <Typography id="input-slider" variant="body2" display="block" gutterBottom>
-                      Range  &nbsp;&nbsp;
-          </Typography>
-                    <Grid item xs>
-                      <Slider
-                        value={resultAge}
+                  <InputLabel htmlFor="uncontrolled-native">Range</InputLabel>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                    
+                    <FormControl className={classes.formControl}>
+                      <NativeSelect
+                        defaultValue={resultAge}
+                        inputProps={{
+                        name: 'name',
+                        id: 'uncontrolled-native',
+                        }}
                         onChange={handleChange}
-                        valueLabelDisplay="auto"
-                        aria-labelledby="range-slider"
-                        getAriaValueText={valuetext}
-                        min={minage}
-                        max={maxage}
-                        step="1"
-                      />
+                        >
+                        <option value={0}>0</option>
+                        <option value={1}>1</option>
+                        <option value={2}>2</option>
+                        <option value={3}>3</option>
+                        <option value={4}>4</option>
+                        <option value={5}>5</option>
+                      </NativeSelect>
+                    </FormControl>
                     </Grid>
-                    <Grid item>
-                      <Box component="div" display="inline" p={1} m={1} bgcolor="background.paper">
-                        {resultAge}
-                      </Box>
-                    </Grid>
-                  </Grid>
                 </div>
               </Grid>
               <Grid item xs={4}>
