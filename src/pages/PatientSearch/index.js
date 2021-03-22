@@ -62,7 +62,7 @@ export default function PatientSearch(props) {
   var [identifier, setidentifier] = useState("");
   var [age, setage] = useState("");
   var [lvd, setlvd] = useState("");
-  var [genderValue, setgenderValue] = useState();
+  var [genderValue, setgenderValue] = useState("");
   var [resultAge, setresultAge] = useState(0);
 
 
@@ -419,8 +419,7 @@ export default function PatientSearch(props) {
       }
 
       if (name == "lvd") {
-        lvd = event.target.value;
-
+        lvdValue = event.target.value;
       }
       else if (lvd) {
         lvdValue = lvd;
@@ -783,7 +782,7 @@ const resetOnKey = (event, name, eventName) => {
   
 }
 
-function outputScreen(classes, searchdat) {
+function outputScreen(classes, searchdat,genderValue) {
     return (
       <Container component="main" maxWidth="lg">
         <div className={classes.paper}>
@@ -809,8 +808,11 @@ function outputScreen(classes, searchdat) {
                   autoComplete="phone"
                   onKeyUp={(e) => searchOnKey(e, "phone", "press")}
                   value={classes.phone}
-
                   className="phoneID"
+                  type="number"
+                  onInput = {(e) =>{
+                  e.target.value = Math.max(0, parseInt(e.target.value) ).toString().slice(0,10)
+                  }}
                 />
               </Grid>
               <Grid item sm={3}>
@@ -991,7 +993,7 @@ function outputScreen(classes, searchdat) {
     );
 }
 
-function inputScreen(classes, searchdat) {
+function inputScreen(classes, searchdat,genderValue) {
     return (
       <Container component="main" maxWidth="lg">
         <div className={classes.paper}>
@@ -1019,6 +1021,9 @@ function inputScreen(classes, searchdat) {
                   value={classes.phone}
                   type="number"
                   className="phoneID"
+                  onInput = {(e) =>{
+                  e.target.value = Math.max(0, parseInt(e.target.value) ).toString().slice(0,10)
+                  }}
                 />
               </Grid>
               <Grid item sm={3}>
@@ -1193,12 +1198,12 @@ function inputScreen(classes, searchdat) {
 
 const classes = useStyles();
 const searchdat = searchData;
-  
+var genderValue = genderValue;
 if (isDataPresent) {
-  return outputScreen(classes, searchdat)
+  return outputScreen(classes, searchdat,genderValue)
 }
 else {
-  return inputScreen(classes, searchdat)
+  return inputScreen(classes, searchdat,genderValue)
 }
 
 }
