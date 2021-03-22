@@ -873,7 +873,7 @@ function outputScreen(classes, searchdat,genderValue) {
                 />
               </Grid>
 <br></br>
-              <Grid item xs={0.5} class="ageClass">
+              <Grid item xs={0.5} className="ageClass">
               <InputLabel htmlFor="uncontrolled-native">Age</InputLabel>
               </Grid>
               <Grid item xs={3}>
@@ -909,11 +909,11 @@ function outputScreen(classes, searchdat,genderValue) {
                     </Grid>
                 
               </Grid>
-              <Grid item xs={1} class="genderClass">
+              <Grid item xs={1} className="genderClass">
                 <InputLabel htmlFor="uncontrolled-native" >Gender</InputLabel>
               </Grid>
               &nbsp;&nbsp;&nbsp;&nbsp;
-                <Grid item xs={4}>
+                <Grid item xs={3.5}>
 
                 <FormControl>
                   <RadioGroup
@@ -1076,7 +1076,7 @@ function inputScreen(classes, searchdat,genderValue) {
                 />
               </Grid>
 <br></br>
-              <Grid item xs={0.5} class="ageClass">
+              <Grid item xs={0.5} className="ageClass">
               <InputLabel htmlFor="uncontrolled-native">Age</InputLabel>
               </Grid>
               <Grid item xs={3}>
@@ -1112,11 +1112,11 @@ function inputScreen(classes, searchdat,genderValue) {
                     </Grid>
                 
               </Grid>
-              <Grid item xs={1} class="genderClass">
+              <Grid item xs={1} className="genderClass">
                 <InputLabel htmlFor="uncontrolled-native" >Gender</InputLabel>
               </Grid>
               &nbsp;&nbsp;&nbsp;&nbsp;
-                <Grid item xs={4}>
+                <Grid item xs={3.5}>
 
                 <FormControl>
                   <RadioGroup

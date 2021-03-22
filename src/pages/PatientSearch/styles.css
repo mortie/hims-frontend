@@ -29,12 +29,13 @@ body {
   padding: 0 0 3px 0;
 }
 .ageClass {
-  margin: 15px 7px 4px 14px;
+  margin: 8px 5px 0px 4px !important;
 }
 .otherClass {
   margin-left: 0 !important;
 }
 .genderClass {
-  margin: 18px 0 0 -40px;
+  margin: 10px -35px 0px -50px !important;
+
   font-size: 16px;
 }
