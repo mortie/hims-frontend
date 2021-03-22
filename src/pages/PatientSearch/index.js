@@ -286,6 +286,18 @@ export default function PatientSearch(props) {
                 return false
               }
             }
+            else if (filterProperty == "identifier") {
+              var searchTokens = filterValues[0].split(" ");
+              var searchString = product[filterProperty];
+              var searchRegex = new RegExp(searchTokens.join('|'), 'g');
+              var numOfMatches = searchString.match(searchRegex);
+              if (numOfMatches != null) {
+                return true;
+              }
+              else {
+                return false;
+              }
+            }
             else if (filterProperty != "name") {
               console.log("compare this :", filterValues, " to ", product[filterProperty], "results :", filterValues.includes(product[filterProperty]))
               return filterValues.includes(product[filterProperty]);
@@ -295,7 +307,6 @@ export default function PatientSearch(props) {
               var searchString = product[filterProperty];
               var searchRegex = new RegExp(searchTokens.join('|'), 'g');
               var numOfMatches = searchString.match(searchRegex);
-              console.log("compare this for Name :", filterValues, " to ", product[filterProperty], "results :", numOfMatches)
               if (numOfMatches != null) {
                 return true;
               }
