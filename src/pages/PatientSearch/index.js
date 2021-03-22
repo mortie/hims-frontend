@@ -62,7 +62,7 @@ export default function PatientSearch(props) {
   var [identifier, setidentifier] = useState("");
   var [age, setage] = useState("");
   var [lvd, setlvd] = useState("");
-  var [genderValue, setgenderValue] = useState("");
+  var [genderValue, setgenderValue] = useState();
   var [resultAge, setresultAge] = useState(0);
 
 
@@ -365,6 +365,8 @@ export default function PatientSearch(props) {
 
     
     var searchValue = event.target.value;
+    let genderValue = ""
+
     if (name == "firstName") {
       setfirstName(searchValue)
     }
@@ -384,19 +386,19 @@ export default function PatientSearch(props) {
         setgenderValue(searchValue)
     }
 
-    
-    if (firstName) {
-    var firstNameValue = firstName.toUpperCase();
-    }
-    let phoneValue = phone;
-    let identifierValue = identifier;
     let ageValue = "";
     let lvdValue = "";
     var minageRange = "";
     var maxageRange = "";
     let ageRange = resultAge;
     var rangeToSend = [];
-    let genderValue = "";
+    
+    if (firstName) {
+    var firstNameValue = firstName.toUpperCase();
+    }
+    let phoneValue = phone;
+    let identifierValue = identifier;
+
 
     if (isValueEntered(event, name, eventName)) {
 
@@ -408,6 +410,12 @@ export default function PatientSearch(props) {
       }
       else if (age) {
         ageValue = age;
+      }
+      if (genderValue) {
+          genderValue = genderValue;
+      }
+      else if(name == "gender") {
+        genderValue = event.target.value
       }
 
       if (name == "lvd") {
@@ -441,8 +449,8 @@ export default function PatientSearch(props) {
         }
         else if (age) {
           if (ageRange) {
-            minageRange = Number(searchDetails.age) - Number(ageRange);
-            maxageRange = Number(searchDetails.age) + Number(ageRange);
+            minageRange = Number(age) - Number(ageRange);
+            maxageRange = Number(age) + Number(ageRange);
             for (let k = minageRange; k <= maxageRange; k++) {
               rangeToSend.push(String(k));
             }
@@ -556,8 +564,8 @@ export default function PatientSearch(props) {
                     setsearchData([]);
                     if (age) {
                       if (ageRange) {
-                        minageRange = Number(searchDetails.age) - Number(ageRange);
-                        maxageRange = Number(searchDetails.age) + Number(ageRange);
+                        minageRange = Number(age) - Number(ageRange);
+                        maxageRange = Number(age) + Number(ageRange);
                         for (let i = minageRange; i <= maxageRange; i++) {
                           rangeToSend.push(String(i));
                         }
@@ -692,8 +700,8 @@ export default function PatientSearch(props) {
                   setsearchData([]);
                   if (ageValue) {
                     if (ageRange) {
-                      minageRange = Number(searchDetails.age) - Number(ageRange);
-                      maxageRange = Number(searchDetails.age) + Number(ageRange);
+                      minageRange = Number(age) - Number(ageRange);
+                      maxageRange = Number(age) + Number(ageRange);
                       for (let i = minageRange; i <= maxageRange; i++) {
                         rangeToSend.push(String(i));
                       }
@@ -916,7 +924,7 @@ function outputScreen(classes, searchdat) {
                 <FormControl>
                   <RadioGroup
                     className="gendergroup"
-                    value={searchDetails.gender}
+                    value={genderValue}
                     onChange={(e) => searchOnKey(e, "gender", "press")}
 
                   >
