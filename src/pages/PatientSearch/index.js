@@ -54,14 +54,13 @@ export default function PatientSearch(props) {
     lvd: "",
   });
   var [searchData, setsearchData] = useState([]);
-
   var [firstNameVal, setfirstNameVal] = useState("");
-
   var [firstName, setfirstName] = useState("");
   var [phone, setphone] = useState("");
   var [identifier, setidentifier] = useState("");
   var [age, setage] = useState("");
   var [lvd, setlvd] = useState("");
+  var [lvdapprox, setlvdapprox] = useState("");
   var [genderValue, setgenderValue] = useState("");
   var [resultAge, setresultAge] = useState(0);
 
@@ -124,14 +123,10 @@ export default function PatientSearch(props) {
     },
   ];
 
-
-  const handleChange = (event, newValue) => {
-    setresultAge(event.target.value)
-  };
-
   const isEnteredPressed = (charLen, event, name, eventName) => {
     
-    if ((event.key === isEnter && event.target.value.length > charLen) || (event.key === isEnter && name == "age")) {
+    if ((event.key === isEnter && event.target.value.length > charLen) ||
+      (event.key === isEnter && name == "age")) {
       if ((name != "phone") || ((name == "phone") && (event.target.value.length > 9))) {
         return true
       }
@@ -230,16 +225,46 @@ export default function PatientSearch(props) {
   }
   
   const isValueChanged = (charLen, event, name, eventName) => {
-    if ((name == "gender" && eventName == "press") || (name == "lvd" && eventName == "press")) {
+    if ((name == "gender" && eventName == "press") ||
+      (name == "lvd" && eventName == "press")
+    )
+    {
       if ((phone && phone.length) > charLen ||
         (firstName && firstName.length > charLen) ||
-        (identifier && identifier.length > charLen)) {
+        (identifier && identifier.length > charLen))
+      {
         return true;
       }
       else {
         return false;
       }
     }
+    else if (name == "lastvisit" && eventName == "press")
+    {
+      if ((lvd != "") && ((phone && phone.length) > charLen ||
+        (firstName && firstName.length > charLen) ||
+        (identifier && identifier.length > charLen))
+      )
+      {
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+    else if (name == "range" && eventName == "press")
+    {
+      if ((age != "") && ((phone && phone.length) > charLen ||
+        (firstName && firstName.length > charLen) ||
+        (identifier && identifier.length > charLen))
+      )
+      {
+        return true;
+      }
+      else {
+        return false;
+      }
+    }        
     else {
       return false;
     }
@@ -280,10 +305,16 @@ export default function PatientSearch(props) {
           default:
             if (filterProperty == "lvd") {
               if (filterValues.length > 0) {
-                return true
+              var searchTokens = filterValues[0].split(" ");
+              var searchString = product[filterProperty];
+              var searchRegex = new RegExp(searchTokens.join('|'), 'g');
+              var numOfMatches = searchString.match(searchRegex);
+              if (numOfMatches != null) {
+                return true;
               }
               else {
-                return false
+                return false;
+              }
               }
             }
             else if (filterProperty == "identifier") {
@@ -299,7 +330,6 @@ export default function PatientSearch(props) {
               }
             }
             else if (filterProperty != "name") {
-              console.log("compare this :", filterValues, " to ", product[filterProperty], "results :", filterValues.includes(product[filterProperty]))
               return filterValues.includes(product[filterProperty]);
             }
             else {
@@ -320,14 +350,39 @@ export default function PatientSearch(props) {
   };
 
   var filters = {};
+  function checkData(param, firstNameVal, phoneVal, identifierVal, ageVal, ageRange, lvd, lvdValueApprox) {
+    let date = new Date();
+    var paramLvd = "";
+    let month = "";
 
-  function checkData(param, firstNameVal, phoneVal, identifierVal, ageVal, ageRange, lvd) {
+    if (lvdValueApprox == "LM") {
+      month = new Date().getMonth();
+      let formatprevOneMonth = new Date(date.setMonth(month - 1));
+      paramLvd = "&lastvisitapprox=" + new Date(formatprevOneMonth).toISOString().split('T')[0] 
+    }
+    else if (lvdValueApprox == "L6M") {
+      month = new Date().getMonth();
+      let formatprev6Month = new Date(date.setMonth(month - 6));
+      paramLvd = "&lastvisitapprox=" + new Date(formatprev6Month).toISOString().split('T')[0] 
+    }
+    else if (lvdValueApprox == "LY") {
+      month = new Date().getMonth();
+      let formatprev6Month = new Date(date.setMonth(month - 12));
+      paramLvd = "&lastvisitapprox=" + new Date(formatprev6Month).toISOString().split('T')[0] 
+    }
+    else if (lvdValueApprox == "A") {
+      paramLvd = "&lastvisitapprox=" + lvd
+    }
+
     if (firstNameVal) {
       if (firstNameVal && ageVal) {
         param = firstNameVal + "&agerange=" + ageRange + "&age=" + ageVal
       }
+      else if (firstNameVal && lvdValueApprox) {
+        param = firstNameVal + paramLvd
+      }
       else if (firstNameVal && lvd) {
-        param = firstNameVal + "&lastvisitapprox=" + lvd
+        param = firstNameVal + "&lastvisitexact=" + lvd
       }
       else {
         param = firstNameVal;
@@ -336,6 +391,9 @@ export default function PatientSearch(props) {
     if (phoneVal) {
       if (phoneVal && ageVal) {
         param = phoneVal + "&agerange=" + ageRange + "&age=" + ageVal
+      }
+      else if (phoneVal && lvdValueApprox) {
+        param = phoneVal + + paramLvd
       }
       else if (phoneVal && lvd) {
         param = phoneVal + "&lastvisitapprox=" + lvd
@@ -348,6 +406,9 @@ export default function PatientSearch(props) {
       if (phoneVal && ageVal) {
         param = phoneVal + "&agerange=" + ageRange + "&age=" + ageVal
       }
+      else if (phoneVal && lvdValueApprox) {
+        param = phoneVal + paramLvd
+      }
       else if (phoneVal && lvd) {
         param = phoneVal + "&lastvisitapprox=" + lvd
       }
@@ -358,6 +419,9 @@ export default function PatientSearch(props) {
     if (identifierVal) {
       if (identifierVal && ageVal) {
         param = identifierVal + "&agerange=" + ageRange + "&age=" + ageVal
+      }
+      else if (identifierVal && lvdValueApprox) {
+        param = identifierVal + paramLvd
       }
       else if (identifierVal && lvd) {
         param = identifierVal + "&lastvisitapprox=" + lvd
@@ -370,9 +434,6 @@ export default function PatientSearch(props) {
     return param
   }
 
-  const postSearchKey = () => {
-    
-  }
   const searchOnKey = (event, name, eventName) => {
 
     
@@ -397,14 +458,34 @@ export default function PatientSearch(props) {
     if (name == "gender") {
         setgenderValue(searchValue)
     }
-
+    if (name == "range") {
+      setresultAge(searchValue)
+    }
+    if (name == "lastvisit") {
+      setlvdapprox(searchValue)
+    }
+  
     let ageValue = "";
     let lvdValue = "";
     var minageRange = "";
     var maxageRange = "";
     let ageRange = resultAge;
     var rangeToSend = [];
-    
+    var lvdValueApprox = "";
+    var lvdParams = "";
+
+    if(name == "lastvisit") {
+      lvdValueApprox = searchValue;
+    }
+    else if (lvdapprox) {
+      lvdValueApprox = lvdapprox;
+    }
+    if (name == "range") {
+      ageRange = searchValue;
+    }
+    else if (resultAge) {
+      ageRange = resultAge;
+    }
     if (firstName) {
     var firstNameValue = firstName.toUpperCase();
     }
@@ -432,9 +513,11 @@ export default function PatientSearch(props) {
 
       if (name == "lvd") {
         lvdValue = event.target.value;
+        lvdValue = event.target.value.split("-").reverse().join("-")
       }
       else if (lvd) {
         lvdValue = lvd;
+        lvdValue = lvdValue.split("-").reverse().join("-")
       }
       let searchDataAlready = searchData;
 
@@ -443,6 +526,7 @@ export default function PatientSearch(props) {
       if (searchDataAlready.length > 0 && isDataPresent == true) {
         isDataAlready = true;
       }
+
       if (isDataAlready) {
         if (name == "age") {
           if (ageRange) {
@@ -505,7 +589,7 @@ export default function PatientSearch(props) {
           let param = firstNameValue;
           var username = "admin";
           var password = "Admin123";
-          param = checkData(param, firstNameValue, phoneValue, identifierValue, ageValue, ageRange, lvdValue)
+          param = checkData(param, firstNameValue, phoneValue, identifierValue, ageValue, ageRange, lvdValue,lvdValueApprox)
           if (firstNameValue || phoneValue || identifierValue) {
             setnameData(false);
             setphoneData(false);
@@ -641,7 +725,7 @@ export default function PatientSearch(props) {
         let param = firstNameValue;
         var username = "admin";
         var password = "Admin123";
-        param = checkData(param, firstNameValue, phoneValue, identifierValue, ageValue, ageRange, lvdValue)
+        param = checkData(param, firstNameValue, phoneValue, identifierValue, ageValue, ageRange, lvdValue,lvdValueApprox)
         if (firstNameValue || phoneValue || identifierValue) {
           setnameData(false);
           setphoneData(false);
@@ -782,11 +866,13 @@ function valuetext(value) {
 }
 
 const resetOnKey = (event, name, eventName) => {
+  setlvdapprox("");
   setgenderValue("");
   setfirstName("");
   setphone("");
   setage("");
   setlvd("");
+  setresultAge("");
   setidentifier("");
   setsearchData([]);
   setisDataPresent(false);
@@ -885,33 +971,51 @@ function outputScreen(classes, searchdat,genderValue) {
                   }}
                   onChange={(e) => searchOnKey(e, "lvd", "press")}
 
-                />
-              </Grid>
-<br></br>
-              <Grid item xs={0.5} className="ageClass">
-              <InputLabel htmlFor="uncontrolled-native">Age</InputLabel>
-              </Grid>
-              <Grid item xs={3}>
-                  <Grid container spacing={2} alignItems="center">
-                    <Grid item>
-                      <Input
-                        className={classes.input}
-                        margin="dense"
-                        onKeyUp={(e) => searchOnKey(e, "age", "press")}
-                        type="number"
-                      />
-                    </Grid>
-            &nbsp;&nbsp;
-                  <InputLabel htmlFor="uncontrolled-native">Range</InputLabel>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                    
-                    <FormControl className={classes.formControl}>
+                />                
+            </Grid>
+            <br></br>
+              <Grid item xs={2.5} className="lvdClass">
+                <FormControl className={classes.formControl}>
+                      <InputLabel htmlFor="uncontrolled-native" className="lvdClassform">Last Visit</InputLabel>
                       <NativeSelect
                         defaultValue={resultAge}
                         inputProps={{
                         name: 'name',
                         id: 'uncontrolled-native',
                         }}
-                        onChange={handleChange}
+                    onChange={(e) => searchOnKey(e, "lastvisit", "press")}
+                    className="lvdClassformss"
+                  >
+                    <option value={"C"}>Select</option>
+                        <option value={"A"}>Anytime</option>
+                        <option value={"LM"}>Last month</option>
+                        <option value={"L6M"}>Last 6 months</option>
+                        <option value={"LY"}>Last year</option>
+                      </NativeSelect>
+                </FormControl>
+                
+              </Grid>
+              <Grid item xs={2}>
+
+                  <Grid container spacing={2} alignItems="center">
+                  <Grid item>
+                      <InputLabel htmlFor="uncontrolled-native">Age</InputLabel>
+
+                      <Input
+                        className={classes.input}
+                        onKeyUp={(e) => searchOnKey(e, "age", "press")}
+                        type="number"
+                      />
+                    </Grid>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel htmlFor="uncontrolled-native">Range</InputLabel>
+                      <NativeSelect
+                        defaultValue={resultAge}
+                        inputProps={{
+                        name: 'name',
+                        id: 'uncontrolled-native',
+                        }}
+                      onChange={(e) => searchOnKey(e, "range", "press")}
                         >
                         <option value={0}>0</option>
                         <option value={1}>1</option>
@@ -1088,33 +1192,50 @@ function inputScreen(classes, searchdat,genderValue) {
                   }}
                   onChange={(e) => searchOnKey(e, "lvd", "press")}
 
-                />
-              </Grid>
-<br></br>
-              <Grid item xs={0.5} className="ageClass">
-              <InputLabel htmlFor="uncontrolled-native">Age</InputLabel>
-              </Grid>
-              <Grid item xs={3}>
-                  <Grid container spacing={2} alignItems="center">
-                    <Grid item>
-                      <Input
-                        className={classes.input}
-                        margin="dense"
-                        onKeyUp={(e) => searchOnKey(e, "age", "press")}
-                        type="number"
-                      />
-                    </Grid>
-            &nbsp;&nbsp;
-                  <InputLabel htmlFor="uncontrolled-native">Range</InputLabel>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                    
-                    <FormControl className={classes.formControl}>
+                />                
+            </Grid>
+            <br></br>
+              <Grid item xs={2.5} className="lvdClass">
+                <FormControl className={classes.formControl}>
+                      <InputLabel htmlFor="uncontrolled-native" className="formslvd">Last Visit</InputLabel>
                       <NativeSelect
                         defaultValue={resultAge}
                         inputProps={{
                         name: 'name',
                         id: 'uncontrolled-native',
                         }}
-                        onChange={handleChange}
+                    onChange={(e) => searchOnKey(e, "lastvisit", "press")}
+                    className="formslvdss"
+                  >
+                    <option value={"C"}>Select</option>
+                        <option value={"A"}>Anytime</option>
+                        <option value={"LM"}>Last month</option>
+                        <option value={"L6M"}>Last 6 months</option>
+                        <option value={"LY"}>Last year</option>
+                      </NativeSelect>
+                </FormControl>
+                
+              </Grid>
+              <Grid item xs={2}>
+
+                  <Grid container spacing={2} alignItems="center">
+                  <Grid item>
+                      <InputLabel htmlFor="uncontrolled-native" className="ageClass">Age</InputLabel>
+                      <Input
+                        className={classes.input}
+                        onKeyUp={(e) => searchOnKey(e, "age", "press")}
+                        type="number"
+                      />
+                    </Grid>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel htmlFor="uncontrolled-native">Range</InputLabel>
+                      <NativeSelect
+                        defaultValue={resultAge}
+                        inputProps={{
+                        name: 'name',
+                        id: 'uncontrolled-native',
+                        }}
+                      onChange={(e) => searchOnKey(e, "range", "press")}
                         >
                         <option value={0}>0</option>
                         <option value={1}>1</option>
@@ -1197,11 +1318,11 @@ function inputScreen(classes, searchdat,genderValue) {
 const classes = useStyles();
 const searchdat = searchData;
 var genderValue = genderValue;
+  
 if (isDataPresent) {
   return outputScreen(classes, searchdat,genderValue)
 }
 else {
   return inputScreen(classes, searchdat,genderValue)
 }
-
 }

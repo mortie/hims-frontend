@@ -28,19 +28,24 @@ body {
 #lvd {
   padding: 0 0 3px 0;
 }
-.ageClass {
-  margin: 8px 5px 0px 4px !important;
+.lvdClass {
+  margin: -7px -11px 0 0 !important;
 }
 .otherClass {
   margin-left: 0 !important;
 }
 .genderClass {
-  margin: 10px -35px 0px -50px !important;
-
+  margin: 13px -35px 0px -50px !important;
   font-size: 16px;
 }
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+#searchForm {
+  margin-top: 0;
+}
+.ageClass {
+  font-size: 13px !important;
 }

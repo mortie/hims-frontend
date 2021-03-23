@@ -37,9 +37,6 @@ const patientSearchStyles = (theme) => ({
   selectEmpty: {
     marginTop: theme.spacing(1),
   },
-  rootage: {
-    width: 200,
-  },
   input: {
     width: 42,
   },
