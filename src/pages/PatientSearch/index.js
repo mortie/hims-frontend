@@ -448,7 +448,6 @@ export default function PatientSearch(props) {
 
     
     var searchValue = event.target.value;
-    let genderValue = ""
 
     if (name == "firstName") {
       setfirstName(searchValue)
@@ -508,7 +507,10 @@ export default function PatientSearch(props) {
 
 
     if (isValueEntered(event, name, eventName)) {
-
+      setIdenErrorMsj("");
+      setNameErrorMsj("");
+      setPhoneErrorMsj("");
+      setErrors({ phoneData: true, nameData: true, identifierData: true });
       setLoading(true);
       setapihit(false);
 
