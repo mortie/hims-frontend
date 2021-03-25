@@ -241,7 +241,7 @@ export default function PatientSearch(props) {
     }
     else if (name == "lastvisit" && eventName == "press")
     {
-      if ((lvd != "") && ((phone && phone.length) > charLen ||
+      if (((phone && phone.length) > charLen ||
         (firstName && firstName.length > charLen) ||
         (identifier && identifier.length > charLen))
       )
@@ -284,7 +284,7 @@ export default function PatientSearch(props) {
     
   }
 
-  var multiFilter = (products, filters) => {
+  var multiFilter = (products, filters,isExactLvd,isApproxLvd) => {
     return products.filter((product) => {
       return Object.entries(filters).every(([filterProperty, filterValues]) => {
         switch (Object.prototype.toString.call(product[filterProperty])) {
@@ -312,8 +312,17 @@ export default function PatientSearch(props) {
               if (numOfMatches != null) {
                 return true;
               }
-              else {
-                return false;
+              else if(isApproxLvd == true){
+                var searchvals = searchTokens[0].split("-");
+                var newdatestring = searchvals[1] + '-' + searchvals[0] + '-' + searchvals[2];
+                var comparesearchvals = searchString.split("-");
+                var comparevalues = comparesearchvals[1] + '-' + comparesearchvals[0] + '-' + comparesearchvals[2];
+                if (new Date(newdatestring) < new Date(comparevalues)) {
+                  return true;
+                }
+                else {
+                  return false;
+                }
               }
               }
             }
@@ -349,31 +358,32 @@ export default function PatientSearch(props) {
     });
   };
 
-  var filters = {};
-  function checkData(param, firstNameVal, phoneVal, identifierVal, ageVal, ageRange, lvd, lvdValueApprox) {
+  function lvdApproxCal(lvdValueApprox,paramLvd) {
     let date = new Date();
-    var paramLvd = "";
     let month = "";
 
     if (lvdValueApprox == "LM") {
       month = new Date().getMonth();
       let formatprevOneMonth = new Date(date.setMonth(month - 1));
-      paramLvd = "&lastvisitapprox=" + new Date(formatprevOneMonth).toISOString().split('T')[0] 
+      paramLvd = "&lastvisitapprox=" + new Date(formatprevOneMonth).toISOString().split('T')[0].split("-").reverse().join("-")
     }
     else if (lvdValueApprox == "L6M") {
       month = new Date().getMonth();
       let formatprev6Month = new Date(date.setMonth(month - 6));
-      paramLvd = "&lastvisitapprox=" + new Date(formatprev6Month).toISOString().split('T')[0] 
+      paramLvd = "&lastvisitapprox=" + new Date(formatprev6Month).toISOString().split('T')[0].split("-").reverse().join("-")
     }
     else if (lvdValueApprox == "LY") {
       month = new Date().getMonth();
       let formatprev6Month = new Date(date.setMonth(month - 12));
-      paramLvd = "&lastvisitapprox=" + new Date(formatprev6Month).toISOString().split('T')[0] 
+      paramLvd = "&lastvisitapprox=" + new Date(formatprev6Month).toISOString().split('T')[0].split("-").reverse().join("-")
     }
-    else if (lvdValueApprox == "A") {
-      paramLvd = "&lastvisitapprox=" + lvd
-    }
+    return paramLvd;
+  }
 
+  var filters = {};
+  function checkData(param, firstNameVal, phoneVal, identifierVal, ageVal, ageRange, lvd, lvdValueApprox) {
+    var paramLvd = "";
+    paramLvd = lvdApproxCal(lvdValueApprox,paramLvd)
     if (firstNameVal) {
       if (firstNameVal && ageVal) {
         param = firstNameVal + "&agerange=" + ageRange + "&age=" + ageVal
@@ -473,6 +483,10 @@ export default function PatientSearch(props) {
     var rangeToSend = [];
     var lvdValueApprox = "";
     var lvdParams = "";
+    var paramLvd = "";
+    let lvdVal = "";
+    let isExactLvd = false;
+    let isApproxLvd = false;
 
     if(name == "lastvisit") {
       lvdValueApprox = searchValue;
@@ -559,13 +573,29 @@ export default function PatientSearch(props) {
           filters["gender"] = [event.target.value.toUpperCase()];
         }
         if (name == "lvd") {
-          let lvdVal = event.target.value.split("-").reverse().join("-")
+          lvdVal = event.target.value.split("-").reverse().join("-")
           filters["lvd"] = [lvdVal];
+          isExactLvd = true;
         }
         else if (lvd) {
-          let lvdVal = lvdValue.split("-").reverse().join("-")
-          filters["lvd"] = [lvdVal];
-        
+          filters["lvd"] = [lvdValue];
+          isExactLvd = true;
+        }
+        if (name == "lastvisit") {
+          if (!lvd) {
+            var paramLvdval = lvdApproxCal(lvdValueApprox, paramLvd)
+            paramLvdval = paramLvdval.split("=")[1]
+            filters["lvd"] = [paramLvdval];
+            isApproxLvd = true;
+          }
+        }
+        else if (lvdapprox) {
+          if (!lvdVal) {
+            var paramLvdval = lvdApproxCal(lvdValueApprox, paramLvd)
+            paramLvdval = paramLvdval.split("=")[1]
+            filters["lvd"] = [paramLvdval];
+            isApproxLvd = true;
+          }
         }
         if (firstName) {
           filters["name"] = [firstName.toUpperCase()];
@@ -576,7 +606,7 @@ export default function PatientSearch(props) {
         if (identifier) {
           filters["identifier"] = [identifier];
         }
-        let filterOutput = multiFilter(searchDataAlready, filters);
+        let filterOutput = multiFilter(searchDataAlready, filters,isExactLvd,isApproxLvd);
         if (filterOutput.length > 0) {
           alreadystoredata = filterOutput;
         }
@@ -680,10 +710,9 @@ export default function PatientSearch(props) {
                       filters["phone"] = [phoneValue];
                     }
                     if (lvdValue) {
-                      let lvdVal = lvdValue.split("-").reverse().join("-")
-                      filters["lvd"] = [lvdVal];
+                      filters["lvd"] = [lvdValue];
                     }
-                    filterOutput = multiFilter(storedata, filters);
+                    filterOutput = multiFilter(storedata, filters,isExactLvd,isApproxLvd);
 
                     if (filterOutput.length > 0) {
                       storedata = filterOutput;
@@ -816,10 +845,9 @@ export default function PatientSearch(props) {
                     filters["phone"] = [phoneValue];
                   }
                   if (lvdValue) {
-                    let lvdVal = lvdValue.split("-").reverse().join("-")
-                    filters["lvd"] = [lvdVal];
+                    filters["lvd"] = [lvdValue];
                   }
-                  filterOutput = multiFilter(storedata, filters);
+                  filterOutput = multiFilter(storedata, filters,isExactLvd,isApproxLvd);
 
                   if (filterOutput.length > 0) {
                     storedata = filterOutput;
@@ -960,7 +988,7 @@ function outputScreen(classes, searchdat,genderValue) {
               <Grid item xs={3}>
                 <TextField
                   id="date"
-                  label="Last visited"
+                  label="Last day of visit"
                   type="date"
                   name="lvd"
                   defaultValue=""
@@ -976,7 +1004,7 @@ function outputScreen(classes, searchdat,genderValue) {
             <br></br>
               <Grid item xs={2.5} className="lvdClass">
                 <FormControl className={classes.formControl}>
-                      <InputLabel htmlFor="uncontrolled-native" className="lvdClassform">Last Visit</InputLabel>
+                      <InputLabel htmlFor="uncontrolled-native" className="lvdClassform">Last visited</InputLabel>
                       <NativeSelect
                         defaultValue={resultAge}
                         inputProps={{
@@ -987,7 +1015,6 @@ function outputScreen(classes, searchdat,genderValue) {
                     className="lvdClassformss"
                   >
                     <option value={"C"}>Select</option>
-                        <option value={"A"}>Anytime</option>
                         <option value={"LM"}>Last month</option>
                         <option value={"L6M"}>Last 6 months</option>
                         <option value={"LY"}>Last year</option>
@@ -1181,7 +1208,7 @@ function inputScreen(classes, searchdat,genderValue) {
               <Grid item xs={3}>
                 <TextField
                   id="date"
-                  label="Last visited"
+                  label="Last day of visit"
                   type="date"
                   name="lvd"
                   defaultValue=""
@@ -1197,7 +1224,7 @@ function inputScreen(classes, searchdat,genderValue) {
             <br></br>
               <Grid item xs={2.5} className="lvdClass">
                 <FormControl className={classes.formControl}>
-                      <InputLabel htmlFor="uncontrolled-native" className="formslvd">Last Visit</InputLabel>
+                      <InputLabel htmlFor="uncontrolled-native" className="formslvd">Last visit</InputLabel>
                       <NativeSelect
                         defaultValue={resultAge}
                         inputProps={{
@@ -1208,7 +1235,6 @@ function inputScreen(classes, searchdat,genderValue) {
                     className="formslvdss"
                   >
                     <option value={"C"}>Select</option>
-                        <option value={"A"}>Anytime</option>
                         <option value={"LM"}>Last month</option>
                         <option value={"L6M"}>Last 6 months</option>
                         <option value={"LY"}>Last year</option>
@@ -1252,7 +1278,7 @@ function inputScreen(classes, searchdat,genderValue) {
                 <InputLabel htmlFor="uncontrolled-native" >Gender</InputLabel>
               </Grid>
               &nbsp;&nbsp;&nbsp;&nbsp;
-                <Grid item xs={3.5}>
+                <Grid item xs={4}>
 
                 <FormControl>
                   <RadioGroup
