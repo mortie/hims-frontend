@@ -619,8 +619,8 @@ export default function PatientSearch(props) {
         }
         else {
           let param = firstNameValue;
-          var username = "admin";
-          var password = "Admin123";
+          var username = "bhavana";
+          var password = "Test1234";
           param = checkData(param, firstNameValue, phoneValue, identifierValue, ageValue, ageRange, lvdValue,lvdValueApprox)
           if (firstNameValue || phoneValue || identifierValue) {
             setnameData(false);
@@ -754,8 +754,8 @@ export default function PatientSearch(props) {
       }
       else {
         let param = firstNameValue;
-        var username = "admin";
-        var password = "Admin123";
+        var username = "bhavana";
+        var password = "Test1234";
         param = checkData(param, firstNameValue, phoneValue, identifierValue, ageValue, ageRange, lvdValue,lvdValueApprox)
         if (firstNameValue || phoneValue || identifierValue) {
           setnameData(false);
@@ -909,6 +909,7 @@ const resetOnKey = (event, name, eventName) => {
   setIdenErrorMsj("");
   setNameErrorMsj("");
   setPhoneErrorMsj("");
+  setLoading("false");
   setErrors({ phoneData: true, nameData: true, identifierData: true });
   document.getElementById("searchForm").reset();  
 }
