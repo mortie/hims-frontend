@@ -933,7 +933,7 @@ export default function PatientSearch(props) {
                   className="identifier"
                 />
               </Grid>
-                            <Grid item xs={3}>
+              <Grid item xs={3}>
                 <TextField
                   id="date"
                   label="Last visited"
@@ -1137,7 +1137,8 @@ export default function PatientSearch(props) {
                   className="identifier"
                 />
               </Grid>
-                            <Grid item xs={3}>
+              
+              <Grid item xs={3}>
                 <TextField
                   id="date"
                   label="Last visited"
@@ -1178,8 +1179,8 @@ export default function PatientSearch(props) {
                         max={maxage}
                         step="1"
                 />
-                    </Grid>
-                                                <Grid item>
+          </Grid>
+          <Grid item>
           <Input
             className={classes.input}
             value={searchDetails.age}
