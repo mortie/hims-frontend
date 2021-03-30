@@ -909,7 +909,7 @@ const resetOnKey = (event, name, eventName) => {
   setIdenErrorMsj("");
   setNameErrorMsj("");
   setPhoneErrorMsj("");
-  setLoading("false");
+  setLoading(false);
   setErrors({ phoneData: true, nameData: true, identifierData: true });
   document.getElementById("searchForm").reset();  
 }
