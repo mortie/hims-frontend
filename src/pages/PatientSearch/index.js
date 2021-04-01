@@ -1011,9 +1011,9 @@ function outputScreen(classes, searchdat,genderValue) {
                 />                
             </Grid>
             <br></br>
-              <Grid item xs={2.5} className="lvdClass">
+              <Grid item xs={3} className="lvdClass">
                 <FormControl className={classes.formControl}>
-                      <InputLabel htmlFor="uncontrolled-native" className="lvdClassform">Last visited</InputLabel>
+                      <InputLabel htmlFor="uncontrolled-native" className="formslvd">Last visit</InputLabel>
                       <NativeSelect
                         defaultValue={resultAge}
                         inputProps={{
@@ -1021,7 +1021,7 @@ function outputScreen(classes, searchdat,genderValue) {
                         id: 'uncontrolled-native',
                         }}
                     onChange={(e) => searchOnKey(e, "lastvisit", "press")}
-                    className="lvdClassformss"
+                    className="formslvdss"
                   >
                     <option value={"C"}>Select</option>
                         <option value={"LM"}>Last month</option>
@@ -1031,18 +1031,25 @@ function outputScreen(classes, searchdat,genderValue) {
                 </FormControl>
                 
               </Grid>
+              &nbsp;&nbsp;&nbsp;&nbsp;
               <Grid item xs={2}>
 
                   <Grid container spacing={2} alignItems="center">
-                  <Grid item>
-                      <InputLabel htmlFor="uncontrolled-native" className="ageClass">Age</InputLabel>
-                      <Input
-                        className={classes.input}
-                        onKeyUp={(e) => searchOnKey(e, "age", "press")}
-                        type="number"
+                      <Grid item className="AgeClass">
+
+                      <TextField
+
+                      id="standard-number"
+                      label="Age"
+                      type="number"
+                      onKeyUp={(e) => searchOnKey(e, "age", "press")}
+                      InputLabelProps={{
+                      shrink: true,
+                      }}
                       />
+
                     </Grid>
-                    <FormControl className={classes.formControl}>
+                    <FormControl >
                       <InputLabel htmlFor="uncontrolled-native">Range</InputLabel>
                       <NativeSelect
                         defaultValue={resultAge}
@@ -1063,7 +1070,8 @@ function outputScreen(classes, searchdat,genderValue) {
                     </Grid>
                 
               </Grid>
-                <Grid item xs={4} className="genderID">
+         
+                <Grid item xs={5} className="genderID">
                 <InputLabel htmlFor="uncontrolled-native" className="genderClass">Gender</InputLabel>
                 <FormControl>
                   <RadioGroup
@@ -1100,7 +1108,7 @@ function outputScreen(classes, searchdat,genderValue) {
               >
                 Search
               </Button>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <Button
                 variant="contained"
                 size="small"
@@ -1226,7 +1234,7 @@ function inputScreen(classes, searchdat,genderValue) {
                 />                
             </Grid>
             <br></br>
-              <Grid item xs={2.5} className="lvdClass">
+              <Grid item xs={3} className="lvdClass">
                 <FormControl className={classes.formControl}>
                       <InputLabel htmlFor="uncontrolled-native" className="formslvd">Last visit</InputLabel>
                       <NativeSelect
@@ -1246,18 +1254,25 @@ function inputScreen(classes, searchdat,genderValue) {
                 </FormControl>
                 
               </Grid>
+              &nbsp;&nbsp;&nbsp;&nbsp;
               <Grid item xs={2}>
 
                   <Grid container spacing={2} alignItems="center">
-                  <Grid item>
-                      <InputLabel htmlFor="uncontrolled-native" className="ageClass">Age</InputLabel>
-                      <Input
-                        className={classes.input}
-                        onKeyUp={(e) => searchOnKey(e, "age", "press")}
-                        type="number"
+                      <Grid item className="AgeClass">
+
+                      <TextField
+
+                      id="standard-number"
+                      label="Age"
+                      type="number"
+                      onKeyUp={(e) => searchOnKey(e, "age", "press")}
+                      InputLabelProps={{
+                      shrink: true,
+                      }}
                       />
+
                     </Grid>
-                    <FormControl className={classes.formControl}>
+                    <FormControl >
                       <InputLabel htmlFor="uncontrolled-native">Range</InputLabel>
                       <NativeSelect
                         defaultValue={resultAge}
@@ -1279,7 +1294,7 @@ function inputScreen(classes, searchdat,genderValue) {
                 
               </Grid>
          
-                <Grid item xs={4} className="genderID">
+                <Grid item xs={5} className="genderID">
                 <InputLabel htmlFor="uncontrolled-native" className="genderClass">Gender</InputLabel>
                 <FormControl>
                   <RadioGroup
@@ -1316,7 +1331,7 @@ function inputScreen(classes, searchdat,genderValue) {
               >
                 Search
               </Button>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <Button
                 variant="contained"
                 size="small"

@@ -32,7 +32,7 @@ const patientSearchStyles = (theme) => ({
   },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 10,
+    minWidth: 230,
   },
   selectEmpty: {
     marginTop: theme.spacing(1),

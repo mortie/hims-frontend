@@ -7,7 +7,8 @@
 }
 .searchbtn {
   margin-top: 20px !important;
-  height: 32px;
+  height: 36px;
+  margin-left: -40px !important;
 }
 body {
   background-color: ghostwhite !important;
@@ -46,9 +47,9 @@ input[type="number"]::-webkit-outer-spin-button {
 #searchForm {
   margin-top: 0;
 }
-.ageClass {
-  font-size: 13px !important;
-}
 .genderID {
-  margin-left: -53px !important;
+  margin-left: -38px !important;
+}
+.AgeClass {
+  width: 40%;
 }
