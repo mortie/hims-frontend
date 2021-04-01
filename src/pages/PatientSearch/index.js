@@ -523,7 +523,7 @@ export default function PatientSearch(props) {
       if (genderValue) {
           genderValue = genderValue;
       }
-      else if(name == "gender") {
+      if(name == "gender") {
         genderValue = event.target.value
       }
 
@@ -705,6 +705,9 @@ export default function PatientSearch(props) {
                     if (genderValue) {
                       filters["gender"] = [genderValue.toUpperCase()];
                     }
+                    if(name == "gender") {
+                      filters["gender"] = [event.target.value.toUpperCase()];
+                    }
                     if (firstNameValue) {
                       filters["name"] = [firstNameValue];
                     }
@@ -839,6 +842,9 @@ export default function PatientSearch(props) {
                   }
                   if (genderValue) {
                     filters["gender"] = [genderValue.toUpperCase()];
+                  }
+                  if(name == "gender") {
+                      filters["gender"] = [event.target.value.toUpperCase()];
                   }
                   if (firstNameValue) {
                     filters["name"] = [firstNameValue];
@@ -1029,8 +1035,7 @@ function outputScreen(classes, searchdat,genderValue) {
 
                   <Grid container spacing={2} alignItems="center">
                   <Grid item>
-                      <InputLabel htmlFor="uncontrolled-native">Age</InputLabel>
-
+                      <InputLabel htmlFor="uncontrolled-native" className="ageClass">Age</InputLabel>
                       <Input
                         className={classes.input}
                         onKeyUp={(e) => searchOnKey(e, "age", "press")}
@@ -1058,12 +1063,8 @@ function outputScreen(classes, searchdat,genderValue) {
                     </Grid>
                 
               </Grid>
-              <Grid item xs={1} className="genderClass">
-                <InputLabel htmlFor="uncontrolled-native" >Gender</InputLabel>
-              </Grid>
-              &nbsp;&nbsp;&nbsp;&nbsp;
-                <Grid item xs={3.5}>
-
+                <Grid item xs={4} className="genderID">
+                <InputLabel htmlFor="uncontrolled-native" className="genderClass">Gender</InputLabel>
                 <FormControl>
                   <RadioGroup
                     className="gendergroup"
@@ -1277,12 +1278,9 @@ function inputScreen(classes, searchdat,genderValue) {
                     </Grid>
                 
               </Grid>
-              <Grid item xs={1} className="genderClass">
-                <InputLabel htmlFor="uncontrolled-native" >Gender</InputLabel>
-              </Grid>
-              &nbsp;&nbsp;&nbsp;&nbsp;
-                <Grid item xs={4}>
-
+         
+                <Grid item xs={4} className="genderID">
+                <InputLabel htmlFor="uncontrolled-native" className="genderClass">Gender</InputLabel>
                 <FormControl>
                   <RadioGroup
                     className="gendergroup"
