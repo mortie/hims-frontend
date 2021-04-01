@@ -926,6 +926,28 @@ function outputScreen(classes, searchdat,genderValue) {
         <div className={classes.paper}>
           <form className={classes.form} noValidate id="searchForm">
             <Grid container spacing={2}>
+                            <Grid item sm={3}>
+                <TextField
+                  error={(!errors.phoneData && !errors.nameData && !errors.identifierData)}
+                  helperText={
+                    (!errors.phoneData && !errors.nameData && !errors.identifierData &&
+                      NameErrorMsj) ||
+                    (errors.nameData &&
+                      NameErrorMsj)
+                  }
+                  autoComplete="fname"
+                  name="firstName"
+                  variant="outlined"
+                  required
+                  fullWidth
+                  type="text"
+                  id="firstName"
+                  label="Name"
+                  autoFocus
+                  onKeyUp={(e) => searchOnKey(e, "firstName", "press")}
+                  className="firstName"
+                />
+              </Grid>
               <Grid item xs={3}>
                 <TextField
                   error={(!errors.phoneData && !errors.nameData && !errors.identifierData)
@@ -953,28 +975,7 @@ function outputScreen(classes, searchdat,genderValue) {
                   }}
                 />
               </Grid>
-              <Grid item sm={3}>
-                <TextField
-                  error={(!errors.phoneData && !errors.nameData && !errors.identifierData)}
-                  helperText={
-                    (!errors.phoneData && !errors.nameData && !errors.identifierData &&
-                      NameErrorMsj) ||
-                    (errors.nameData &&
-                      NameErrorMsj)
-                  }
-                  autoComplete="fname"
-                  name="firstName"
-                  variant="outlined"
-                  required
-                  fullWidth
-                  type="text"
-                  id="firstName"
-                  label="Name"
-                  autoFocus
-                  onKeyUp={(e) => searchOnKey(e, "firstName", "press")}
-                  className="firstName"
-                />
-              </Grid>
+
               <Grid item xs={3}>
                 <TextField
                   error={!errors.phoneData && !errors.nameData && !errors.identifierData}
@@ -1149,6 +1150,28 @@ function inputScreen(classes, searchdat,genderValue) {
         <div className={classes.paper}>
           <form className={classes.form} noValidate id="searchForm">
             <Grid container spacing={2}>
+                            <Grid item sm={3}>
+                <TextField
+                  error={(!errors.phoneData && !errors.nameData && !errors.identifierData)}
+                  helperText={
+                    (!errors.phoneData && !errors.nameData && !errors.identifierData &&
+                      NameErrorMsj) ||
+                    (errors.nameData &&
+                      NameErrorMsj)
+                  }
+                  autoComplete="fname"
+                  name="firstName"
+                  variant="outlined"
+                  required
+                  fullWidth
+                  type="text"
+                  id="firstName"
+                  label="Name"
+                  autoFocus
+                  onKeyUp={(e) => searchOnKey(e, "firstName", "press")}
+                  className="firstName"
+                />
+              </Grid>
               <Grid item xs={3}>
                 <TextField
                   error={(!errors.phoneData && !errors.nameData && !errors.identifierData)
@@ -1176,28 +1199,7 @@ function inputScreen(classes, searchdat,genderValue) {
                   }}
                 />
               </Grid>
-              <Grid item sm={3}>
-                <TextField
-                  error={(!errors.phoneData && !errors.nameData && !errors.identifierData)}
-                  helperText={
-                    (!errors.phoneData && !errors.nameData && !errors.identifierData &&
-                      NameErrorMsj) ||
-                    (errors.nameData &&
-                      NameErrorMsj)
-                  }
-                  autoComplete="fname"
-                  name="firstName"
-                  variant="outlined"
-                  required
-                  fullWidth
-                  type="text"
-                  id="firstName"
-                  label="Name"
-                  autoFocus
-                  onKeyUp={(e) => searchOnKey(e, "firstName", "press")}
-                  className="firstName"
-                />
-              </Grid>
+
               <Grid item xs={3}>
                 <TextField
                   error={!errors.phoneData && !errors.nameData && !errors.identifierData}
@@ -1208,6 +1210,7 @@ function inputScreen(classes, searchdat,genderValue) {
                   }
                   variant="outlined"
                   fullWidth
+                  required
                   id="identifier"
                   label="Identifier"
                   name="identifier"
