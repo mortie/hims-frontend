@@ -5,22 +5,14 @@ import Container from "@material-ui/core/Container";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-import InputLabel from "@material-ui/core/InputLabel";
-// import Grid from '@material-ui/core/Grid';
 import { GridContainer, GridItem } from "../../components/Grid";
-import Grid from "@material-ui/core/Grid";
-// import CustomizedMenus from "./ActionButton";
-
-import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import { UpdateOutlined } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -33,26 +25,6 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
 }));
-
-function getStyles(name, personName, theme) {
-  return {
-    fontWeight:
-      personName.indexOf(name) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
-}
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
 
 const col = [
   { field: "id", headerName: "PatientID", width: 130 },
@@ -68,9 +40,13 @@ const col = [
     type: "string",
     width: 130,
     renderCell: (params) => (
-      <Button variant="contained" color="primary" >
-      Triage
-    </Button>
+      <Button
+        // onClick = {handleOpen}
+        variant="contained"
+        color="primary"
+      >
+        Triage
+      </Button>
     ),
   },
 
@@ -80,9 +56,9 @@ const col = [
     type: "string",
     width: 130,
     renderCell: (params) => (
-      <Button variant="contained" color="primary" >
-      History
-    </Button>
+      <Button variant="contained" color="primary">
+        History
+      </Button>
     ),
   },
 ];
@@ -93,20 +69,25 @@ export default function DataGridDemo() {
   const [list, setList] = useState([]);
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
-  const [age, setAge] = React.useState("");
   const [fields, setFields] = React.useState([]);
   const [selectValue, setValues] = React.useState([]);
-  const [TypeValues, setTypeValues] = React.useState([]);
-  // const [height,setHeight] = React.useState("")
+  const [gender, setGender] = React.useState("");
+  const [id,setIdValue]     = React.useState("");
+
+  const [state, setState] = useState({
+    height: {
+      uuid: "uuid",
+      value: 45,
+    },
+  });
 
   const [selectedDate, setSelectedDate] = React.useState(
-    new Date("2014-08-18T21:11:54")
+    new Date()
   );
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
-  // const [personName, setPersonName] = React.useState([]);
 
   useEffect(() => {
     const url =
@@ -158,40 +139,51 @@ export default function DataGridDemo() {
       .catch((error) => console.log(error));
   }, []);
 
+  const onChange = (event, key) => {
+
+    
+
+    console.log("target", event.target.value);
+    console.log("label", key);
+  };
+
   const getFeilds = () => {
+    console.log("Date ",selectedDate)
     return (
       <>
         {" "}
         {fields.map((field) => {
           const { uuid, display, datatype, answers } = field;
+          // console.log("field", field);
           if (datatype.display === "Coded") {
             let item = [];
             for (let i = 0; i < answers.length; i++) {
-              item.push(answers[i].display);
+              let valueWithKey = { uuid: uuid, display: answers[i].display };
+              // item.push(answers[i].display);
+              item.push(valueWithKey);
             }
-
-            console.log("coded item ", item);
+            // console.log("coded item ", item);
             return (
-              <GridItem item xs={12} sm={6} md={4} key={uuid}>
+              <GridItem item xs={12} sm={4} md={4} key={uuid}>
                 <FormControl className={classes.formControl}>
-                  <InputLabel id="demo-customized-select-label">
-                    {display}
-                  </InputLabel>
-                  <Select
-                    style={{ width: 250 }}
-                    // labelId="demo-simple-select-required-label"
+                  <TextField
+                    style={{ width: 228 }}
+                    autoFocus
+                    multiline="true"
+                    select
                     variant="outlined"
-                    autoFocus="true"
-                    autoWidth="true"
-                    onChange={getValue}
+                    id={uuid}
+                    label={display}
+                    rowsMax={4}
+                    onChange={(e) => onChange(e,uuid)}
+                    // onChange={getValue}
                   >
                     {item.map((name) => (
                       <MenuItem key={name} value={name}>
-                        {name}
+                        {name.display}
                       </MenuItem>
                     ))}
-                  </Select>
-                  {/* <FormHelperText>Required</FormHelperText> */}
+                  </TextField>
                 </FormControl>
                 {display === "height" && <h1></h1>}
               </GridItem>
@@ -205,32 +197,40 @@ export default function DataGridDemo() {
                   <TextField
                     autoFocus
                     variant="outlined"
-                    id="name"
+                    id={uuid}
                     label={display}
                     type="Numeric"
                     rowsMax={4}
+                    className={classes.textField}
                     size="small"
+                    onChange={(e) => onChange(e,uuid)}
+                    // InputLabelProps={{
+                    //   shrink: true,
+                    // }}
+                    // onChange={getValue}
                   />
                 </FormControl>
               </GridItem>
             );
           }
-
-          if (datatype.display === "Date") {
+          if (gender==="F") {
             return (
-              <TextField
-                id="date"
-                label={display}
-                type="date"
-                name="lvd"
-                defaultValue=""
-                className={classes.textField}
-                maxDate={new Date()}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                onKeyUp={(e) => searchOnKey(e, "lvd", "press")}
-              />
+              <GridItem item xs={12} sm={4} md={4} key={uuid}>
+                <FormControl className={classes.formControl}>
+                  <TextField
+                    id="date"
+                    variant="outlined"
+                    label={display}
+                    margin="normal"
+                    // onChange={getValue}
+                    type="date"
+                    className={classes.textField}
+                    InputLabelProps={{ shrink: true }}
+                    maxDate={new Date()}
+                    onChange={(e) => onChange(e,uuid)}
+                  />
+                </FormControl>
+              </GridItem>
             );
           }
         })}
@@ -238,10 +238,10 @@ export default function DataGridDemo() {
     );
   };
 
-  const getValue = (event) => {
-    selectValue.push(event.target.value);
-    console.log("slected value ", selectValue);
-  };
+  // const onChange = (event) => {
+  //   selectValue.push(event.target.value);
+  //   console.log(selectValue);
+  // };
 
   const searchOnKey = (event) => {
     let key = event.target.value;
@@ -261,7 +261,11 @@ export default function DataGridDemo() {
     }
   };
 
-  const handleOpen = () => {
+  const handleOpen = (event) => {
+    setGender(event.row.gender)
+    setIdValue(event.row)
+    // console.log("ID ",event.row.id)
+    // console.log("Gender ",event.row.gender)
     setOpen(true);
   };
 
@@ -290,18 +294,14 @@ export default function DataGridDemo() {
             </form>
             &nbsp;
             <DataGrid
-              // onRowClick={handleOpen}
+              // onCellClick	={handleOpen}
+              onCellClick={event =>
+                handleOpen(event)
+              }
               rows={list}
               columns={col}
               pageSize={5}
             />
-            <Button
-              variant="contained"
-              color="primary"
-              href="#contained-buttons"
-            >
-              Link
-            </Button>
           </div>
           <div>
             <Dialog
@@ -313,7 +313,9 @@ export default function DataGridDemo() {
             >
               <DialogTitle id="form-dialog-title">Vital Signs</DialogTitle>
               <DialogContent>
-                <GridContainer>{getFeilds()}</GridContainer>
+                <GridContainer>
+                  {getFeilds()}
+                </GridContainer>
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleClose} color="primary">
