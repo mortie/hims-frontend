@@ -9,6 +9,7 @@ import {
   Billing,
   UserProfile,
   ProviderScheduling,
+  PatientRegistration,
 } from "../pages";
 
 /**
@@ -37,6 +38,21 @@ export const appRoutes = [
     visibleOnSidebar: true,
     icon: "fa fa-user-plus",
     component: PatientSearch,
+    layout: "/app",
+  },
+  {
+    path: "/patient-registration",
+    title: "Patient Registration",
+    roles: [
+      "System Developer",
+      "Organizational: Registration clerk",
+      "Application: Registers Patients",
+      "Application: Schedules appointments",
+      "Application: Sees appointment schedule",
+    ],
+    visibleOnSidebar: false,
+    icon: "fa fa-user-plus",
+    component: PatientRegistration,
     layout: "/app",
   },
   {
