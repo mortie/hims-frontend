@@ -1,26 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import clsx from "clsx";
-import moment from "moment";
-import { useSnackbar } from "notistack";
 import { getAPI, postAPI } from "../../services/index";
 import { Autocomplete } from "@material-ui/lab";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/material.css";
 import { GridContainer, GridItem } from "../../components/Grid";
-import BasicDetails from "./Demographics";
-import PrintPatientRegistration from "./PrintPatientRegistration";
-import { Card, CardBody } from "../../components/Card";
+import BasicDetails from "./components/Demographics";
+import PrintPatientRegistration from "./components/PrintPatientRegistration";
+import AvailableTimeSlots from "./components/AvailableTimeSlots";
+import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
+import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
+
 import {
   Paper,
   TextField,
   makeStyles,
+  useTheme,
   Stepper,
   Step,
   StepButton,
   Button,
   Typography,
   FormHelperText,
+  MobileStepper,
 } from "@material-ui/core";
 import styles from "./styles";
 
@@ -38,7 +40,7 @@ const initialSate = {
 
 export default function PatientRegistration() {
   const classes = useStyles();
-  const { enqueueSnackbar } = useSnackbar();
+  const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState(new Set());
   const [steps, setsteps] = useState(["Demographics"]);
@@ -48,7 +50,8 @@ export default function PatientRegistration() {
   const [appointmentTypes, setAppointmentTypes] = useState([]);
   const [identifier, setIdentifier] = useState("");
   const [timeSlots, setTimeSlots] = useState([]);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState();
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+  const [timeSlotsLoading, setTimeSlotsLoading] = useState(false);
   const [personAttributeTypes, setPersonAttributeTypes] = useState();
   const [visitAttributeTypes, setVisitAttributeTypes] = useState();
   const [registrationSuccessData, setRegistrationSuccessData] = useState(null);
@@ -104,6 +107,7 @@ export default function PatientRegistration() {
       <GridContainer>
         {step === 0 ? (
           <BasicDetails
+            classes={classes}
             identifier={identifier}
             formErrors={formErrors}
             formValues={formValues}
@@ -112,7 +116,9 @@ export default function PatientRegistration() {
             onAutocompleteChange={onAutocompleteChange}
             onPhoneChange={onPhoneChange}
             onDateOfBirthChange={onDateOfBirthChange}
-            classes={classes}
+            validateText={validateText}
+            validateAutocomplete={validateAutocomplete}
+            validatePhone={validatePhone}
           />
         ) : (
           <>
@@ -126,7 +132,7 @@ export default function PatientRegistration() {
                 });
               }
               if (datatype.display === "Text") {
-                return getTextFieldComponent(uuid, display, error);
+                return getTextFieldComponent(uuid, display, error, index === 0);
               }
 
               if (datatype.display === "Numeric") {
@@ -152,13 +158,16 @@ export default function PatientRegistration() {
                         specialLabel={display}
                         value={formValues[display]}
                         onChange={onPhoneChange}
+                        onBlur={(e, data) =>
+                          validatePhone(e, data, formValues[display])
+                        }
                         containerClass={classes.field}
                       />
                       <FormHelperText
                         className={classes.phoneFieldHelperText}
                         error
                       >
-                        {formErrors[display] && "This field is required"}
+                        {formErrors[display]}
                       </FormHelperText>
                     </GridItem>
                   );
@@ -172,9 +181,7 @@ export default function PatientRegistration() {
                       name={display}
                       value={formValues[display]}
                       autoFocus={index === 0 ? true : false}
-                      onChange={(e) =>
-                        onTextChange(e.target.value, e.target.name)
-                      }
+                      onChange={onTextChange}
                       className={classes.field}
                       fullWidth
                     />
@@ -185,25 +192,33 @@ export default function PatientRegistration() {
               if (datatype.display === "Coded") {
                 return (
                   <React.Fragment key={uuid}>
-                    {getAutocompleteComponent(display, answers, error)}
+                    {getAutocompleteComponent(
+                      display,
+                      answers,
+                      error,
+                      index === 0
+                    )}
                     {formValues[display]?.datatype?.display === "Coded" &&
                       getAutocompleteComponent(
                         formValues[display].display,
                         formValues[display].answers,
-                        error
+                        error,
+                        true
                       )}
                     {formValues[display]?.datatype?.display === "Text" &&
                       getTextFieldComponent(
                         formValues[display].uuid,
                         formValues[display].display,
-                        error
+                        error,
+                        true
                       )}
                     {formValues[formValues[display]?.display]?.datatype
                       ?.display === "Coded"
                       ? getAutocompleteComponent(
                           formValues[formValues[display]?.display]?.display,
                           formValues[formValues[display]?.display]?.answers,
-                          error
+                          error,
+                          true
                         )
                       : null}
                     {formValues[
@@ -216,7 +231,8 @@ export default function PatientRegistration() {
                           formValues[
                             formValues[formValues[display]?.display]?.display
                           ]?.display,
-                          error
+                          error,
+                          true
                         )
                       : null}
                   </React.Fragment>
@@ -227,26 +243,33 @@ export default function PatientRegistration() {
             {isLastStep() ? (
               <GridItem item xs={12} sm={6} md={4}>
                 <Autocomplete
-                  id="appointmentTypes"
+                  id="Department*"
                   options={appointmentTypes}
                   getOptionLabel={(option) => option.display}
                   onChange={(e, newValue) => {
-                    onAutocompleteChange("appointmentTypes", newValue);
+                    onAutocompleteChange("Department*", newValue);
                     getTimeSlots(newValue);
                   }}
-                  value={formValues["appointmentTypes"]}
+                  onBlur={(e) =>
+                    validateAutocomplete(
+                      "Department*",
+                      formValues["Department*"]
+                    )
+                  }
+                  value={formValues["Department*"]}
                   getOptionSelected={(option, value) =>
                     option.uuid === value.uuid
                   }
-                  defaultValue={formValues["appointmentTypes"]}
+                  defaultValue={formValues["Department*"]}
                   className={classes.field}
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      onBlur={(e) => setFormErrors(validate())}
-                      name="appointmentTypes"
-                      label="Department"
+                      name="Department*"
+                      label="Department*"
                       variant="outlined"
+                      error={formErrors["Department*"] ? true : false}
+                      helperText={formErrors["Department*"]}
                     />
                   )}
                 />
@@ -258,7 +281,7 @@ export default function PatientRegistration() {
     );
   }
 
-  function getAutocompleteComponent(display, answers, error) {
+  function getAutocompleteComponent(display, answers, error, autoFocus) {
     const errors = formErrors[display] ? true : false;
     return (
       <>
@@ -270,6 +293,7 @@ export default function PatientRegistration() {
             onChange={(e, newValue) => {
               onAutocompleteChange(display, newValue);
             }}
+            onBlur={(e) => validateAutocomplete(display, formValues[display])}
             value={formValues[display]}
             getOptionSelected={(option, value) => option.uuid === value.uuid}
             className={classes.field}
@@ -277,9 +301,10 @@ export default function PatientRegistration() {
               <TextField
                 {...params}
                 error={errors}
-                helperText={errors && formErrors[display]}
+                helperText={formErrors[display]}
                 label={display}
                 variant="outlined"
+                autoFocus={autoFocus}
               />
             )}
           />
@@ -288,7 +313,7 @@ export default function PatientRegistration() {
     );
   }
 
-  function getTextFieldComponent(uuid, display, error) {
+  function getTextFieldComponent(uuid, display, error, autoFocus) {
     const errors = formErrors[display] ? true : false;
     return (
       <GridItem key={uuid} item xs={12} sm={6} md={4}>
@@ -303,6 +328,8 @@ export default function PatientRegistration() {
           helperText={errors && formErrors[display]}
           value={formValues[display]}
           onChange={(e) => onTextChange(e)}
+          onBlur={validateText}
+          autoFocus={autoFocus}
         />
       </GridItem>
     );
@@ -314,6 +341,7 @@ export default function PatientRegistration() {
       ...formValues,
       [name]: value,
     });
+    validateText(e);
   }
 
   function onAutocompleteChange(display, newValue) {
@@ -332,12 +360,15 @@ export default function PatientRegistration() {
     } else {
       setFormValues({ ...formValues, [display]: newValue });
     }
+
+    validateAutocomplete(display, newValue);
   }
 
   function onPhoneChange(value, data, event, formattedValue) {
     const { name } = event.target;
     const rawValue = value.slice(data.dialCode.length);
     setFormValues({ ...formValues, [name]: value });
+    validatePhone(event, data, value);
   }
 
   function onDateOfBirthChange(name, dob) {
@@ -345,6 +376,7 @@ export default function PatientRegistration() {
   }
 
   function getTimeSlots(type) {
+    setSelectedTimeSlot(null);
     const fromDate = new Date();
     const toDate = new Date(
       fromDate.getFullYear(),
@@ -355,15 +387,18 @@ export default function PatientRegistration() {
       59
     );
     if (type) {
+      setTimeSlotsLoading(true);
       getAPI(
         `/appointmentscheduling/timeslot?appointmentType=${
           type.uuid
         }&fromDate=${fromDate.toISOString()}&toDate=${toDate.toISOString()}&v=default`
       )
         .then((response) => {
+          setTimeSlotsLoading(false);
           setTimeSlots(response.data.results);
         })
         .catch((error) => {
+          setTimeSlotsLoading(false);
           console.log(error);
         });
     }
@@ -374,7 +409,7 @@ export default function PatientRegistration() {
     for (const key in formValues) {
       if (Object.hasOwnProperty.call(formValues, key)) {
         if (
-          key.indexOf("*") > -1 &&
+          key.slice(-1) === "*" &&
           (!formValues[key] || formValues[key] === "")
         ) {
           errors[key] = "This field is required";
@@ -382,6 +417,47 @@ export default function PatientRegistration() {
       }
     }
     return errors;
+  }
+
+  function validateText(e) {
+    const { name, value } = e.target;
+    console.log(name + " " + value);
+    if (name.slice(-1) === "*") {
+      if (!value || value === "") {
+        console.log(name);
+        setFormErrors({ ...formErrors, [name]: "This field is required" });
+      } else {
+        const errors = formErrors;
+        delete errors[name];
+        setFormErrors(errors);
+      }
+    }
+  }
+
+  function validateAutocomplete(key, value = null) {
+    if (key.slice(-1) === "*") {
+      if (value) {
+        const errors = formErrors;
+        delete errors[key];
+        setFormErrors(errors);
+      } else {
+        setFormErrors({ ...formErrors, [key]: "This field is required" });
+      }
+    }
+  }
+
+  function validatePhone(e, data, value = "91") {
+    const { name } = e.target;
+    const phoneNumber = value ? value.slice(data.dialCode.length) : "";
+    if (phoneNumber === "") {
+      setFormErrors({ ...formErrors, [name]: "This field is required" });
+    } else if (phoneNumber.length !== 10) {
+      setFormErrors({ ...formErrors, [name]: "Invalid phone number" });
+    } else {
+      const errors = formErrors;
+      delete errors[name];
+      setFormErrors(errors);
+    }
   }
 
   function checkSynonymForMobile(synonyms) {
@@ -415,12 +491,11 @@ export default function PatientRegistration() {
   };
 
   const handleNext = () => {
-    const errors = validate();
-    if (Object.keys(errors).length !== 0) {
-      setFormErrors(errors);
+    let errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors({ ...formErrors, ...errors });
       return;
     }
-
     const newActiveStep =
       isLastStep() && !allStepsCompleted()
         ? // It's the last step, but not all steps have been completed
@@ -432,20 +507,20 @@ export default function PatientRegistration() {
   };
 
   const handleBack = () => {
-    const errors = validate();
-    if (Object.keys(errors).length !== 0) {
-      setFormErrors(errors);
+    let errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors({ ...formErrors, ...errors });
       return;
     }
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
   const handleStep = (step) => () => {
-    // const errors = validate();
-    // if (Object.keys(errors).length !== 0) {
-    //   setFormErrors(errors);
-    //   return;
-    // }
+    let errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors({ ...formErrors, ...errors });
+      return;
+    }
     setActiveStep(step);
   };
 
@@ -522,7 +597,7 @@ export default function PatientRegistration() {
         postAPI("/visit", visit)
           .then((visitResponse) => {
             postAPI("/appointmentscheduling/appointment", {
-              appointmentType: formValues["appointmentTypes"].uuid,
+              appointmentType: formValues["Department*"].uuid,
               patient: patientResponse.data.uuid,
               reason: "New Registration",
               status: "Scheduled",
@@ -561,10 +636,49 @@ export default function PatientRegistration() {
       .filter((element) => element && element);
   };
 
+  const changeTimeSlot = (uuid) => {
+    setSelectedTimeSlot(uuid);
+  };
+
   return (
     <>
+      <MobileStepper
+        variant="dots"
+        steps={steps.length}
+        position="static"
+        activeStep={activeStep}
+        className={classes.mobileStepper}
+        nextButton={
+          <Button
+            size="small"
+            onClick={handleNext}
+            disabled={activeStep === steps.length - 1}
+          >
+            Next
+            {theme.direction === "rtl" ? (
+              <KeyboardArrowLeft />
+            ) : (
+              <KeyboardArrowRight />
+            )}
+          </Button>
+        }
+        backButton={
+          <Button size="small" onClick={handleBack} disabled={activeStep === 0}>
+            {theme.direction === "rtl" ? (
+              <KeyboardArrowRight />
+            ) : (
+              <KeyboardArrowLeft />
+            )}
+            Back
+          </Button>
+        }
+      />
       <div className={classes.root}>
-        <Stepper nonLinear activeStep={activeStep}>
+        <Stepper
+          nonLinear
+          activeStep={activeStep}
+          className={classes.desktopStepper}
+        >
           {steps.map((label, index) => {
             const stepProps = {};
             return (
@@ -591,99 +705,67 @@ export default function PatientRegistration() {
           ) : (
             <Paper className={classes.paper}>
               {getStepContent(activeStep)}
-              {isLastStep() && timeSlots.length > 0 && (
-                <GridContainer>
-                  {timeSlots.map((item, key) => {
-                    const {
-                      uuid,
-                      countOfAppointments,
-                      unallocatedMinutes,
-                      startDate,
-                      endDate,
-                      appointmentBlock,
-                    } = item;
-                    const { display: provider } = appointmentBlock.provider;
-                    const { display: location } = appointmentBlock.location;
-                    return (
-                      <GridItem item xs={12} sm={6} md={3} key={key}>
-                        <Card
-                          onClick={(e) => setSelectedTimeSlot(uuid)}
-                          className={clsx(
-                            classes.card,
-                            selectedTimeSlot === uuid && classes.cardSelected
-                          )}
-                        >
-                          <CardBody>
-                            <h6 className={classes.cardBodyInfo}>
-                              <strong>Location:</strong> {location}
-                            </h6>
-                            <h6 className={classes.cardBodyInfo}>
-                              <strong>Provider:</strong> {provider}
-                            </h6>
-                            <h6 className={classes.cardBodyInfo}>
-                              <strong>Start Time:</strong>{" "}
-                              {moment(startDate).format("hh:mm A")}
-                            </h6>
-                            <h6 className={classes.cardBodyInfo}>
-                              <strong>End Time:</strong>{" "}
-                              {moment(endDate).format("hh:mm A")}
-                            </h6>
-                            <h6 className={classes.cardBodyInfo}>
-                              <strong>No. of Appointments done:</strong>{" "}
-                              {countOfAppointments}
-                            </h6>
-                            <h6 className={classes.cardBodyInfo}>
-                              <strong>Minutes left:</strong>{" "}
-                              {unallocatedMinutes}
-                            </h6>
-                          </CardBody>
-                        </Card>
-                      </GridItem>
-                    );
-                  })}
-                </GridContainer>
+              {isLastStep() && formValues["Department*"] && (
+                <AvailableTimeSlots
+                  loading={timeSlotsLoading}
+                  timeSlots={timeSlots}
+                  classes={classes}
+                  selectedTimeSlot={selectedTimeSlot}
+                  setSelectedTimeSlot={setSelectedTimeSlot}
+                />
               )}
-              <div>
-                <Button
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                  className={classes.button}
-                >
-                  Back
-                </Button>
-                <Button
-                  color="secondary"
-                  component={Link}
-                  to="/app/patient-search"
-                  className={classes.button}
-                >
-                  Cancel
-                </Button>
-
-                {isLastStep() ? (
+              <GridContainer>
+                <GridItem item xs={12} sm={4} md={1}>
                   <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={submitRegistrationForm}
+                    disabled={activeStep === 0}
+                    onClick={handleBack}
                     className={classes.button}
+                    fullWidth
                   >
-                    Submit
+                    Back
                   </Button>
-                ) : (
+                </GridItem>
+                <GridItem item xs={12} sm={4} md={1}>
                   <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleNext}
+                    color="secondary"
+                    component={Link}
+                    to="/app/patient-search"
                     className={classes.button}
+                    fullWidth
                   >
-                    Next
+                    Cancel
                   </Button>
-                )}
-              </div>
+                </GridItem>
+                <GridItem item xs={12} sm={4} md={1}>
+                  {isLastStep() ? (
+                    <Button
+                      disabled={
+                        Object.keys(formErrors).length > 0 || !selectedTimeSlot
+                      }
+                      variant="contained"
+                      color="primary"
+                      onClick={submitRegistrationForm}
+                      className={classes.button}
+                      fullWidth
+                    >
+                      Submit
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleNext}
+                      className={classes.button}
+                      fullWidth
+                    >
+                      Next
+                    </Button>
+                  )}
+                </GridItem>
+              </GridContainer>
             </Paper>
           )}
         </div>
-        {/* <PrintPatientRegistration data={registrationSuccessData} /> */}
       </div>
       {registrationSuccessData && (
         <PrintPatientRegistration data={registrationSuccessData} />

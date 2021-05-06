@@ -37,6 +37,7 @@ export default function PrintPatientRegistration({ data }) {
 
   const handlePrint = useReactToPrint({
     content: () => ref.current,
+    onAfterPrint: () => handleClose()
   });
 
   const handleClose = () => {

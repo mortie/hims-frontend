@@ -14,7 +14,7 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
-import { GridItem } from "../../components/Grid";
+import { GridItem } from "../../../components/Grid";
 
 const genderOptions = [
   { name: "Male", value: "M" },
@@ -30,12 +30,13 @@ function Demographics(props) {
     onTextChange,
     onAutocompleteChange,
     onPhoneChange,
-    onDateOfBirthChange,
     setFormValues,
     formErrors,
+    validateText,
+    validateAutocomplete,
+    validatePhone,
   } = props;
   const [error, setError] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
 
   const handleDateChange = (date, value) => {
     let age = undefined;
@@ -64,6 +65,7 @@ function Demographics(props) {
     const regex = /^[0-9]+(y|Y|m|M|w|W|d|D)$/;
 
     setFormValues({ ...formValues, [name]: value });
+    validateText(e);
 
     if (value === "") {
       setError(false);
@@ -120,6 +122,7 @@ function Demographics(props) {
             value={formValues["First Name*"]}
             autoFocus
             onChange={onTextChange}
+            onBlur={validateText}
             className={classes.field}
             fullWidth
             error={formErrors["First Name*"] ? true : false}
@@ -145,6 +148,7 @@ function Demographics(props) {
           label="Last Name*"
           value={formValues["Last Name*"]}
           onChange={onTextChange}
+          onBlur={validateText}
           className={classes.field}
           fullWidth
           error={formErrors["Last Name*"] ? true : false}
@@ -163,6 +167,7 @@ function Demographics(props) {
             placeholder="Enter age in 20y or 10m or 20d"
             value={formValues["Age*"]}
             onChange={onAgeChange}
+            onBlur={validateText}
             className={classes.field}
             fullWidth
             error={error || formErrors["Age*"] ? true : false}
@@ -199,6 +204,7 @@ function Demographics(props) {
           onChange={(e, newValue) => {
             onAutocompleteChange("Gender*", newValue);
           }}
+          onBlur={(e) => validateAutocomplete("Gender*", formValues["Gender*"])}
           value={formValues["Gender*"]}
           getOptionSelected={(option, value) => option.value === value.value}
           defaultValue={formValues["Gender*"]}
@@ -217,7 +223,7 @@ function Demographics(props) {
         <PhoneInput
           containerStyle={{
             marginTop: 8,
-            color: formErrors["Phone Number*"] ? "red": "rgba(0, 0, 0, 0.54)",
+            color: formErrors["Phone Number*"] ? "red" : "rgba(0, 0, 0, 0.54)",
           }}
           inputProps={{
             name: "Phone Number*",
@@ -229,10 +235,13 @@ function Demographics(props) {
           specialLabel="Phone Number*"
           value={formValues["Phone Number*"]}
           onChange={onPhoneChange}
+          onBlur={(e, data) =>
+            validatePhone(e, data, formValues["Phone Number*"])
+          }
           containerClass={classes.field}
         />
         <FormHelperText className={classes.phoneFieldHelperText} error>
-          {formErrors["Phone Number*"] && "This field is required"}
+          {formErrors["Phone Number*"]}
         </FormHelperText>
       </GridItem>
     </>

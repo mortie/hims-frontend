@@ -37,6 +37,16 @@ const patientRegistrationStyles = (theme) => ({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
+  '@media screen and (max-width: 600px)': {
+    desktopStepper: {
+      display: 'none'
+    }
+  },
+  '@media screen and (min-width: 600px)': {
+    mobileStepper: {
+      display: 'none'
+    }
+  }
 });
 
 export default patientRegistrationStyles;
