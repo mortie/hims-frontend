@@ -13,6 +13,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import ControlledAccordions from "./patient_history"
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -70,6 +71,8 @@ export default function DataGridDemo() {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const [fields, setFields] = React.useState([]);
+  const [historyfields, setHistoryfields] = React.useState([]);
+  const [showhistory, setShowhistory] = React.useState(false);
   const [selectValue, setValues] = React.useState([]);
   const [gender, setGender] = React.useState("");
   const [id,setIdValue]     = React.useState("");
@@ -139,10 +142,17 @@ export default function DataGridDemo() {
       .catch((error) => console.log(error));
   }, []);
 
+  useEffect(() => {
+    let patient_history_url =
+      `/concept?q=Patient History&v=custom:(answers:(display,answers:(uuid,display,datatype:(display),synonyms:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display)))))`;
+    getAPI(patient_history_url)
+      .then((response) => {
+        setHistoryfields(response.data.results[0].answers);        
+      })
+      .catch((error) => console.log(error));
+  }, []);
+
   const onChange = (event, key) => {
-
-    
-
     console.log("target", event.target.value);
     console.log("label", key);
   };
@@ -267,6 +277,15 @@ export default function DataGridDemo() {
     // console.log("ID ",event.row.id)
     // console.log("Gender ",event.row.gender)
     setOpen(true);
+    console.log("HANDLE OPEN :", event)
+    var showField = event.field;
+    if (showField == "History") {
+      // fetchPatientHistory()
+      setShowhistory(true)
+    }
+    else {
+        setShowhistory(false)
+    }
   };
 
   const handleClose = () => {
@@ -311,20 +330,44 @@ export default function DataGridDemo() {
               onClose={handleClose}
               aria-labelledby="form-dialog-title"
             >
-              <DialogTitle id="form-dialog-title">Vital Signs</DialogTitle>
-              <DialogContent>
-                <GridContainer>
-                  {getFeilds()}
-                </GridContainer>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleClose} color="primary">
-                  Cancel
+              {!showhistory &&
+                <div>
+                  <DialogTitle id="form-dialog-title">Vital Signs</DialogTitle>
+                  <DialogContent>
+                    <GridContainer>
+                      {getFeilds()}
+                    </GridContainer>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                      Cancel
                 </Button>
-                <Button onClick={handleClose} color="primary">
-                  Save
+                    <Button onClick={handleClose} color="primary">
+                      Save
                 </Button>
-              </DialogActions>
+                  </DialogActions>
+                </div>
+              }
+              {showhistory &&
+                <div>
+                  <DialogTitle id="form-dialog-title">Patient History</DialogTitle>
+                  <DialogContent>
+                    <GridContainer>
+                    <ControlledAccordions
+                    historyfields = {historyfields}
+                    />
+                    </GridContainer>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                      Cancel
+                </Button>
+                    <Button onClick={handleClose} color="primary">
+                      Save
+                </Button>
+                  </DialogActions>
+                </div>
+              }
             </Dialog>
           </div>
         </Container>
