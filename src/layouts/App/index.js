@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Switch,
   Route,
@@ -8,11 +8,12 @@ import {
 } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
 import { makeStyles, CssBaseline, Container } from "@material-ui/core";
-import { logout, hasAccess } from "../../utils";
+import { logout, hasAccess, isLogin } from "../../utils";
 import { appRoutes as routes } from "../../routes";
 import { AppBar, SideBar, Footer } from "../../components";
 import styles from "./styles";
 import { deleteAPI } from "../../services";
+import { SESSION_TIME_OUT } from "../../utils/constants";
 
 const useStyles = makeStyles(styles);
 
@@ -21,6 +22,15 @@ function App({ ...rest }) {
   const history = useHistory();
   const match = useRouteMatch();
   const [drawer, setDrawer] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isLogin()) {
+        logout(history);
+      }
+    }, SESSION_TIME_OUT);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleDrawer = () => {
     setDrawer(!drawer);

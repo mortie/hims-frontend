@@ -20,11 +20,11 @@ import {
   Step,
   StepButton,
   Button,
-  Typography,
   FormHelperText,
   MobileStepper,
 } from "@material-ui/core";
 import styles from "./styles";
+import AutocompleteComponent from "./components/AutocompleteComponent";
 
 const useStyles = makeStyles(styles);
 
@@ -42,7 +42,6 @@ export default function PatientRegistration() {
   const classes = useStyles();
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
-  const [completed, setCompleted] = useState(new Set());
   const [steps, setsteps] = useState(["Demographics"]);
   const [stepsWithContent, setStepsWithContent] = useState();
   const [formValues, setFormValues] = useState(initialSate);
@@ -132,11 +131,31 @@ export default function PatientRegistration() {
                 });
               }
               if (datatype.display === "Text") {
+                if (checkSynonym(synonyms) === "email") {
+                  return (
+                    <GridItem key={uuid} item xs={12} sm={6} md={4}>
+                      <TextField
+                        id={display}
+                        variant="outlined"
+                        label={display}
+                        name={display}
+                        fullWidth
+                        className={classes.field}
+                        error={formErrors[display]}
+                        helperText={formErrors[display] && formErrors[display]}
+                        value={formValues[display]}
+                        onChange={onEmailChange}
+                        onBlur={validateEmail}
+                        autoFocus={index === 0}
+                      />
+                    </GridItem>
+                  );
+                }
                 return getTextFieldComponent(uuid, display, error, index === 0);
               }
 
               if (datatype.display === "Numeric") {
-                if (checkSynonymForMobile(synonyms)) {
+                if (checkSynonym(synonyms) === "mobile") {
                   return (
                     <GridItem key={uuid} item xs={12} sm={6} md={4}>
                       <PhoneInput
@@ -192,19 +211,30 @@ export default function PatientRegistration() {
               if (datatype.display === "Coded") {
                 return (
                   <React.Fragment key={uuid}>
-                    {getAutocompleteComponent(
-                      display,
-                      answers,
-                      error,
-                      index === 0
+                    <AutocompleteComponent
+                      display={display}
+                      answers={answers}
+                      formErrors={formErrors}
+                      formValues={formValues}
+                      autoFocus={index === 0}
+                      classes={classes}
+                      onAutocompleteChange={onAutocompleteChange}
+                      validateAutocomplete={validateAutocomplete}
+                    />
+
+                    {formValues[display]?.datatype?.display === "Coded" && (
+                      <AutocompleteComponent
+                        display={formValues[display].display}
+                        answers={formValues[display].answers}
+                        formErrors={formErrors}
+                        formValues={formValues}
+                        autoFocus={true}
+                        classes={classes}
+                        onAutocompleteChange={onAutocompleteChange}
+                        validateAutocomplete={validateAutocomplete}
+                      />
                     )}
-                    {formValues[display]?.datatype?.display === "Coded" &&
-                      getAutocompleteComponent(
-                        formValues[display].display,
-                        formValues[display].answers,
-                        error,
-                        true
-                      )}
+
                     {formValues[display]?.datatype?.display === "Text" &&
                       getTextFieldComponent(
                         formValues[display].uuid,
@@ -212,15 +242,25 @@ export default function PatientRegistration() {
                         error,
                         true
                       )}
+
                     {formValues[formValues[display]?.display]?.datatype
-                      ?.display === "Coded"
-                      ? getAutocompleteComponent(
-                          formValues[formValues[display]?.display]?.display,
-                          formValues[formValues[display]?.display]?.answers,
-                          error,
-                          true
-                        )
-                      : null}
+                      ?.display === "Coded" && (
+                      <AutocompleteComponent
+                        display={
+                          formValues[formValues[display]?.display]?.display
+                        }
+                        answers={
+                          formValues[formValues[display]?.display]?.answers
+                        }
+                        formErrors={formErrors}
+                        formValues={formValues}
+                        autoFocus={true}
+                        classes={classes}
+                        onAutocompleteChange={onAutocompleteChange}
+                        validateAutocomplete={validateAutocomplete}
+                      />
+                    )}
+
                     {formValues[
                       formValues[formValues[display]?.display]?.display
                     ]?.datatype?.display === "Numeric"
@@ -281,38 +321,6 @@ export default function PatientRegistration() {
     );
   }
 
-  function getAutocompleteComponent(display, answers, error, autoFocus) {
-    const errors = formErrors[display] ? true : false;
-    return (
-      <>
-        <GridItem item xs={12} sm={6} md={4}>
-          <Autocomplete
-            id={display}
-            options={answers}
-            getOptionLabel={(option) => option.display}
-            onChange={(e, newValue) => {
-              onAutocompleteChange(display, newValue);
-            }}
-            onBlur={(e) => validateAutocomplete(display, formValues[display])}
-            value={formValues[display]}
-            getOptionSelected={(option, value) => option.uuid === value.uuid}
-            className={classes.field}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                error={errors}
-                helperText={formErrors[display]}
-                label={display}
-                variant="outlined"
-                autoFocus={autoFocus}
-              />
-            )}
-          />
-        </GridItem>
-      </>
-    );
-  }
-
   function getTextFieldComponent(uuid, display, error, autoFocus) {
     const errors = formErrors[display] ? true : false;
     return (
@@ -333,46 +341,6 @@ export default function PatientRegistration() {
         />
       </GridItem>
     );
-  }
-
-  function onTextChange(e) {
-    const { name, value } = e.target;
-    setFormValues({
-      ...formValues,
-      [name]: value,
-    });
-    validateText(e);
-  }
-
-  function onAutocompleteChange(display, newValue) {
-    if (newValue?.datatype?.display === "Coded") {
-      setFormValues({
-        ...formValues,
-        [newValue.display]: null,
-        [display]: newValue,
-      });
-    } else if (newValue?.datatype?.display === "Text") {
-      setFormValues({
-        ...formValues,
-        [newValue.display]: "",
-        [display]: newValue,
-      });
-    } else {
-      setFormValues({ ...formValues, [display]: newValue });
-    }
-
-    validateAutocomplete(display, newValue);
-  }
-
-  function onPhoneChange(value, data, event, formattedValue) {
-    const { name } = event.target;
-    const rawValue = value.slice(data.dialCode.length);
-    setFormValues({ ...formValues, [name]: value });
-    validatePhone(event, data, value);
-  }
-
-  function onDateOfBirthChange(name, dob) {
-    setFormValues({ ...formValues, [name]: dob });
   }
 
   function getTimeSlots(type) {
@@ -402,6 +370,57 @@ export default function PatientRegistration() {
           console.log(error);
         });
     }
+  }
+
+  function onTextChange(e) {
+    const { name, value } = e.target;
+    setFormValues({
+      ...formValues,
+      [name]: value,
+    });
+    validateText(e);
+  }
+
+  function onEmailChange(e) {
+    const { name, value } = e.target;
+
+    setFormValues({
+      ...formValues,
+      [name]: value,
+    });
+
+    validateEmail(e);
+  }
+
+  function onAutocompleteChange(display, newValue) {
+    if (newValue?.datatype?.display === "Coded") {
+      setFormValues({
+        ...formValues,
+        [newValue.display]: null,
+        [display]: newValue,
+      });
+    } else if (newValue?.datatype?.display === "Text") {
+      setFormValues({
+        ...formValues,
+        [newValue.display]: "",
+        [display]: newValue,
+      });
+    } else {
+      setFormValues({ ...formValues, [display]: newValue });
+    }
+
+    validateAutocomplete(display, newValue);
+  }
+
+  function onPhoneChange(value, data, event, formattedValue) {
+    const { name } = event.target;
+    // const rawValue = value.slice(data.dialCode.length);
+    setFormValues({ ...formValues, [name]: value });
+    validatePhone(event, data, value);
+  }
+
+  function onDateOfBirthChange(name, dob) {
+    setFormValues({ ...formValues, [name]: dob });
   }
 
   function validate() {
@@ -434,6 +453,18 @@ export default function PatientRegistration() {
     }
   }
 
+  function validateEmail(e) {
+    const { name, value } = e.target;
+    const regex = /^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]+$/;
+    if (value !== "" && !regex.test(value)) {
+      setFormErrors({ ...formErrors, [name]: "Invalid email address" });
+    } else {
+      const errors = formErrors;
+      delete errors[name];
+      setFormErrors(errors);
+    }
+  }
+
   function validateAutocomplete(key, value = null) {
     if (key.slice(-1) === "*") {
       if (value) {
@@ -460,30 +491,20 @@ export default function PatientRegistration() {
     }
   }
 
-  function checkSynonymForMobile(synonyms) {
-    let found = false;
-    synonyms.forEach((synonym) => {
-      if (synonym.display.toLowerCase() === "mobile") {
-        found = true;
+  function checkSynonym(synonyms) {
+    let synonym = "";
+    synonyms.forEach((synm) => {
+      if (synm.display.toLowerCase() === "mobile") {
+        synonym = synm.display.toLowerCase();
+      } else if (synm.display.toLowerCase() === "email") {
+        synonym = synm.display.toLowerCase();
       }
     });
-    return found;
+    return synonym;
   }
 
   const totalSteps = () => {
     return steps.length;
-  };
-
-  const isStepOptional = (step) => {
-    return step === 1;
-  };
-
-  const completedSteps = () => {
-    return completed.size;
-  };
-
-  const allStepsCompleted = () => {
-    return completedSteps() === totalSteps();
   };
 
   const isLastStep = () => {
@@ -492,23 +513,17 @@ export default function PatientRegistration() {
 
   const handleNext = () => {
     let errors = validate();
-    if (Object.keys(errors).length > 0) {
+    if (Object.keys(errors).length > 0 || Object.keys(formErrors).length > 0) {
       setFormErrors({ ...formErrors, ...errors });
       return;
     }
-    const newActiveStep =
-      isLastStep() && !allStepsCompleted()
-        ? // It's the last step, but not all steps have been completed
-          // find the first step that has been completed
-          steps.findIndex((step, i) => !completed.has(i))
-        : activeStep + 1;
 
-    setActiveStep(newActiveStep);
+    setActiveStep(activeStep + 1);
   };
 
   const handleBack = () => {
     let errors = validate();
-    if (Object.keys(errors).length > 0) {
+    if (Object.keys(errors).length > 0 || Object.keys(formErrors).length > 0) {
       setFormErrors({ ...formErrors, ...errors });
       return;
     }
@@ -517,36 +532,12 @@ export default function PatientRegistration() {
 
   const handleStep = (step) => () => {
     let errors = validate();
-    if (Object.keys(errors).length > 0) {
+    if (Object.keys(errors).length > 0 || Object.keys(formErrors).length > 0) {
       setFormErrors({ ...formErrors, ...errors });
       return;
     }
     setActiveStep(step);
   };
-
-  const handleComplete = () => {
-    const newCompleted = new Set(completed);
-    newCompleted.add(activeStep);
-    setCompleted(newCompleted);
-
-    /**
-     * Sigh... it would be much nicer to replace the following if conditional with
-     * `if (!this.allStepsComplete())` however state is not set when we do this,
-     * thus we have to resort to not being very DRY.
-     */
-    if (completed.size !== totalSteps()) {
-      handleNext();
-    }
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-    setCompleted(new Set());
-  };
-
-  function isStepComplete(step) {
-    return completed.has(step);
-  }
 
   const submitRegistrationForm = () => {
     let patient = {
@@ -571,7 +562,17 @@ export default function PatientRegistration() {
             countyDistrict: formValues["District"],
           },
         ],
-        attributes: getAttributes(personAttributeTypes),
+        attributes: [
+          {
+            attributeType: "75f95cc0-aff4-4025-9f69-27029d186e95",
+            value: "PERNO",
+          },
+          {
+            attributeType: "4ea2ceb4-2edf-454f-af76-ef7e8d777901",
+            value: "NA",
+          },
+          ...getAttributes(personAttributeTypes),
+        ],
       },
       identifiers: [
         {
@@ -636,10 +637,6 @@ export default function PatientRegistration() {
       .filter((element) => element && element);
   };
 
-  const changeTimeSlot = (uuid) => {
-    setSelectedTimeSlot(uuid);
-  };
-
   return (
     <>
       <MobileStepper
@@ -695,14 +692,7 @@ export default function PatientRegistration() {
           })}
         </Stepper>
         <div>
-          {allStepsCompleted() ? (
-            <div>
-              <Typography className={classes.instructions}>
-                All steps completed - you&apos;re finished
-              </Typography>
-              <Button onClick={handleReset}>Reset</Button>
-            </div>
-          ) : (
+          {
             <Paper className={classes.paper}>
               {getStepContent(activeStep)}
               {isLastStep() && formValues["Department*"] && (
@@ -764,7 +754,7 @@ export default function PatientRegistration() {
                 </GridItem>
               </GridContainer>
             </Paper>
-          )}
+          }
         </div>
       </div>
       {registrationSuccessData && (

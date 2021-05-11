@@ -664,9 +664,7 @@ export default function PatientSearch(props) {
                   }
                   if (searchdatanew[0][i]["person_attributes"]) {
                     phoneNo =
-                      searchdatanew[0][i]["person_attributes"][
-                        "Telephone Number"
-                      ];
+                      searchdatanew[0][i]["person_attributes"]["Phone Number*"];
                   }
                   if (searchdatanew[0][i]["visit_date"] !== undefined) {
                     visitdate = searchdatanew[0][i]["visit_date"];
@@ -814,7 +812,7 @@ export default function PatientSearch(props) {
                 if (searchdatanew[0][i]["person_attributes"]) {
                   phoneNo =
                     searchdatanew[0][i]["person_attributes"][
-                      "Telephone Number"
+                      "Phone Number*"
                     ];
                 }
                 if (searchdatanew[0][i]["visit_date"] != undefined) {
@@ -940,7 +938,7 @@ export default function PatientSearch(props) {
         <Button
           variant="contained"
           color="primary"
-          style={{color: "white"}}
+          style={{ color: "white" }}
           startIcon={<AddIcon />}
           component={Link}
           to="/app/patient-registration"
