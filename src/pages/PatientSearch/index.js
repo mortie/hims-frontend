@@ -65,7 +65,6 @@ export default function PatientSearch(props) {
   var [genderValue, setgenderValue] = useState("");
   var [resultAge, setresultAge] = useState(0);
   var [loading, setLoading] = useState(false);
-
   var [errors, setErrors] = useState({
     phoneData: true,
     nameData: true,
@@ -811,9 +810,7 @@ export default function PatientSearch(props) {
                 }
                 if (searchdatanew[0][i]["person_attributes"]) {
                   phoneNo =
-                    searchdatanew[0][i]["person_attributes"][
-                      "Phone Number*"
-                    ];
+                    searchdatanew[0][i]["person_attributes"]["Phone Number*"];
                 }
                 if (searchdatanew[0][i]["visit_date"] != undefined) {
                   visitdate = searchdatanew[0][i]["visit_date"];
