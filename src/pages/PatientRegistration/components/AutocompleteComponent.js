@@ -5,6 +5,7 @@ import { GridItem } from "../../../components";
 
 function AutocompleteComponent({
   display,
+  labelName,
   answers,
   formErrors,
   formValues,
@@ -33,7 +34,7 @@ function AutocompleteComponent({
               {...params}
               error={errors}
               helperText={formErrors[display]}
-              label={display}
+              label={labelName}
               variant="outlined"
               autoFocus={autoFocus}
             />

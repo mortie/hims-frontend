@@ -13,7 +13,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import ControlledAccordions from "./patient_history"
+import ControlledAccordions from "./patient_history";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -75,7 +75,7 @@ export default function DataGridDemo() {
   const [showhistory, setShowhistory] = React.useState(false);
   const [selectValue, setValues] = React.useState([]);
   const [gender, setGender] = React.useState("");
-  const [id,setIdValue]     = React.useState("");
+  const [id, setIdValue] = React.useState("");
 
   const [state, setState] = useState({
     height: {
@@ -84,9 +84,7 @@ export default function DataGridDemo() {
     },
   });
 
-  const [selectedDate, setSelectedDate] = React.useState(
-    new Date()
-  );
+  const [selectedDate, setSelectedDate] = React.useState(new Date());
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -143,11 +141,10 @@ export default function DataGridDemo() {
   }, []);
 
   useEffect(() => {
-    let patient_history_url =
-      `/concept?q=Patient History&v=custom:(answers:(display,answers:(uuid,display,datatype:(display),synonyms:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display)))))`;
+    let patient_history_url = `/concept?q=Patient History&v=custom:(answers:(display,answers:(uuid,display,datatype:(display),synonyms:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display)))))`;
     getAPI(patient_history_url)
       .then((response) => {
-        setHistoryfields(response.data.results[0].answers);        
+        setHistoryfields(response.data.results[0].answers);
       })
       .catch((error) => console.log(error));
   }, []);
@@ -158,7 +155,7 @@ export default function DataGridDemo() {
   };
 
   const getFeilds = () => {
-    console.log("Date ",selectedDate)
+    console.log("Date ", selectedDate);
     return (
       <>
         {" "}
@@ -185,7 +182,7 @@ export default function DataGridDemo() {
                     id={uuid}
                     label={display}
                     rowsMax={4}
-                    onChange={(e) => onChange(e,uuid)}
+                    onChange={(e) => onChange(e, uuid)}
                     // onChange={getValue}
                   >
                     {item.map((name) => (
@@ -213,7 +210,7 @@ export default function DataGridDemo() {
                     rowsMax={4}
                     className={classes.textField}
                     size="small"
-                    onChange={(e) => onChange(e,uuid)}
+                    onChange={(e) => onChange(e, uuid)}
                     // InputLabelProps={{
                     //   shrink: true,
                     // }}
@@ -223,7 +220,7 @@ export default function DataGridDemo() {
               </GridItem>
             );
           }
-          if (gender==="F") {
+          if (gender === "F") {
             return (
               <GridItem item xs={12} sm={4} md={4} key={uuid}>
                 <FormControl className={classes.formControl}>
@@ -237,7 +234,7 @@ export default function DataGridDemo() {
                     className={classes.textField}
                     InputLabelProps={{ shrink: true }}
                     maxDate={new Date()}
-                    onChange={(e) => onChange(e,uuid)}
+                    onChange={(e) => onChange(e, uuid)}
                   />
                 </FormControl>
               </GridItem>
@@ -272,19 +269,18 @@ export default function DataGridDemo() {
   };
 
   const handleOpen = (event) => {
-    setGender(event.row.gender)
-    setIdValue(event.row)
+    setGender(event.row.gender);
+    setIdValue(event.row);
     // console.log("ID ",event.row.id)
     // console.log("Gender ",event.row.gender)
     setOpen(true);
-    console.log("HANDLE OPEN :", event)
+    console.log("HANDLE OPEN :", event);
     var showField = event.field;
     if (showField == "History") {
       // fetchPatientHistory()
-      setShowhistory(true)
-    }
-    else {
-        setShowhistory(false)
+      setShowhistory(true);
+    } else {
+      setShowhistory(false);
     }
   };
 
@@ -314,9 +310,7 @@ export default function DataGridDemo() {
             &nbsp;
             <DataGrid
               // onCellClick	={handleOpen}
-              onCellClick={event =>
-                handleOpen(event)
-              }
+              onCellClick={(event) => handleOpen(event)}
               rows={list}
               columns={col}
               pageSize={5}
@@ -330,44 +324,42 @@ export default function DataGridDemo() {
               onClose={handleClose}
               aria-labelledby="form-dialog-title"
             >
-              {!showhistory &&
+              {!showhistory && (
                 <div>
                   <DialogTitle id="form-dialog-title">Vital Signs</DialogTitle>
                   <DialogContent>
-                    <GridContainer>
-                      {getFeilds()}
-                    </GridContainer>
+                    <GridContainer>{getFeilds()}</GridContainer>
                   </DialogContent>
                   <DialogActions>
                     <Button onClick={handleClose} color="primary">
                       Cancel
-                </Button>
+                    </Button>
                     <Button onClick={handleClose} color="primary">
                       Save
-                </Button>
+                    </Button>
                   </DialogActions>
                 </div>
-              }
-              {showhistory &&
+              )}
+              {showhistory && (
                 <div>
-                  <DialogTitle id="form-dialog-title">Patient History</DialogTitle>
+                  <DialogTitle id="form-dialog-title">
+                    Patient History
+                  </DialogTitle>
                   <DialogContent>
                     <GridContainer>
-                    <ControlledAccordions
-                    historyfields = {historyfields}
-                    />
+                      <ControlledAccordions historyfields={historyfields} />
                     </GridContainer>
                   </DialogContent>
                   <DialogActions>
                     <Button onClick={handleClose} color="primary">
                       Cancel
-                </Button>
+                    </Button>
                     <Button onClick={handleClose} color="primary">
                       Save
-                </Button>
+                    </Button>
                   </DialogActions>
                 </div>
-              }
+              )}
             </Dialog>
           </div>
         </Container>

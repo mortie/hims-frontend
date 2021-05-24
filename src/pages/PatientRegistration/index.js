@@ -25,6 +25,7 @@ import {
 } from "@material-ui/core";
 import styles from "./styles";
 import AutocompleteComponent from "./components/AutocompleteComponent";
+import TextFieldComponent from "./components/TextFieldComponent";
 
 const useStyles = makeStyles(styles);
 
@@ -57,7 +58,7 @@ export default function PatientRegistration() {
 
   useEffect(() => {
     getAPI(
-      `/concept?q="Registration Attribute"&v=custom:(answers:(display,answers:(uuid,display,datatype:(display),synonyms:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display)))))`
+      `/concept?q="Registration Attribute"&v=custom:(answers:(display,answers:(uuid,display,datatype:(display),synonyms:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType)))))`
     )
       .then((response) => {
         const stapsWithContent = response.data.results[0].answers.filter(
@@ -122,8 +123,10 @@ export default function PatientRegistration() {
         ) : (
           <>
             {stepsWithContent[step - 1].answers.map((element, index) => {
-              const { uuid, display, answers, datatype, synonyms } = element;
-              const error = formErrors[display] ? true : false;
+              const { uuid, display, answers, datatype, synonyms, names } =
+                element;
+
+              const labelName = getLabelName(names) || display;
               if (!formValues.hasOwnProperty(display)) {
                 setFormValues({
                   ...formValues,
@@ -131,31 +134,30 @@ export default function PatientRegistration() {
                 });
               }
               if (datatype.display === "Text") {
-                if (checkSynonym(synonyms) === "email") {
-                  return (
-                    <GridItem key={uuid} item xs={12} sm={6} md={4}>
-                      <TextField
-                        id={display}
-                        variant="outlined"
-                        label={display}
-                        name={display}
-                        fullWidth
-                        className={classes.field}
-                        error={formErrors[display]}
-                        helperText={formErrors[display] && formErrors[display]}
-                        value={formValues[display]}
-                        onChange={onEmailChange}
-                        onBlur={validateEmail}
-                        autoFocus={index === 0}
-                      />
-                    </GridItem>
-                  );
-                }
-                return getTextFieldComponent(uuid, display, error, index === 0);
+                return (
+                  <TextFieldComponent
+                    display={display}
+                    labelName={labelName}
+                    formValues={formValues}
+                    formErrors={formErrors}
+                    classes={classes}
+                    autoFocus={index === 0}
+                    onTextChange={
+                      checkSynonym(synonyms, "email")
+                        ? onEmailChange
+                        : onTextChange
+                    }
+                    validateText={
+                      checkSynonym(synonyms, "email")
+                        ? validateEmail
+                        : validateText
+                    }
+                  />
+                );
               }
 
               if (datatype.display === "Numeric") {
-                if (checkSynonym(synonyms) === "mobile") {
+                if (checkSynonym(synonyms, "mobile")) {
                   return (
                     <GridItem key={uuid} item xs={12} sm={6} md={4}>
                       <PhoneInput
@@ -174,7 +176,7 @@ export default function PatientRegistration() {
                         }}
                         inputClass={formErrors[display] && classes.phoneField}
                         country={"in"}
-                        specialLabel={display}
+                        specialLabel={labelName}
                         value={formValues[display]}
                         onChange={onPhoneChange}
                         onBlur={(e, data) =>
@@ -196,7 +198,7 @@ export default function PatientRegistration() {
                     <TextField
                       type="number"
                       variant="outlined"
-                      label={display}
+                      label={labelName}
                       name={display}
                       value={formValues[display]}
                       autoFocus={index === 0 ? true : false}
@@ -213,6 +215,7 @@ export default function PatientRegistration() {
                   <React.Fragment key={uuid}>
                     <AutocompleteComponent
                       display={display}
+                      labelName={getLabelName(names) || display}
                       answers={answers}
                       formErrors={formErrors}
                       formValues={formValues}
@@ -225,6 +228,10 @@ export default function PatientRegistration() {
                     {formValues[display]?.datatype?.display === "Coded" && (
                       <AutocompleteComponent
                         display={formValues[display].display}
+                        labelName={
+                          getLabelName(formValues[display].names) ||
+                          formValues[display].display
+                        }
                         answers={formValues[display].answers}
                         formErrors={formErrors}
                         formValues={formValues}
@@ -235,19 +242,32 @@ export default function PatientRegistration() {
                       />
                     )}
 
-                    {formValues[display]?.datatype?.display === "Text" &&
-                      getTextFieldComponent(
-                        formValues[display].uuid,
-                        formValues[display].display,
-                        error,
-                        true
-                      )}
+                    {formValues[display]?.datatype?.display === "Text" && (
+                      <TextFieldComponent
+                        display={formValues[display].display}
+                        labelName={getLabelName(
+                          formValues[display].names ||
+                            formValues[display].display
+                        )}
+                        formValues={formValues}
+                        formErrors={formErrors}
+                        classes={classes}
+                        autoFocus={index === 0}
+                        onTextChange={onTextChange}
+                        validateText={validateText}
+                      />
+                    )}
 
                     {formValues[formValues[display]?.display]?.datatype
                       ?.display === "Coded" && (
                       <AutocompleteComponent
                         display={
                           formValues[formValues[display]?.display]?.display
+                        }
+                        labelName={
+                          getLabelName(
+                            formValues[formValues[display]?.display]?.names
+                          ) || formValues[formValues[display]?.display]?.display
                         }
                         answers={
                           formValues[formValues[display]?.display]?.answers
@@ -263,18 +283,29 @@ export default function PatientRegistration() {
 
                     {formValues[
                       formValues[formValues[display]?.display]?.display
-                    ]?.datatype?.display === "Numeric"
-                      ? getTextFieldComponent(
+                    ]?.datatype?.display === "Numeric" && (
+                      <TextFieldComponent
+                        display={
                           formValues[
                             formValues[formValues[display]?.display]?.display
-                          ]?.uuid,
+                          ]?.display
+                        }
+                        labelName={getLabelName(
                           formValues[
                             formValues[formValues[display]?.display]?.display
-                          ]?.display,
-                          error,
-                          true
-                        )
-                      : null}
+                          ]?.names ||
+                            formValues[
+                              formValues[formValues[display]?.display]?.display
+                            ]?.display
+                        )}
+                        formValues={formValues}
+                        formErrors={formErrors}
+                        classes={classes}
+                        autoFocus={index === 0}
+                        onTextChange={onTextChange}
+                        validateText={validateText}
+                      />
+                    )}
                   </React.Fragment>
                 );
               }
@@ -321,26 +352,9 @@ export default function PatientRegistration() {
     );
   }
 
-  function getTextFieldComponent(uuid, display, error, autoFocus) {
-    const errors = formErrors[display] ? true : false;
-    return (
-      <GridItem key={uuid} item xs={12} sm={6} md={4}>
-        <TextField
-          id={display}
-          variant="outlined"
-          label={display}
-          name={display}
-          fullWidth
-          className={classes.field}
-          error={errors}
-          helperText={errors && formErrors[display]}
-          value={formValues[display]}
-          onChange={(e) => onTextChange(e)}
-          onBlur={validateText}
-          autoFocus={autoFocus}
-        />
-      </GridItem>
-    );
+  function getLabelName(names) {
+    const shortName = names.filter((name) => name.conceptNameType === "SHORT");
+    return shortName.length > 0 ? shortName[0].display : null;
   }
 
   function getTimeSlots(type) {
@@ -491,16 +505,12 @@ export default function PatientRegistration() {
     }
   }
 
-  function checkSynonym(synonyms) {
-    let synonym = "";
-    synonyms.forEach((synm) => {
-      if (synm.display.toLowerCase() === "mobile") {
-        synonym = synm.display.toLowerCase();
-      } else if (synm.display.toLowerCase() === "email") {
-        synonym = synm.display.toLowerCase();
-      }
-    });
-    return synonym;
+  function checkSynonym(synonyms, synonym) {
+    const result = synonyms.filter(
+      (synm) => synm.display.toLowerCase() === synonym
+    );
+
+    return result.length;
   }
 
   const totalSteps = () => {
