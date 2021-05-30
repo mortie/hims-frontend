@@ -64,7 +64,7 @@ const col = [
   },
 ];
 
-const patientData = [];
+var patientData = [];
 
 export default function DataGridDemo() {
   const [list, setList] = useState([]);
@@ -176,7 +176,7 @@ export default function DataGridDemo() {
                   <TextField
                     style={{ width: 228 }}
                     autoFocus
-                    multiline="true"
+                    multiline
                     select
                     variant="outlined"
                     id={uuid}
@@ -319,7 +319,7 @@ export default function DataGridDemo() {
           <div>
             <Dialog
               maxWidth="md"
-              fullWidth="true"
+              fullWidth
               open={open}
               onClose={handleClose}
               aria-labelledby="form-dialog-title"
