@@ -31,7 +31,6 @@ import {
   CurrentTimeIndicator,
 } from "@devexpress/dx-react-scheduler-material-ui";
 import { addProviders } from "../../actions/providersActions";
-import { addLocations } from "../../actions/locationActions";
 import { addServices } from "../../actions/servicesActions";
 import {
   fetchAppointmentBlockWithTimeSlot,
@@ -136,44 +135,38 @@ export default function ProviderScheduling() {
   ]);
 
   useEffect(() => {
-    if (appointmentBlockWithTimeSlots.length === 0) {
-      setLoading(true);
-      const urls = [
-        "/provider",
-        "/location",
-        "/appointmentscheduling/appointmenttype",
-        `/appointmentscheduling/appointmentblockwithtimeslot?v=full&limit=100&fromDate=${new Date().toISOString()}`,
-      ];
-      const requests = urls.map((url) => getAPI(url));
+    // if (appointmentBlockWithTimeSlots.length != 0) {
+    setLoading(true);
+    const urls = [
+      "/provider",
+      "/appointmentscheduling/appointmenttype",
+      `/appointmentscheduling/appointmentblockwithtimeslot?v=full&limit=100&fromDate=${new Date().toISOString()}`,
+    ];
+    const requests = urls.map((url) => getAPI(url));
 
-      Promise.all(requests).then((responses) => {
-        const provider = convertResponseData(responses[0]);
-        const location = convertResponseData(responses[1]);
-        const service = convertResponseData(responses[2]);
-        const appointmentBlockWithTimeSlot = convertAppointmentData(
-          responses[3]
-        );
+    Promise.all(requests).then((responses) => {
+      const provider = convertResponseData(responses[0].data.results);
+      const service = convertResponseData(responses[1].data.results);
+      const appointmentBlockWithTimeSlot = convertAppointmentData(responses[2]);
 
-        const resorce = resources;
-        resorce.find((a) => a.fieldName === "types").instances = service;
-        resorce.find((a) => a.fieldName === "location").instances = location;
-        resorce.find((a) => a.fieldName === "provider").instances = provider;
-        setResources(resorce);
+      const resorce = resources;
+      resorce.find((a) => a.fieldName === "types").instances = service;
+      resorce.find((a) => a.fieldName === "location").instances =
+        convertResponseData(locations);
+      resorce.find((a) => a.fieldName === "provider").instances = provider;
+      setResources(resorce);
 
-        dispatch(addProviders(provider));
-        dispatch(addLocations(location));
-        dispatch(addServices(service));
-        dispatch(
-          fetchAppointmentBlockWithTimeSlot(appointmentBlockWithTimeSlot)
-        );
-        setData(appointmentBlockWithTimeSlot);
-        setLoading(false);
-      });
-    }
+      dispatch(addProviders(provider));
+      dispatch(addServices(service));
+      dispatch(fetchAppointmentBlockWithTimeSlot(appointmentBlockWithTimeSlot));
+      setData(appointmentBlockWithTimeSlot);
+      setLoading(false);
+    });
+    // }
 
     setData(getFilteredAppointments(department));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appointmentBlockWithTimeSlots]);
+  }, []);
 
   function currentDateChange(currentDate) {
     if (getDifferenceInDays(currentDate, new Date()) > 1) {
@@ -183,8 +176,8 @@ export default function ProviderScheduling() {
     setCurrentDate(currentDate);
   }
 
-  function convertResponseData(response) {
-    return response.data.results.map((item) => ({
+  function convertResponseData(results) {
+    return results.map((item) => ({
       id: item.uuid,
       text: item.display,
     }));

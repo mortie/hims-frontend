@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import {
   Switch,
   Route,
@@ -12,16 +13,25 @@ import { logout, hasAccess, isLogin } from "../../utils";
 import { appRoutes as routes } from "../../routes";
 import { AppBar, SideBar, Footer } from "../../components";
 import styles from "./styles";
-import { deleteAPI } from "../../services";
+import { getAPI, deleteAPI } from "../../services";
 import { SESSION_TIME_OUT } from "../../utils/constants";
+
+import { addLocations } from "../../actions/locationActions";
 
 const useStyles = makeStyles(styles);
 
 function App({ ...rest }) {
+  const dispatch = useDispatch();
   const classes = useStyles();
   const history = useHistory();
   const match = useRouteMatch();
   const [drawer, setDrawer] = useState(true);
+
+  useEffect(() => {
+    getAPI("/location?v=custom:(uuid,display)")
+      .then((response) => dispatch(addLocations(response.data.results)))
+      .catch((error) => console.log(error));
+  }, [dispatch]);
 
   useEffect(() => {
     const interval = setInterval(() => {

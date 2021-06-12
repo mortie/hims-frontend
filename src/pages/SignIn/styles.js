@@ -7,7 +7,8 @@ const signinStyles = (theme) => ({
     position: 'relative',
   },
   image: {
-    backgroundImage: "url(https://source.unsplash.com/random)",
+    // backgroundImage: "url(https://source.unsplash.com/random)",
+    backgroundImage: "url(/img/registration_counter.png)",
     backgroundRepeat: "no-repeat",
     backgroundColor:
       theme.palette.type === "light"

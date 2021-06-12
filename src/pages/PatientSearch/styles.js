@@ -1,7 +1,7 @@
 const patientSearchStyles = (theme) => ({
   paper: {
     marginTop: theme.spacing(2),
-    padding: theme.spacing(2),
+    // padding: theme.spacing(2),
   },
   field: {
     marginTop: theme.spacing(1),

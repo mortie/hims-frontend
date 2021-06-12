@@ -136,6 +136,7 @@ export default function PatientRegistration() {
               if (datatype.display === "Text") {
                 return (
                   <TextFieldComponent
+                    key={uuid}
                     display={display}
                     labelName={labelName}
                     formValues={formValues}
@@ -245,10 +246,10 @@ export default function PatientRegistration() {
                     {formValues[display]?.datatype?.display === "Text" && (
                       <TextFieldComponent
                         display={formValues[display].display}
-                        labelName={getLabelName(
-                          formValues[display].names ||
-                            formValues[display].display
-                        )}
+                        labelName={
+                          getLabelName(formValues[display].names) ||
+                          formValues[display].display
+                        }
                         formValues={formValues}
                         formErrors={formErrors}
                         classes={classes}
@@ -293,11 +294,11 @@ export default function PatientRegistration() {
                         labelName={getLabelName(
                           formValues[
                             formValues[formValues[display]?.display]?.display
-                          ]?.names ||
+                          ]?.names )||
                             formValues[
                               formValues[formValues[display]?.display]?.display
                             ]?.display
-                        )}
+                        }
                         formValues={formValues}
                         formErrors={formErrors}
                         classes={classes}
@@ -354,7 +355,7 @@ export default function PatientRegistration() {
 
   function getLabelName(names) {
     const shortName = names.filter((name) => name.conceptNameType === "SHORT");
-    return shortName.length > 0 ? shortName[0].display : null;
+    return shortName.length ? shortName[0].display : null;
   }
 
   function getTimeSlots(type) {
@@ -454,10 +455,8 @@ export default function PatientRegistration() {
 
   function validateText(e) {
     const { name, value } = e.target;
-    console.log(name + " " + value);
     if (name.slice(-1) === "*") {
       if (!value || value === "") {
-        console.log(name);
         setFormErrors({ ...formErrors, [name]: "This field is required" });
       } else {
         const errors = formErrors;

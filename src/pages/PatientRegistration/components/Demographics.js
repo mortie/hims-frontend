@@ -15,6 +15,7 @@ import {
   KeyboardDatePicker,
 } from "@material-ui/pickers";
 import { GridItem } from "../../../components/Grid";
+import { calculateAge } from "../../../utils/commons";
 
 const genderOptions = [
   { name: "Male", value: "M" },
@@ -41,16 +42,7 @@ function Demographics(props) {
   const handleDateChange = (date, value) => {
     let age = undefined;
     if (date?._isValid) {
-      let difference = moment.duration(moment().diff(date));
-      if (difference.years() >= 1) {
-        age = `${difference.years()}y`;
-      } else if (difference.months() >= 1) {
-        age = `${difference.months()}m`;
-      } else if (difference.weeks() >= 1) {
-        age = `${difference.weeks()}w`;
-      } else {
-        age = `${difference.days()}d`;
-      }
+      age = calculateAge(date);
     }
 
     setFormValues({
