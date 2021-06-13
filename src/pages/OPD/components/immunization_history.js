@@ -1,83 +1,68 @@
 import React, { useState } from 'react';
+import axios from "axios";
+
 import { DataGrid } from '@material-ui/data-grid';
-import {
-  randomCreatedDate,
-  randomTraderName,
-  randomUpdatedDate,
-} from '@material-ui/x-grid-data-generator';
 import Typography from "@material-ui/core/Typography";
-import { makeStyles } from '@material-ui/styles';
+import Alert from '@material-ui/lab/Alert';
 
 
-const useStyles = makeStyles({
-  root: {
-    '& .super-app-theme--cell': {
-      backgroundColor: 'rgba(224, 183, 60, 0.55)',
-      color: '#1a3e72',
-      fontWeight: '600',
-    },
-    '& .super-app.negative': {
-      backgroundColor: 'rgba(157, 255, 118, 0.49)',
-      color: '#1a3e72',
-      fontWeight: '600',
-    },
-    '& .super-app-positive': {
-      backgroundColor: '#d47483',
-      color: '#1a3e72',
-      fontWeight: '600',
-    },
-  },
-});
-
-const createData = (
+const createData = (uuid,
   eligibility,
   vaccines,
   dateCreated,
   comments,
   id
 ) => {
-  return { eligibility, vaccines, dateCreated, comments, id };
+  return { uuid,eligibility, vaccines, dateCreated, comments, id };
 };
 
-export default function BasicEditingGrid(props) {
+export default function ImmunizationTable(props) {
 
-  const rowpros = props.rows.answers
+  const rowpros = props.rows
   var storedata = [];
   let id = 0;
+  var elig = "";
+  var uuidval = "";
   Object.entries(rowpros).map(([key, value]) => {
-    var elig = value.display
+    if (key == "display") {
+      elig = value
+    }
+    if (key == "uuid") {
+      uuidval = value
+    }
     var vaccine = ""
-    var date = ""
+    var date = new Date();
     var comment = ""
     var vac = {}
-    Object.entries(value.answers).map(([key, values]) => {
-      if (values.datatype.display == "N/A") {
-        vac["vaccine_"+key] = values.display
-        // if (!vaccine) {
-        //   vaccine = values.display
-        // }
-        // else {
-        //   vaccine = vaccine + "," + values.display
-        // }
-      }
-    })
-
-  storedata.push(
-    createData(
-      elig,
-      vac,
-      date,
-      comment,
-      id
-    )
-    );
-    id = id +1
-
+    if (key == "answers") {
+      Object.entries(value).map(([key, values]) => {
+        if (values.datatype.display == "N/A") {
+            vac["vaccine_" + key] = values.display
+        }
+      })
+    }
+    if (Object.entries(vac).length != 0) {
+      storedata.push(
+        createData(
+          uuidval,
+          elig,
+          vac,
+          date,
+          comment,
+          id
+        )
+      );
+      id = id + 1
+    }
   })
-  var [searchData, setsearchData] = useState(storedata);
+  var [immuneData, setImmuneData] = useState(storedata);
+  var [successcheck, setSuccesscheck] = useState(false);
 
 
   const columns = [
+        {
+      field: 'uuid', headerName: 'UUID', hide:true
+    },
     {
       field: 'eligibility', headerName: 'Eligibility', width: 180,
       cellClassName: 'super-app-theme--cell',
@@ -106,36 +91,100 @@ export default function BasicEditingGrid(props) {
     type: 'date',
     width: 180,
     editable: true,
+    valueFormatter: (params) => {
+      var d = new Date(params.value);
+      params.value = [('0' + d.getDate()).slice(-2),
+  ('0' + (d.getMonth() + 1)).slice(-2),
+  d.getFullYear(),
+].join('-');
+    }
   },
   {
     field: 'comments',
     headerName: 'Comments',
-    width: 220,
+    width: 245,
     editable: true,
   },
   ];
 
-  const rows = [
-  {
-    id: 1,
-    eligibility: randomTraderName(),
-    vaccines: 25,
-    dateCreated: randomCreatedDate(),
-    comments: randomUpdatedDate(),
-  },
-  {
-    id: 2,
-    eligibility: randomTraderName(),
-    vaccines: 36,
-    dateCreated: randomCreatedDate(),
-    comments: randomUpdatedDate(),
-  },
-];
-  const classes = useStyles();
+  const updateImmunzationData = (row) => {
+    console.log(" Rows  ", row)
+    var formData = {}
+    axios({
+  method: "post",
+  url: "myurl",
+  data: formData,
+  headers: { "Content-Type": "multipart/form-data" },
+})
+  .then(function (response) {
+    //handle success
+    console.log(response);
+  })
+  .catch(function (response) {
+    //handle error
+    console.log(response);
+  });
+  }
+
+  const handleEditCellChangeCommitted = React.useCallback(
+    ({ id, field, props }) => {
+      setSuccesscheck(false)
+      if (field == 'dateCreated') {
+        let datavalue = props.value;
+        const updatedRows = immuneData.map((row) => {
+          if (row.id === id) {
+            row['dateCreated'] = datavalue
+          }
+          updateImmunzationData(row)
+          setSuccesscheck(true)
+          return row;
+        });
+        setImmuneData(updatedRows)
+      }
+      else if (field == 'comments') {
+        let datavalue = props.value;
+        const updatedRows = immuneData.map((row) => {
+          if (row.id === id) {
+            row['comments'] = datavalue
+          }
+          updateImmunzationData(row)
+          setSuccesscheck(true)
+          return row;
+        });
+        setImmuneData(updatedRows)
+      }
+    },
+    [immuneData],
+  );
+
+  const handleCellClick = (param, event) => {
+  console.log(param);
+    console.log(event);
+    setSuccesscheck(false)
+  // if (param.colIndex === 2) {
+  //   event.stopPropagation();
+  // }
+  };
 
   return (
-    <div style={{ height: 800, width: '100%' }} className={classes.root}>
-      <DataGrid rows={searchData} columns={columns} rowHeight={180} />
-    </div>
+    <div>
+    <div style={{ height: 208, width: '100%' }} >
+      <DataGrid rows={immuneData}
+        columns={columns}
+        rowHeight={150}
+        onEditCellChangeCommitted={handleEditCellChangeCommitted}
+        showColumnRightBorder={true}
+        showCellRightBorder={true}
+          onCellClick={handleCellClick}
+          hideFooterPagination={true}
+          hideFooter={true}
+
+      />
+      </div>
+      {successcheck &&
+        <Alert severity="success">Saved Successfully!</Alert>
+      }
+      </div>
+
   );
 }

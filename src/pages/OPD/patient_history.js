@@ -9,7 +9,12 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-import BasicEditingGrid from './components/immunization_history'
+import ImmunizationTable from './components/immunization_history'
+import RadioButtonsGroup from './components/medication_history'
+import DatePickers from './components/surgical_history'
+import PS_History from './components/ps_history'
+import FamilyHistory from './components/family_history'
+import AllergyHistory from './components/allergy_history'
 
 
 
@@ -32,6 +37,12 @@ const ControlledAccordions = (props) => {
   const classes = useStyles();
   var [immunization, setImmunization] = useState({});
   var [value, setValue] = useState("");
+  var IMMUNIZATION_HISTORY = "Immunization History"
+  var MEDICATION_HISTORY = "Medication History"
+  var SURGICAL_HISTORY = "Surgical History"
+  var PS_HISTORY = "Personal and Social History"
+  var FAMILY_HISTORY = "Family History"
+  var ALLERGY_HISTORY = "Allergies History"
 
   const onChange = (event, key) => {
     setImmunization({
@@ -105,19 +116,84 @@ const ControlledAccordions = (props) => {
     );
   }
 
-  const itemList = props.historyfields.map((item, index) => (
-    <Panel header={item.display} key={index}>
-      {/* {getFeilds(item)} */}
-      <BasicEditingGrid
-      rows = {item}
-      />
-    </Panel>
-  ));
+  const itemImmuneList = (items) => {
+    return items.answers.map((item1, index) => (
+      <Panel header={item1.display} key={index}>
+        <ImmunizationTable
+        rows = {item1}
+        />
+      </Panel>
+    ))
+  };
 
-  return(
-    <Collapse accordion>
-      {itemList}
-  </Collapse>)
+  const itemMedicationList = (items) => {
+    return items.answers.map((item1, index) => (
+      <Panel header={item1.display} key={index}>
+        <RadioButtonsGroup question = {item1}/>
+      </Panel>
+    ))
+  };
+
+  const itemSurgicalList = (items) => {
+    return items.answers.map((item1, index) => (
+      <Panel header={item1.display} key={index}>
+        <DatePickers answer={item1}/>
+      </Panel>
+    ))
+  };
+
+  const itemSocialList = (items) => {
+    return items.answers.map((item1, index) => (
+      <Panel header={item1.display} key={index}>
+        <PS_History answer={item1}/>
+      </Panel>
+    ))
+  };
+
+  const itemFamilyList = (items) => {
+    return items.answers.map((item1, index) => (
+      <Panel header={item1.display} key={index}>
+        <FamilyHistory answer={item1}/>
+      </Panel>
+    ))
+  };
+
+  const itemAllergyList = (items) => {
+    return items.answers.map((item1, index) => (
+      <Panel header={item1.display} key={index}>
+        <AllergyHistory answer={item1}/>
+      </Panel>
+    ))
+  };
+
+return(
+  <Collapse accordion>
+    {props.historyfields.map((item, index) => (
+      <Panel header={item.display} key={index}>
+        <Collapse>
+          {item.display == IMMUNIZATION_HISTORY &&
+            itemImmuneList(item)
+          }
+          {item.display == MEDICATION_HISTORY &&
+            itemMedicationList(item)
+          }
+          {item.display == SURGICAL_HISTORY &&
+            itemSurgicalList(item)
+          }
+          {item.display == PS_HISTORY &&
+            itemSocialList(item)
+          }
+          {item.display == FAMILY_HISTORY &&
+            itemFamilyList(item)
+          }
+          {item.display == ALLERGY_HISTORY &&
+            itemAllergyList(item)
+          }
+        </Collapse>
+      </Panel>
+    ))}
+  </Collapse>
+)
 }
 
 export default ControlledAccordions;

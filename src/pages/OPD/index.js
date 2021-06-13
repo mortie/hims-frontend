@@ -350,13 +350,14 @@ export default function DataGridDemo() {
                       <ControlledAccordions historyfields={historyfields} />
                     </GridContainer>
                   </DialogContent>
+                  <br></br>
                   <DialogActions>
-                    <Button onClick={handleClose} color="primary">
+                    {/* <Button onClick={handleClose} color="primary">
                       Cancel
                     </Button>
                     <Button onClick={handleClose} color="primary">
                       Save
-                    </Button>
+                    </Button> */}
                   </DialogActions>
                 </div>
               )}
