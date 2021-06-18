@@ -19,6 +19,7 @@ const createData = (uuid,
 export default function ImmunizationTable(props) {
 
   const rowpros = props.rows
+  const patientData = props.patientData;
   var storedata = [];
   let id = 0;
   var elig = "";
@@ -57,6 +58,28 @@ export default function ImmunizationTable(props) {
   })
   var [immuneData, setImmuneData] = useState(storedata);
   var [successcheck, setSuccesscheck] = useState(false);
+
+    const updateImmunzationData = (row) => {
+    console.log(" Rows  ", row)
+      var formData = {
+        "patient": patientData.id,
+        "obs":[{"concept":row.uuid,"value":"40"}]
+    }
+    axios({
+  method: "post",
+  url: "myurl",
+  data: formData,
+  headers: { "Content-Type": "multipart/form-data" },
+})
+  .then(function (response) {
+    //handle success
+    console.log(response);
+  })
+  .catch(function (response) {
+    //handle error
+    console.log(response);
+  });
+  }
 
 
   const columns = [
@@ -107,24 +130,7 @@ export default function ImmunizationTable(props) {
   },
   ];
 
-  const updateImmunzationData = (row) => {
-    console.log(" Rows  ", row)
-    var formData = {}
-    axios({
-  method: "post",
-  url: "myurl",
-  data: formData,
-  headers: { "Content-Type": "multipart/form-data" },
-})
-  .then(function (response) {
-    //handle success
-    console.log(response);
-  })
-  .catch(function (response) {
-    //handle error
-    console.log(response);
-  });
-  }
+
 
   const handleEditCellChangeCommitted = React.useCallback(
     ({ id, field, props }) => {

@@ -31,7 +31,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const { Panel } = Collapse;
-const { Option } = Select;
 
 const ControlledAccordions = (props) => {
   const classes = useStyles();
@@ -43,6 +42,7 @@ const ControlledAccordions = (props) => {
   var PS_HISTORY = "Personal and Social History"
   var FAMILY_HISTORY = "Family History"
   var ALLERGY_HISTORY = "Allergies History"
+  var patientData = props.rowdata;
 
   const onChange = (event, key) => {
     setImmunization({
@@ -120,7 +120,8 @@ const ControlledAccordions = (props) => {
     return items.answers.map((item1, index) => (
       <Panel header={item1.display} key={index}>
         <ImmunizationTable
-        rows = {item1}
+          rows={item1}
+          patientData={patientData}
         />
       </Panel>
     ))

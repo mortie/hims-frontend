@@ -347,7 +347,10 @@ export default function DataGridDemo() {
                   </DialogTitle>
                   <DialogContent>
                     <GridContainer>
-                      <ControlledAccordions historyfields={historyfields} />
+                      <ControlledAccordions
+                        historyfields={historyfields}
+                        rowdata = {id}
+                      />
                     </GridContainer>
                   </DialogContent>
                   <br></br>
