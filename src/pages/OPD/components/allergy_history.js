@@ -11,7 +11,6 @@ import DrugHistory from './drug_allergies'
 
 const { Panel } = Collapse;
 
-
 const useStyles = makeStyles((theme) => ({
   container: {
     display: 'flex',
@@ -81,27 +80,19 @@ export default function AllergyHistory(props) {
         <br></br>
           <br></br>
           {showDrug &&
-            <Collapse accordion>
-              {drugAllergy.map((item, index) => (
-                <Panel header={item.display} key={index}>
+              drugAllergy.map((item, index) => (
                     <DrugHistory
                     answer = {item}
                     />
-                </Panel>
-              ))}
-            </Collapse>
+              ))
           }
 
           {showNonDrug &&
-            <Collapse accordion>
-              {nondrugAllergy.map((item, index) => (
-                <Panel header={item.display} key={index}>
+              nondrugAllergy.map((item, index) => (
                     <DrugHistory
                     answer = {item}
                     />
-                </Panel>
-              ))}
-            </Collapse>
+              ))
           }
 
         {successcheck &&

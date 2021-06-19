@@ -1,57 +1,60 @@
 import React,{ useState } from 'react';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import TextField from '@material-ui/core/TextField';
 import Alert from '@material-ui/lab/Alert';
 
-export default function RadioButtonsGroup(props) {
+import { makeStyles } from '@material-ui/core/styles';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Select from '@material-ui/core/Select';
+
+import CodedType from './codedType'
+import TextType from './textType'
+
+const useStyles = makeStyles((theme) => ({
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
+}));
+
+
+export default function MedicationHistory(props) {
+    const classes = useStyles();
     var data = props.question;
-    var dataType = props.question.datatype.display
-    const [value, setValue] = React.useState('no');
-      var [successcheck, setSuccesscheck] = useState(false);
+  var dataType = props.question.datatype.display
+      var [value,setValue] = useState()
 
+  var [successcheck, setSuccesscheck] = useState(false);
 
-  const handleChange = (event) => {
-      setValue(event.target.value);
-      setSuccesscheck(true)
-  };
-    if (dataType == "Coded") {
-        return (
-            <div>
-            <FormControl component="fieldset" className="medication">
-                <RadioGroup aria-label="gender" name="gender1" className="medi" value={value} onChange={handleChange}>
-                    <FormControlLabel value="yes" control={<Radio />} label="Yes" className="yesClass" />
-                    <FormControlLabel value="no" control={<Radio />} label="No" className="noClass"/>
-                </RadioGroup>
-                </FormControl>
-                <br></br>
-                <br></br>
-                  {successcheck &&
-        <Alert severity="success">Saved Successfully!</Alert>
-                }
-                </div>
-        );
+    const handleChange = (event) => {
+    setValue(event.target.value);
+    setSuccesscheck(true)
+    };
+
+  if (dataType == "Coded") {
+    return (
+        <div>
+          <CodedType codeddata={data} />
+          {successcheck &&
+          <Alert severity="success">Saved Successfully!</Alert>
+          }
+        </div>
+      )
     }
-    else if (dataType == "Text") {
-        return (
-            <div>
-        <TextField
-          id="outlined-multiline-static"
-          label="Comments"
-          multiline
-          rows={2}
-                variant="outlined"
-                    className="commentClass"
-                    onChange={handleChange}
-                />
-                <br></br>
-                <br></br>
-                      {successcheck &&
-        <Alert severity="success">Saved Successfully!</Alert>
-                }
-                </div>
-        )
+  else if (dataType == "Text") {
+    return (
+      <div>
+      <TextType textdata={data} />
+      {successcheck &&
+      <Alert severity="success">Saved Successfully!</Alert>
+      }
+      </div>
+    )
     }
+
 }

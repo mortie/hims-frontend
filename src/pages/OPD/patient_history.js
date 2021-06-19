@@ -10,7 +10,7 @@ import FormControl from "@material-ui/core/FormControl";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import ImmunizationTable from './components/immunization_history'
-import RadioButtonsGroup from './components/medication_history'
+import MedicationHistory from './components/medication_history'
 import DatePickers from './components/surgical_history'
 import PS_History from './components/ps_history'
 import FamilyHistory from './components/family_history'
@@ -127,43 +127,43 @@ const ControlledAccordions = (props) => {
     ))
   };
 
-  const itemMedicationList = (items) => {
-    return items.answers.map((item1, index) => (
-      <Panel header={item1.display} key={index}>
-        <RadioButtonsGroup question = {item1}/>
-      </Panel>
-    ))
-  };
-
   const itemSurgicalList = (items) => {
     return items.answers.map((item1, index) => (
-      <Panel header={item1.display} key={index}>
+      // <Panel header={item1.display} key={index}>
         <DatePickers answer={item1}/>
-      </Panel>
+      // </Panel>
     ))
   };
 
   const itemSocialList = (items) => {
     return items.answers.map((item1, index) => (
-      <Panel header={item1.display} key={index}>
+      // <Panel header={item1.display} key={index}>
         <PS_History answer={item1}/>
-      </Panel>
+      // </Panel>
     ))
   };
 
   const itemFamilyList = (items) => {
     return items.answers.map((item1, index) => (
-      <Panel header={item1.display} key={index}>
+      // <Panel header={item1.display} key={index}>
         <FamilyHistory answer={item1}/>
-      </Panel>
+      // </Panel>
     ))
   };
 
   const itemAllergyList = (items) => {
     return items.answers.map((item1, index) => (
-      <Panel header={item1.display} key={index}>
+      // <Panel header={item1.display} key={index}>
         <AllergyHistory answer={item1}/>
-      </Panel>
+      // </Panel>
+    ))
+  };
+
+    const itemMedicationList = (items) => {
+    return items.answers.map((item1, index) => (
+      // <Panel header={item1.display} key={index}>
+        <MedicationHistory question = {item1}/>
+      // </Panel>
     ))
   };
 
@@ -171,15 +171,16 @@ return(
   <Collapse accordion>
     {props.historyfields.map((item, index) => (
       <Panel header={item.display} key={index}>
-        <Collapse>
           {item.display == IMMUNIZATION_HISTORY &&
-            itemImmuneList(item)
-          }
+                    <Collapse>
+          {itemImmuneList(item)}
+                     </Collapse>
+            }
           {item.display == MEDICATION_HISTORY &&
             itemMedicationList(item)
           }
-          {item.display == SURGICAL_HISTORY &&
-            itemSurgicalList(item)
+        {item.display == SURGICAL_HISTORY &&
+          itemSurgicalList(item)
           }
           {item.display == PS_HISTORY &&
             itemSocialList(item)
@@ -190,7 +191,6 @@ return(
           {item.display == ALLERGY_HISTORY &&
             itemAllergyList(item)
           }
-        </Collapse>
       </Panel>
     ))}
   </Collapse>

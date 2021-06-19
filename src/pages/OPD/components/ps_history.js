@@ -6,6 +6,13 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+
+import CodedType from './codedType'
+import TextType from './textType'
+
+
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -29,45 +36,25 @@ export default function PS_History(props) {
     //   setValue(event.target.value);
       setSuccesscheck(true)
   };
-    console.log(" Data : ", data)
+
         if (dataType == "Coded") {
-        return (
-            <div>
-
-            <FormControl component="fieldset" className="medication">
-                    <RadioGroup aria-label="gender" name="gender1" className="medi" onChange={handleChange}>
-                                  {data.answers.map((smoker, index) => (
-                    <FormControlLabel value={smoker.display} control={<Radio />} label={smoker.display} className="yesClass" />
-          ))}
-
-                </RadioGroup>
-                </FormControl>
-                <br></br>
-                <br></br>
-                  {successcheck &&
-        <Alert severity="success">Saved Successfully!</Alert>
-                }
-                </div>
-        );
+  return (
+        <div>
+          <CodedType codeddata={data} />
+          {successcheck &&
+          <Alert severity="success">Saved Successfully!</Alert>
+          }
+        </div>
+      )
     }
     else if (data.datatype.display == "Text" || data.datatype.display == "N/A") {
-        return (
-            <div>
-        <TextField
-          id="outlined-multiline-static"
-          label="Comments"
-          multiline
-          rows={1}
-                variant="outlined"
-                    className="commentClass"
-                    onChange={handleChange}
-                />
-                <br></br>
-                <br></br>
-                      {successcheck &&
-        <Alert severity="success">Saved Successfully!</Alert>
-                }
-                </div>
-        )
+    return (
+      <div>
+      <TextType textdata={data} />
+      {successcheck &&
+      <Alert severity="success">Saved Successfully!</Alert>
+      }
+      </div>
+    )
     }
 }
