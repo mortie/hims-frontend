@@ -162,6 +162,7 @@ export default function Triage() {
   const [isFemale, setIsFemale] = useState(false);
   const [patient, setPatient] = useState({});
   const [vitalValues, setVitalValues] = useState(initialState);
+  const [historyValues, setHistoryValues] = useState({});
   const [previousVitals, setPreviousVitals] = useState([]);
   const [previousVitalsLoading, setPreviousVitalsLoading] = useState(false);
   const [providerUuid, setProviderUuid] = useState(null);
@@ -372,32 +373,39 @@ export default function Triage() {
       obs: getHistoryObs(),
     };
 
-    postAPI("/encounter", encounter)
-      .then((response) => {
-        enqueueSnackbar("Vitals saved successfully.");
-        setOpen(false);
-        setVitalSaved(true);
-      })
-      .catch((error) => {
-        console.log(error);
-        enqueueSnackbar(
-          "There is a problem while saving vitals. Please try again."
-        );
-      });
+    // postAPI("/encounter", encounter)
+    //   .then((response) => {
+    //     enqueueSnackbar("Vitals saved successfully.");
+    //     setOpen(false);
+    //     setVitalSaved(true);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //     enqueueSnackbar(
+    //       "There is a problem while saving vitals. Please try again."
+    //     );
+    //   });
   };
 
   const getHistoryObs = () => {
     let obs = [];
-    for (const key in vitalValues) {
-      if (Object.hasOwnProperty.call(vitalValues, key)) {
-        const value = vitalValues[key];
+    console.log(" History Values : ",historyValues)
+    for (const key in historyValues) {
+      if (Object.hasOwnProperty.call(historyValues, key)) {
+        const value = historyValues[key];
         obs.push({
           concept: key,
           value: typeof value !== "object" ? value : value.toISOString(),
         });
       }
     }
+    console.log(" History Observations : ", obs);
     return obs;
+  };
+
+  const handleHistoryChange = (hisConcept) => {
+    const { name, value } = hisConcept;
+    setHistoryValues({ ...historyValues, [name]: value });
   };
 
 
@@ -667,12 +675,15 @@ export default function Triage() {
         )}
         {showhistory && (
           <div>
+          <form
+            onSubmit={savePatientHistory}
+          >
             <DialogTitle id="form-dialog-title">Patient History</DialogTitle>
             <DialogContent dividers>
               <GridContainer>
                 <ControlledAccordions
                   historyfields={historyfields}
-                  onchange = {savePatientHistory}
+                  onChange = {handleHistoryChange}
                 />
               </GridContainer>
             </DialogContent>
@@ -680,10 +691,11 @@ export default function Triage() {
               <Button onClick={handleClose} color="primary">
                 Cancel
               </Button>
-              <Button onClick={handleClose} color="primary">
+              <Button type="submit" color="primary">
                 Save
               </Button>
-            </DialogActions>
+              </DialogActions>
+              </form>
           </div>
         )}
       </Dialog>

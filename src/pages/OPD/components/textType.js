@@ -32,6 +32,8 @@ export default function TextType(props) {
             id="outlined-multiline-static"
             label={data.display}
             variant="outlined"
+            size="small"
+            margin="normal"
             className="commentClass"
             onChange={handleChange}
             />

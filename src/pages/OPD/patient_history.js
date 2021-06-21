@@ -51,71 +51,6 @@ const ControlledAccordions = (props) => {
     })
   };
 
-    const getFeilds = (item) => {
-    return (
-      <>
-        {item.answers.map((field) => {
-          const { uuid, display, datatype, answers } = field;
-          if (datatype.display === "Coded") {
-            let item = [];
-            for (let i = 0; i < answers.length; i++) {
-              let valueWithKey = { uuid: uuid, display: answers[i].display };
-              item.push(valueWithKey);
-            }
-            return (
-              <GridItem item xs={12} sm={4} md={4} key={uuid}>
-                <FormControl className={classes.formControl}>
-                  <TextField
-                    style={{ width: 228 }}
-                    autoFocus
-                    multiline="true"
-                    select
-                    variant="outlined"
-                    id={uuid}
-                    label={display}
-                    // rowsMax={4}
-                    onChange={(e) => onChange(e,uuid)}
-                    // onChange={getValue}
-                  >
-                    {item.map((name) => (
-                      <MenuItem key={name} value={name}>
-                        {name.display}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </FormControl>
-              </GridItem>
-            );
-          }
-
-          else if (datatype.display === "Text") {
-            return (
-              <GridItem item xs={12} sm={4} md={4} key={uuid}>
-                <FormControl className={classes.formControl}>
-                  <TextField
-                    autoFocus
-                    variant="outlined"
-                    id={uuid}
-                    label={display}
-                    type="Text"
-                    rowsMax={4}
-                    className={classes.textField}
-                    size="small"
-                    onChange={(e) => onChange(e,uuid)}
-                    // InputLabelProps={{
-                    //   shrink: true,
-                    // }}
-                    // onChange={getValue}
-                  />
-                </FormControl>
-              </GridItem>
-            );
-          }
-        })}
-      </>
-    );
-  }
-
   const itemImmuneList = (items) => {
     return items.answers.map((item1, index) => (
       <Panel header={item1.display} key={index}>
@@ -141,25 +76,22 @@ const ControlledAccordions = (props) => {
 
   const itemFamilyList = (items) => {
     return items.answers.map((item1, index) => (
-      // <Panel header={item1.display} key={index}>
         <FamilyHistory answer={item1}/>
-      // </Panel>
     ))
   };
 
   const itemAllergyList = (items) => {
     return items.answers.map((item1, index) => (
-      // <Panel header={item1.display} key={index}>
-        <AllergyHistory answer={item1}/>
-      // </Panel>
+      <AllergyHistory
+        answer={item1}
+        onChange = {props.onChange}
+      />
     ))
   };
 
     const itemMedicationList = (items) => {
     return items.answers.map((item1, index) => (
-      // <Panel header={item1.display} key={index}>
         <MedicationHistory question = {item1}/>
-      // </Panel>
     ))
   };
 

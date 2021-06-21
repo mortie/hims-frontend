@@ -17,7 +17,10 @@ export default function DrugHistory(props) {
     if (dataType == "Coded") {
         return (
         <div>
-          <CodedType codeddata={data} />
+            <CodedType
+              codeddata={data}
+              onChange = {props.onChange}
+            />
           {successcheck &&
           <Alert severity="success">Saved Successfully!</Alert>
           }
@@ -27,7 +30,10 @@ export default function DrugHistory(props) {
     else if (data.datatype.display == "Text" || data.datatype.display == "N/A") {
     return (
       <div>
-      <TextType textdata={data} />
+        <TextType
+          textdata={data}
+          onChange = {props.onChange}
+        />
       {successcheck &&
       <Alert severity="success">Saved Successfully!</Alert>
       }
