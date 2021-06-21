@@ -357,6 +357,50 @@ export default function Triage() {
       });
   };
 
+  const savePatientHistory = (event) => {
+    event.preventDefault();
+    const encounter = {
+      encounterType: "67a71486-1a54-468f-ac3e-7091a9a79584",
+      encounterProviders: [
+        {
+          provider: providerUuid,
+          encounterRole: "240b26f9-dd88-4172-823d-4a8bfeb7841f",
+        },
+      ],
+      patient: patient.uuid,
+      visit: patient.visit,
+      obs: getHistoryObs(),
+    };
+
+    postAPI("/encounter", encounter)
+      .then((response) => {
+        enqueueSnackbar("Vitals saved successfully.");
+        setOpen(false);
+        setVitalSaved(true);
+      })
+      .catch((error) => {
+        console.log(error);
+        enqueueSnackbar(
+          "There is a problem while saving vitals. Please try again."
+        );
+      });
+  };
+
+  const getHistoryObs = () => {
+    let obs = [];
+    for (const key in vitalValues) {
+      if (Object.hasOwnProperty.call(vitalValues, key)) {
+        const value = vitalValues[key];
+        obs.push({
+          concept: key,
+          value: typeof value !== "object" ? value : value.toISOString(),
+        });
+      }
+    }
+    return obs;
+  };
+
+
   const getObs = () => {
     let obs = [];
     for (const key in vitalValues) {
