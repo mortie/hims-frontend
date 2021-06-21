@@ -6,6 +6,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -32,27 +35,21 @@ export default function CodedType(props) {
 
     return (
         <div>
-            <FormControl
-                variant="outlined"
-                fullWidth
-                className={classes.field}
-                margin="dense"
-            >
-            <InputLabel id="lastVistSelectLabel">{data.display}</InputLabel>
-            <Select
-                labelId="lastVistSelectLabel"
-                label={data.display}
-                id="lastVistSelect"
-                onChange={(e) => handleChange}
-            >
-                <MenuItem value="">
-                <em>None</em>
-                </MenuItem>
-                {data.answers.map((smoker, index) => (
-                <MenuItem value={smoker.display}>{smoker.display}</MenuItem>
-                ))}
-            </Select>
+
+        <FormControl component="fieldset" className="medication">
+          <RadioGroup aria-label="gender" name="gender1" className="medi" >
+          {data.answers.map((smoker, index) => (
+            <FormControlLabel
+              value={smoker.display}
+              control={<Radio id={smoker.uuid} onChange={handleChange} />}
+              label={smoker.display}
+              className="yesClass"
+              key={smoker.uuid}
+            />
+          ))}
+          </RadioGroup>
             </FormControl>
+
             <br></br>
             <br></br>
             {successcheck &&

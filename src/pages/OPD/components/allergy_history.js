@@ -51,10 +51,11 @@ export default function AllergyHistory(props) {
   });
 
   const handleChange = (event) => {
+    var btnid = event.target.id
     var btnvalue = event.target.value
     var cVal = {
       "name": uuid,
-      "value":btnvalue
+      "value":btnid
     }
     // setConcetVal({
     //     ...concetVal,
@@ -81,13 +82,14 @@ export default function AllergyHistory(props) {
       return (
       <div>
         <FormControl component="fieldset" className="medication">
-          <RadioGroup aria-label="gender" name="gender1" className="medi" onChange={handleChange}>
+          <RadioGroup aria-label="gender" name="gender1" className="medi" >
           {data.answers.map((smoker, index) => (
             <FormControlLabel
               value={smoker.display}
-              control={<Radio />}
+              control={<Radio id={smoker.uuid} onChange={handleChange} />}
               label={smoker.display}
               className="yesClass"
+              key={smoker.uuid}
             />
           ))}
           </RadioGroup>
@@ -98,7 +100,8 @@ export default function AllergyHistory(props) {
               drugAllergy.map((item, index) => (
                     <DrugHistory
                   answer={item}
-                  onChange = {props.onChange}
+                  onChange={props.onChange}
+                  key={item.uuid}
                     />
               ))
           }
@@ -107,7 +110,8 @@ export default function AllergyHistory(props) {
               nondrugAllergy.map((item, index) => (
                     <DrugHistory
                   answer={item}
-                  onChange = {props.onChange}
+                  onChange={props.onChange}
+                  key={item.uuid}
                     />
               ))
           }

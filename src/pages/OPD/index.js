@@ -373,18 +373,18 @@ export default function Triage() {
       obs: getHistoryObs(),
     };
 
-    // postAPI("/encounter", encounter)
-    //   .then((response) => {
-    //     enqueueSnackbar("Vitals saved successfully.");
-    //     setOpen(false);
-    //     setVitalSaved(true);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //     enqueueSnackbar(
-    //       "There is a problem while saving vitals. Please try again."
-    //     );
-    //   });
+    postAPI("/encounter", encounter)
+      .then((response) => {
+        enqueueSnackbar("Vitals saved successfully.");
+        setOpen(false);
+        setVitalSaved(true);
+      })
+      .catch((error) => {
+        console.log(error);
+        enqueueSnackbar(
+          "There is a problem while saving vitals. Please try again."
+        );
+      });
   };
 
   const getHistoryObs = () => {
@@ -683,7 +683,8 @@ export default function Triage() {
               <GridContainer>
                 <ControlledAccordions
                   historyfields={historyfields}
-                  onChange = {handleHistoryChange}
+                  onChange={handleHistoryChange}
+                  key="Accordians"
                 />
               </GridContainer>
             </DialogContent>
