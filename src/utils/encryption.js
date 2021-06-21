@@ -10,7 +10,7 @@ export const encrypt = (e, t) => {
   t = t || 2;
   try {
     if (!e) throw new Error("input can not be empty. Please enter a string.");
-    let r = btoa(e).slice(0, -1),
+    let r = btoa(e),
       n = "",
       o = 0,
       a = "";
@@ -40,7 +40,7 @@ export const decrypt = (e) => {
         ? r.slice(0, n) + r.slice(n + o)
         : r.slice(0, -(n + o)) + r.slice(-n);
   }
-  return (r = "Basic " + r + "=");
+  return (r = "Basic " + r);
   // ,(r = atob(r));
 };
 

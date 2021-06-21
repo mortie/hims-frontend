@@ -1,8 +1,10 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { updateSession } from "../utils/authentication";
 import { JSESSIONID, BASE_URL } from "../utils/constants";
 
 export function getAPI(endpoint, authorization = Cookies.get(JSESSIONID)) {
+  updateSession();
   const config = {
     headers: {
       Authorization: authorization,
@@ -26,6 +28,7 @@ export function postAPI(
   data,
   authorization = Cookies.get(JSESSIONID)
 ) {
+  updateSession();
   const config = {
     headers: {
       Authorization: authorization,
@@ -33,7 +36,6 @@ export function postAPI(
   };
   return axios.post(BASE_URL + endpoint, data, config);
 }
-
 
 export function deleteAPI(endpoint, authorization = Cookies.get(JSESSIONID)) {
   const config = {
