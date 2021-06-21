@@ -294,7 +294,7 @@ export default function Triage() {
   };
 
   const handleOpen = (event) => {
-    if (!providerUuid) return;
+    // if (!providerUuid) return;
     const { row, field } = event;
     row.uuid !== patient.uuid && setVitalValues(initialState);
     setIsFemale(row.gender === "F");
@@ -626,7 +626,10 @@ export default function Triage() {
             <DialogTitle id="form-dialog-title">Patient History</DialogTitle>
             <DialogContent dividers>
               <GridContainer>
-                <ControlledAccordions historyfields={historyfields} />
+                <ControlledAccordions
+                  historyfields={historyfields}
+                  onchange = {savePatientHistory}
+                />
               </GridContainer>
             </DialogContent>
             <DialogActions>
