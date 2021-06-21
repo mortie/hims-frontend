@@ -3,8 +3,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Alert from '@material-ui/lab/Alert';
 
-
-import CodedType from './codedType'
 import TextType from './textType'
 
 
@@ -20,46 +18,45 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function DatePickers(props) {
-  const classes = useStyles();
+export default function SurgicalHistory(props) {
+    const classes = useStyles();
     var data = props.answer
     var [successcheck, setSuccesscheck] = useState(false);
-      const handleChange = (event) => {
+    const handleChange = (event) => {
     //   setValue(event.target.value);
-      setSuccesscheck(true)
-  };
-    console.log(" Data : ", data)
+    setSuccesscheck(true)
+    };
+
     if (data.datatype.display == "Date") {
       return (
         <div>
-  <TextField
-                variant="outlined"
-                label={data.display}
-                type="date"
-                margin="dense"
-                name="lvd"
-                id="lvd"
-                defaultValue=""
-                maxDate={new Date()}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-
-                className={classes.field}
-                onChange={(e) => handleChange(e)}
-        />
+          <TextField
+          variant="outlined"
+          label={data.display}
+          type="date"
+          margin="dense"
+          name="surgicalDate"
+          id="surgicalDate"
+          defaultValue=""
+          maxDate={new Date()}
+          InputLabelProps={{
+          shrink: true,
+          }}
+          className={classes.field}
+          onChange={(e) => handleChange(e)}
+          />
           <br></br>
-          </div>
-)
+        </div>
+      )
     }
     else if (data.datatype.display == "Text") {
-            return (
-      <div>
-      <TextType textdata={data} />
-      {successcheck &&
-      <Alert severity="success">Saved Successfully!</Alert>
-      }
-      </div>
-    )
+      return (
+        <div>
+          <TextType textdata={data} />
+          {successcheck &&
+          <Alert severity="success">Saved Successfully!</Alert>
+          }
+        </div>
+      )
     }
 }

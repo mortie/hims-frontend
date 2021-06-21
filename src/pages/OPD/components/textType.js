@@ -31,8 +31,6 @@ export default function TextType(props) {
             <TextField
             id="outlined-multiline-static"
             label={data.display}
-            multiline
-            rows={1}
             variant="outlined"
             className="commentClass"
             onChange={handleChange}

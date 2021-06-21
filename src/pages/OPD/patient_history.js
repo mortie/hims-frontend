@@ -11,7 +11,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import ImmunizationTable from './components/immunization_history'
 import MedicationHistory from './components/medication_history'
-import DatePickers from './components/surgical_history'
+import SurgicalHistory from './components/surgical_history'
 import PS_History from './components/ps_history'
 import FamilyHistory from './components/family_history'
 import AllergyHistory from './components/allergy_history'
@@ -129,17 +129,13 @@ const ControlledAccordions = (props) => {
 
   const itemSurgicalList = (items) => {
     return items.answers.map((item1, index) => (
-      // <Panel header={item1.display} key={index}>
-        <DatePickers answer={item1}/>
-      // </Panel>
+        <SurgicalHistory answer={item1}/>
     ))
   };
 
   const itemSocialList = (items) => {
     return items.answers.map((item1, index) => (
-      // <Panel header={item1.display} key={index}>
         <PS_History answer={item1}/>
-      // </Panel>
     ))
   };
 
