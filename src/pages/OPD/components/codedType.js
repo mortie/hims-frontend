@@ -9,6 +9,9 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Typography from '@material-ui/core/Typography';
+import { GridContainer, GridItem } from "../../../components/Grid";
+
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -34,9 +37,15 @@ export default function CodedType(props) {
     };
 
     return (
-        <div>
-
+        <GridContainer>
+            <GridItem item xs={12} sm={6} md={6}>
+            <Typography variant="body1" className={classes.type}>
+            {data.display}
+          </Typography>
+            </GridItem>
+            <GridItem item xs={12} sm={6} md={6}>
         <FormControl component="fieldset" className="medication">
+
           <RadioGroup aria-label="gender" name="gender1" className="medi" >
           {data.answers.map((smoker, index) => (
             <FormControlLabel
@@ -48,13 +57,19 @@ export default function CodedType(props) {
             />
           ))}
           </RadioGroup>
-            </FormControl>
-
-            <br></br>
+                </FormControl>
+                            <br></br>
             <br></br>
             {successcheck &&
             <Alert severity="success">Saved Successfully!</Alert>
             }
-        </div>
+            </GridItem>
+            </GridContainer>
+
+
+
+
+
+
     );
 }

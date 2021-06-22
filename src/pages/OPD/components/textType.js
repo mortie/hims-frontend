@@ -1,6 +1,8 @@
 import React,{ useState } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Alert from '@material-ui/lab/Alert';
+import Typography from '@material-ui/core/Typography';
+import { GridContainer, GridItem } from "../../../components/Grid";
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -27,7 +29,13 @@ export default function TextType(props) {
     };
 
     return (
-        <div>
+        <GridContainer>
+            <GridItem item xs={12} sm={6} md={6}>
+            <Typography variant="body1" className={classes.type}>
+            {data.display}
+            </Typography>
+            </GridItem>
+            <GridItem item xs={12} sm={6} md={6}>
             <TextField
             id="outlined-multiline-static"
             label={data.display}
@@ -36,12 +44,14 @@ export default function TextType(props) {
             margin="normal"
             className="commentClass"
             onChange={handleChange}
-            />
+                />
+                </GridItem>
         <br></br>
         <br></br>
         {successcheck &&
         <Alert severity="success">Saved Successfully!</Alert>
         }
-        </div>
+
+        </GridContainer>
         )
 }

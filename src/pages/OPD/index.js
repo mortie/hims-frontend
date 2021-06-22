@@ -43,6 +43,8 @@ import {
   SYSTOLIC,
   DIASTOLIC,
 } from "../../utils/constants";
+import './index.css';
+
 
 const useStyles = makeStyles(opdStyles);
 
@@ -643,10 +645,11 @@ export default function Triage() {
       </Paper>
       <Dialog
         maxWidth="lg"
-        fullWidth
         open={open}
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
+        fullWidth
+        className={showhistory && "patientDialog"}
       >
         {!showhistory && (
           <form
@@ -676,7 +679,8 @@ export default function Triage() {
         {showhistory && (
           <div>
           <form
-            onSubmit={savePatientHistory}
+              onSubmit={savePatientHistory}
+
           >
             <DialogTitle id="form-dialog-title">Patient History</DialogTitle>
             <DialogContent dividers>

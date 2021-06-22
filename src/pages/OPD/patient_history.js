@@ -52,14 +52,13 @@ const ControlledAccordions = (props) => {
   };
 
   const itemImmuneList = (items) => {
-    return items.answers.map((item1, index) => (
-      <Panel header={item1.display} key={index}>
-        <ImmunizationTable
-          rows={item1}
+      // return items.answers.map((item1, index) => (
+       return( <ImmunizationTable
+          rows={items}
           patientData={patientData}
-        />
-      </Panel>
-    ))
+    />
+       )
+    // ))
   };
 
   const itemSurgicalList = (items) => {
@@ -100,9 +99,7 @@ return(
     {props.historyfields.map((item, index) => (
       <Panel header={item.display} key={index}>
           {item.display == IMMUNIZATION_HISTORY &&
-                    <Collapse>
-          {itemImmuneList(item)}
-                     </Collapse>
+          itemImmuneList(item)
             }
           {item.display == MEDICATION_HISTORY &&
             itemMedicationList(item)
