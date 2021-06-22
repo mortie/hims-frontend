@@ -4,6 +4,21 @@ import axios from "axios";
 import { DataGrid } from '@material-ui/data-grid';
 import Typography from "@material-ui/core/Typography";
 import Alert from '@material-ui/lab/Alert';
+import TextField from '@material-ui/core/TextField';
+import { makeStyles } from '@material-ui/core/styles';
+
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: 200,
+  },
+}));
 
 
 const createData = (uuid,
@@ -20,6 +35,8 @@ export default function ImmunizationTable(props) {
 
   const rowpros = props.rows
   const patientData = props.patientData;
+  const classes = useStyles();
+
   var storedata = [];
   let id = 0;
   var elig = "";
@@ -32,7 +49,7 @@ export default function ImmunizationTable(props) {
     uuidval = value.uuid
 
     var vaccine = ""
-    var comment = "Enter Comments"
+    var comment = ""
     var vac = {}
 
       Object.entries(value.answers).map(([key, values]) => {
@@ -96,13 +113,52 @@ export default function ImmunizationTable(props) {
   ('0' + (d.getMonth() + 1)).slice(-2),
   d.getFullYear(),
 ].join('-');
-    }
-  },
+    },
+    renderCell: (params) => {
+        return(
+          <TextField
+          // variant="outlined"
+          label="Date"
+          type="date"
+          margin="dense"
+          name="surgicalDate"
+          id="surgicalDate"
+          defaultValue=""
+          maxDate={new Date()}
+          InputLabelProps={{
+          shrink: true,
+          }}
+          // className={classes.field}
+          onChange = {(e)=>handleCellClick(e,params)}
+          />
+        )
+      }
+    },
+
   {
     field: 'comments',
     headerName: 'Comments',
     width: 450,
     editable: true,
+    renderCell: (params) => {
+        return(
+          <TextField
+          // variant="outlined"
+          label="Comment"
+          type="text"
+          margin="dense"
+          name="surgicalDate"
+          id="surgicalDate"
+          defaultValue=""
+          InputLabelProps={{
+          shrink: true,
+          }}
+          // className={classes.field}
+            value = {params.value}
+          onClick={(e) => handleCellClick(e, params)}
+          />
+        )
+      }
   },
   ];
 
@@ -140,13 +196,21 @@ export default function ImmunizationTable(props) {
     [immuneData],
   );
 
-  const handleCellClick = (param, event) => {
-  console.log(param);
-    console.log(event);
+  const handleCellClick = (event,param) => {
+    console.log(" cell Event values ", event.target.value)
+    console.log(" cell Event values Param ", param)
+
+    var cVal = {
+      "name": param.row.uuid,
+      "value":event.target.value,
+    }
     setSuccesscheck(false)
   // if (param.colIndex === 2) {
   //   event.stopPropagation();
   // }
+    console.log(" Cell values ",cVal)
+    props.onChange(cVal)
+
   };
 
   return (
@@ -158,7 +222,7 @@ export default function ImmunizationTable(props) {
         onEditCellChangeCommitted={handleEditCellChangeCommitted}
         showColumnRightBorder={true}
         showCellRightBorder={true}
-          onCellClick={handleCellClick}
+          // onCellClick={handleCellClick}
           hideFooterPagination={true}
           hideFooter={true}
 
