@@ -57,11 +57,6 @@ export default function AllergyHistory(props) {
       "name": uuid,
       "value":btnid
     }
-    // setConcetVal({
-    //     ...concetVal,
-    //     "concept": uuid,
-    //     "value":btnvalue
-    // })
     if (btnvalue == DRUG_ALLERGY) {
       setShowDrug(true);
       setShowNonDrug(false);
@@ -77,6 +72,13 @@ export default function AllergyHistory(props) {
     setSuccesscheck(false);
     props.onChange(cVal)
   };
+
+  const handleValueChange = (cVal) => {
+    setSuccesscheck(false);
+    props.onChange(cVal)
+  };
+
+
 
   if (dataType == "Coded") {
       return (
@@ -100,7 +102,7 @@ export default function AllergyHistory(props) {
               drugAllergy.map((item, index) => (
                     <DrugHistory
                   answer={item}
-                  onChange={props.onChange}
+                  onChange={handleValueChange}
                   key={item.uuid}
                     />
               ))
@@ -110,7 +112,7 @@ export default function AllergyHistory(props) {
               nondrugAllergy.map((item, index) => (
                     <DrugHistory
                   answer={item}
-                  onChange={props.onChange}
+                  onChange={handleValueChange}
                   key={item.uuid}
                     />
               ))

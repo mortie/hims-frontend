@@ -297,7 +297,7 @@ export default function Triage() {
   };
 
   const handleOpen = (event) => {
-    // if (!providerUuid) return;
+    if (!providerUuid) return;
     const { row, field } = event;
     row.uuid !== patient.uuid && setVitalValues(initialState);
     setIsFemale(row.gender === "F");
@@ -377,14 +377,14 @@ export default function Triage() {
 
     postAPI("/encounter", encounter)
       .then((response) => {
-        enqueueSnackbar("Vitals saved successfully.");
+        enqueueSnackbar("Patient History saved successfully.");
         setOpen(false);
         setVitalSaved(true);
       })
       .catch((error) => {
         console.log(error);
         enqueueSnackbar(
-          "There is a problem while saving vitals. Please try again."
+          "There is a problem while saving history. Please try again."
         );
       });
   };
@@ -407,6 +407,7 @@ export default function Triage() {
 
   const handleHistoryChange = (hisConcept) => {
     const { name, value } = hisConcept;
+    console.log(" History changes : ",hisConcept)
     setHistoryValues({ ...historyValues, [name]: value });
   };
 

@@ -2,6 +2,9 @@ import React,{useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Alert from '@material-ui/lab/Alert';
+import { GridContainer, GridItem } from "../../../components/Grid";
+import Typography from '@material-ui/core/Typography';
+
 
 import TextType from './textType'
 
@@ -20,16 +23,33 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SurgicalHistory(props) {
     const classes = useStyles();
-    var data = props.answer
+  var data = props.answer
+  var uuid = data.uuid;
     var [successcheck, setSuccesscheck] = useState(false);
-    const handleChange = (event) => {
-    //   setValue(event.target.value);
-    setSuccesscheck(true)
+    const handleChange = (cVal) => {
+      setSuccesscheck(true)
+      props.onChange(cVal)
     };
+
+    const handleDateChange = (event) => {
+    var btnvalue = event.target.value
+    var cVal = {
+      "name": uuid,
+      "value":btnvalue
+    }
+    setSuccesscheck(false);
+    props.onChange(cVal)
+  };
 
     if (data.datatype.display == "Date") {
       return (
-        <div>
+          <GridContainer>
+            <GridItem item xs={12} sm={6} md={6}>
+                <Typography variant="body1" className={classes.type}>
+                {data.display}
+                </Typography>
+            </GridItem>
+            <GridItem item xs={12} sm={6} md={6}>
           <TextField
           variant="outlined"
           label={data.display}
@@ -43,19 +63,21 @@ export default function SurgicalHistory(props) {
           shrink: true,
           }}
           className={classes.field}
-          onChange={(e) => handleChange(e)}
+          onChange = {handleDateChange}
           />
-          <br></br>
-        </div>
+</GridItem>
+</GridContainer>
       )
     }
     else if (data.datatype.display == "Text") {
       return (
         <div>
-          <TextType textdata={data} />
-          {successcheck &&
+          <TextType textdata={data}
+          onChange = {handleChange}
+          />
+          {/* {successcheck &&
           <Alert severity="success">Saved Successfully!</Alert>
-          }
+          } */}
         </div>
       )
     }

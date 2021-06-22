@@ -20,37 +20,42 @@ const useStyles = makeStyles((theme) => ({
 export default function TextType(props) {
     const classes = useStyles();
     var data = props.textdata;
+    var uuid = data.uuid;
     var [successcheck, setSuccesscheck] = useState(false);
-    var [value,setValue] = useState()
 
     const handleChange = (event) => {
-        setValue(event.target.value);
+        var btnid = event.target.value
+        var cVal = {
+            "name": uuid,
+            "value":btnid
+        }
         setSuccesscheck(true)
+        props.onChange(cVal)
     };
 
     return (
         <GridContainer>
             <GridItem item xs={12} sm={6} md={6}>
-            <Typography variant="body1" className={classes.type}>
-            {data.display}
-            </Typography>
+                <Typography variant="body1" className={classes.type}>
+                {data.display}
+                </Typography>
             </GridItem>
             <GridItem item xs={12} sm={6} md={6}>
-            <TextField
-            id="outlined-multiline-static"
-            label={data.display}
-            variant="outlined"
-            size="small"
-            margin="normal"
-            className="commentClass"
-            onChange={handleChange}
+                <TextField
+                id="outlined-multiline-static"
+                label={data.display}
+                variant="outlined"
+                size="small"
+                margin="normal"
+                className="commentClass"
+                onChange={handleChange}
                 />
-                </GridItem>
-        <br></br>
-        <br></br>
-        {successcheck &&
-        <Alert severity="success">Saved Successfully!</Alert>
-        }
+            {/* {successcheck &&
+            <Alert severity="success">Saved Successfully!</Alert>
+            } */}
+            </GridItem>
+            <br></br>
+            <br></br>
 
         </GridContainer>
         )

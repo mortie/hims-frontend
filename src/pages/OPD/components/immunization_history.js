@@ -24,15 +24,15 @@ export default function ImmunizationTable(props) {
   let id = 0;
   var elig = "";
   var uuidval = "";
+  var date = new Date();
+
   Object.entries(rowpros.answers).map(([key, value]) => {
-      console.log(" UIIDSSSS :",key, value)
 
     elig = value.display
     uuidval = value.uuid
 
     var vaccine = ""
-    var date = new Date();
-    var comment = ""
+    var comment = "Enter Comments"
     var vac = {}
 
       Object.entries(value.answers).map(([key, values]) => {
@@ -57,29 +57,6 @@ export default function ImmunizationTable(props) {
   })
   var [immuneData, setImmuneData] = useState(storedata);
   var [successcheck, setSuccesscheck] = useState(false);
-
-    const updateImmunzationData = (row) => {
-    console.log(" Rows  ", row)
-      var formData = {
-        "patient": patientData.id,
-        "obs":[{"concept":row.uuid,"value":"40"}]
-    }
-    axios({
-  method: "post",
-  url: "myurl",
-  data: formData,
-  headers: { "Content-Type": "multipart/form-data" },
-})
-  .then(function (response) {
-    //handle success
-    console.log(response);
-  })
-  .catch(function (response) {
-    //handle error
-    console.log(response);
-  });
-  }
-
 
   const columns = [
         {
@@ -138,9 +115,10 @@ export default function ImmunizationTable(props) {
         let datavalue = props.value;
         const updatedRows = immuneData.map((row) => {
           if (row.id === id) {
+            console.log(" Rowsss : ",row, "data Value : ",datavalue)
             row['dateCreated'] = datavalue
           }
-          updateImmunzationData(row)
+          // updateImmunzationData(row)
           setSuccesscheck(true)
           return row;
         });
@@ -152,7 +130,7 @@ export default function ImmunizationTable(props) {
           if (row.id === id) {
             row['comments'] = datavalue
           }
-          updateImmunzationData(row)
+          // updateImmunzationData(row)
           setSuccesscheck(true)
           return row;
         });

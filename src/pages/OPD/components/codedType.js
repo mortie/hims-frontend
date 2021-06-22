@@ -27,13 +27,17 @@ const useStyles = makeStyles((theme) => ({
 export default function CodedType(props) {
     const classes = useStyles();
     var data = props.codeddata;
-    var [value,setValue] = useState()
+    var uuid = data.uuid;
     var [successcheck, setSuccesscheck] = useState(false);
 
-
     const handleChange = (event) => {
-        setValue(event.target.value);
-        setSuccesscheck(true)
+      var btnid = event.target.id
+      var cVal = {
+        "name": uuid,
+        "value":btnid
+      }
+      setSuccesscheck(true)
+      props.onChange(cVal)
     };
 
     return (
@@ -41,10 +45,10 @@ export default function CodedType(props) {
             <GridItem item xs={12} sm={6} md={6}>
             <Typography variant="body1" className={classes.type}>
             {data.display}
-          </Typography>
+            </Typography>
             </GridItem>
             <GridItem item xs={12} sm={6} md={6}>
-        <FormControl component="fieldset" className="medication">
+            <FormControl component="fieldset" className="medication">
 
           <RadioGroup aria-label="gender" name="gender1" className="medi" >
           {data.answers.map((smoker, index) => (
@@ -57,19 +61,11 @@ export default function CodedType(props) {
             />
           ))}
           </RadioGroup>
-                </FormControl>
+            </FormControl>
                             <br></br>
             <br></br>
-            {successcheck &&
-            <Alert severity="success">Saved Successfully!</Alert>
-            }
+
             </GridItem>
-            </GridContainer>
-
-
-
-
-
-
+        </GridContainer>
     );
 }

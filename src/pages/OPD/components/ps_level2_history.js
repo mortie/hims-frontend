@@ -4,7 +4,7 @@ import Alert from '@material-ui/lab/Alert';
 import CodedType from './codedType'
 import TextType from './textType'
 
-export default function DrugHistory(props) {
+export default function PS_Level2_History(props) {
     var data = props.answer;
     var dataType = props.answer.datatype.display
 

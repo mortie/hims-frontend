@@ -55,7 +55,8 @@ const ControlledAccordions = (props) => {
       // return items.answers.map((item1, index) => (
        return( <ImmunizationTable
           rows={items}
-          patientData={patientData}
+         patientData={patientData}
+         onChange = {props.onChange}
     />
        )
     // ))
@@ -63,19 +64,28 @@ const ControlledAccordions = (props) => {
 
   const itemSurgicalList = (items) => {
     return items.answers.map((item1, index) => (
-        <SurgicalHistory answer={item1}/>
+      <SurgicalHistory
+        answer={item1}
+        onChange = {props.onChange}
+      />
     ))
   };
 
   const itemSocialList = (items) => {
     return items.answers.map((item1, index) => (
-        <PS_History answer={item1}/>
+      <PS_History
+        answer={item1}
+        onChange = {props.onChange}
+      />
     ))
   };
 
   const itemFamilyList = (items) => {
     return items.answers.map((item1, index) => (
-        <FamilyHistory answer={item1}/>
+      <FamilyHistory
+        answer={item1}
+        onChange = {props.onChange}
+      />
     ))
   };
 
@@ -90,7 +100,10 @@ const ControlledAccordions = (props) => {
 
     const itemMedicationList = (items) => {
     return items.answers.map((item1, index) => (
-        <MedicationHistory question = {item1}/>
+      <MedicationHistory
+        question={item1}
+        onChange = {props.onChange}
+      />
     ))
   };
 

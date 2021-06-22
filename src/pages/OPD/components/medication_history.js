@@ -8,31 +8,30 @@ export default function MedicationHistory(props) {
 
   var data = props.question;
   var dataType = props.question.datatype.display
-  var [value,setValue] = useState()
   var [successcheck, setSuccesscheck] = useState(false);
 
-  const handleChange = (event) => {
-    setValue(event.target.value);
-    setSuccesscheck(true)
+  const handleChange = (cVal) => {
+      setSuccesscheck(true)
+      props.onChange(cVal)
   };
 
   if (dataType == "Coded") {
     return (
         <div>
-          <CodedType codeddata={data} />
-          {successcheck &&
-          <Alert severity="success">Saved Successfully!</Alert>
-          }
+        <CodedType
+          codeddata={data}
+          onChange = {handleChange}
+        />
         </div>
       )
     }
   else if (dataType == "Text") {
     return (
       <div>
-      <TextType textdata={data} />
-      {successcheck &&
-      <Alert severity="success">Saved Successfully!</Alert>
-      }
+        <TextType
+          textdata={data}
+          onChange = {handleChange}
+        />
       </div>
     )
     }
