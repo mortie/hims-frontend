@@ -27,8 +27,7 @@ const useStyles = makeStyles((theme) => ({
 export default function CodedType(props) {
     const classes = useStyles();
     var data = props.codeddata;
-    var uuid = data.uuid;
-    var [successcheck, setSuccesscheck] = useState(false);
+  var uuid = data.uuid;
 
     const handleChange = (event) => {
       var btnid = event.target.id
@@ -36,8 +35,7 @@ export default function CodedType(props) {
         "name": uuid,
         "value":btnid
       }
-      setSuccesscheck(true)
-      props.onChange(cVal)
+      props.onChange(event,cVal)
     };
 
     return (

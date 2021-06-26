@@ -3,27 +3,93 @@ import Alert from '@material-ui/lab/Alert';
 
 import CodedType from './codedType'
 import TextType from './textType'
+import Famiily_Level2_History from './family_history_level2'
 
 export default function FamilyHistory(props) {
 
     var data = props.answer;
     var dataType = props.answer.datatype.display
     var [successcheck, setSuccesscheck] = useState(false);
+    var FATHER_ALIVE = "Father Alive - No"
+    var MOTHER_ALIVE = "Mother Alive - No"
+    var family_level_1 = data.answers;
+    var uuid= data.uuid;
+    var [showMotherDead, setShowMotherDead] = useState();
+    var [showFatherDead, setShowFatherDead] = useState();
+    var [deadMotherDetails, setDeadMotherDetails] = useState([]);
+    var [deadFatherDetails, setDeadFatherDetails] = useState([]);
 
-    const handleChange = (event) => {
-    //   setValue(event.target.value);
-      setSuccesscheck(true)
-    };
+
+    family_level_1.forEach(function (item, index) {
+    var title = item.display;
+      if (title.indexOf(MOTHER_ALIVE) > -1) {
+        if (deadMotherDetails.length == 0) {
+          setDeadMotherDetails(item.answers)
+        }
+      }
+      if (title.indexOf(FATHER_ALIVE) > -1) {
+        if (deadFatherDetails.length == 0) {
+          setDeadFatherDetails(item.answers)
+        }
+      }
+  });
+
+  const handleChange = (event,cVal) => {
+    var btnid = event.target.id
+    var btnvalue = event.target.value
+    var cVal = {
+      "name": uuid,
+      "value":btnid
+    }
+
+      if (btnvalue.indexOf(MOTHER_ALIVE) > -1) {
+        setShowMotherDead(true);
+      }
+      else if (btnvalue.indexOf(FATHER_ALIVE) > -1) {
+        setShowFatherDead(true);
+      }
+      else {
+      setShowMotherDead(false);
+      setShowFatherDead(false);
+
+    }
+    setSuccesscheck(false);
+    props.onChange(cVal)
+  };
+
+  const handleValueChange = (cVal) => {
+    setSuccesscheck(false);
+    props.onChange(cVal)
+  };
 
     if (dataType == "Coded") {
       return (
         <div>
-          <CodedType codeddata={data} />
-          {successcheck &&
-          <Alert severity="success">Saved Successfully!</Alert>
+          <CodedType codeddata={data}
+            onChange={handleChange}
+          />
+
+          {showMotherDead &&
+              deadMotherDetails.map((item, index) => (
+                    <Famiily_Level2_History
+                  answer={item}
+                  onChange={handleValueChange}
+                  key={item.uuid}
+                    />
+              ))
           }
-        </div>
-      )
+
+          {showFatherDead &&
+              deadFatherDetails.map((item, index) => (
+                    <Famiily_Level2_History
+                  answer={item}
+                  onChange={handleValueChange}
+                  key={item.uuid}
+                    />
+              ))
+          }
+          </div>
+        )
     }
     else if (data.datatype.display == "Text" || data.datatype.display == "N/A") {
       return (

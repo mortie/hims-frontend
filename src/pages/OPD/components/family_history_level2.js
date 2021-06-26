@@ -4,9 +4,9 @@ import Alert from '@material-ui/lab/Alert';
 import CodedType from './codedType'
 import TextType from './textType'
 
-export default function DrugHistory(props) {
+export default function Famiily_Level2_History(props) {
     var data = props.answer;
-  var dataType = props.answer.datatype.display
+    var dataType = data.datatype.display
 
     var [successcheck, setSuccesscheck] = useState(false);
     const handleChange = (cVal) => {
@@ -27,7 +27,7 @@ export default function DrugHistory(props) {
       </div>
       );
     }
-    else if (data.datatype.display == "Text" || data.datatype.display == "N/A") {
+    else if (dataType= "Text" || dataType == "N/A") {
     return (
         <div>
         <TextType
