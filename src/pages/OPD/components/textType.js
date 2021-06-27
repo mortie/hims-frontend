@@ -21,7 +21,6 @@ export default function TextType(props) {
     const classes = useStyles();
     var data = props.textdata;
     var uuid = data.uuid;
-    var [successcheck, setSuccesscheck] = useState(false);
 
     const handleChange = (event) => {
         var btnid = event.target.value
@@ -29,7 +28,6 @@ export default function TextType(props) {
             "name": uuid,
             "value":btnid
         }
-        setSuccesscheck(true)
         props.onChange(cVal)
     };
 
@@ -50,9 +48,6 @@ export default function TextType(props) {
                 className="commentClass"
                 onChange={handleChange}
                 />
-            {/* {successcheck &&
-            <Alert severity="success">Saved Successfully!</Alert>
-            } */}
             </GridItem>
             <br></br>
             <br></br>
