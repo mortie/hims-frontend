@@ -22,13 +22,13 @@ export default function TextType(props) {
     var data = props.textdata;
     var uuid = data.uuid;
 
-    const handleChange = (event) => {
+    const handleChange = (event,cVal) => {
         var btnid = event.target.value
         var cVal = {
             "name": uuid,
             "value":btnid
         }
-        props.onChange(cVal)
+        props.onChange(event,cVal)
     };
 
     return (

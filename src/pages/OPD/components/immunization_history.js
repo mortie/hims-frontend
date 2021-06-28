@@ -141,6 +141,7 @@ export default function ImmunizationTable(props) {
     width: 450,
     editable: true,
     renderCell: (params) => {
+      console.log(" Params Value ",params.value)
         return(
           <TextField
           // variant="outlined"
@@ -149,13 +150,12 @@ export default function ImmunizationTable(props) {
           margin="dense"
           name="surgicalDate"
           id="surgicalDate"
-          defaultValue=""
           InputLabelProps={{
           shrink: true,
           }}
           // className={classes.field}
-            value = {params.value}
-          onClick={(e) => handleCellClick(e, params)}
+          value = {params.value}
+          onChange={(e) => handleCellClick(e, params)}
           />
         )
       }
@@ -198,18 +198,17 @@ export default function ImmunizationTable(props) {
 
   const handleCellClick = (event,param) => {
     console.log(" cell Event values ", event.target.value)
-    console.log(" cell Event values Param ", param)
+    console.log(" cell  Param ", param)
 
     var cVal = {
       "name": param.row.uuid,
       "value":event.target.value,
     }
-    setSuccesscheck(false)
   // if (param.colIndex === 2) {
   //   event.stopPropagation();
   // }
-    console.log(" Cell values ",cVal)
-    props.onChange(cVal)
+    console.log(" Cell values DICT ",cVal)
+    props.onChange(event,cVal)
 
   };
 
@@ -228,9 +227,7 @@ export default function ImmunizationTable(props) {
 
       />
       </div>
-      {successcheck &&
-        <Alert severity="success">Saved Successfully!</Alert>
-      }
+
       </div>
 
   );

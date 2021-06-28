@@ -9,9 +9,9 @@ export default function PS_Level2_History(props) {
     var dataType = data.datatype.display
 
     var [successcheck, setSuccesscheck] = useState(false);
-    const handleChange = (cVal) => {
+    const handleChange = (event,cVal) => {
       setSuccesscheck(true)
-      props.onChange(cVal)
+      props.onChange(event,cVal)
     };
 
     if (dataType == "Coded") {
@@ -21,9 +21,7 @@ export default function PS_Level2_History(props) {
       codeddata={data}
       onChange = {handleChange}
       />
-      {successcheck &&
-      <Alert severity="success">Saved Successfully!</Alert>
-      }
+
       </div>
       );
     }
@@ -32,11 +30,8 @@ export default function PS_Level2_History(props) {
         <div>
         <TextType
         textdata={data}
-        onChange = {props.onChange}
+        onChange = {handleChange}
         />
-        {successcheck &&
-        <Alert severity="success">Saved Successfully!</Alert>
-        }
         </div>
         )
     }

@@ -363,7 +363,7 @@ export default function Triage() {
   const savePatientHistory = (event) => {
     event.preventDefault();
     const encounter = {
-      encounterType: "67a71486-1a54-468f-ac3e-7091a9a79584",
+      encounterType: "f4776859-673c-4f75-abb0-bcc0e9d037d2",
       encounterProviders: [
         {
           provider: providerUuid,
@@ -405,7 +405,7 @@ export default function Triage() {
     return obs;
   };
 
-  const handleHistoryChange = (hisConcept) => {
+  const handleHistoryChange = (event,hisConcept) => {
     const { name, value } = hisConcept;
     console.log(" History changes : ",hisConcept)
     setHistoryValues({ ...historyValues, [name]: value });

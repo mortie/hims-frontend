@@ -54,12 +54,12 @@ export default function FamilyHistory(props) {
 
     }
     setSuccesscheck(false);
-    props.onChange(cVal)
+    props.onChange(event,cVal)
   };
 
-  const handleValueChange = (cVal) => {
+  const handleValueChange = (event,cVal) => {
     setSuccesscheck(false);
-    props.onChange(cVal)
+    props.onChange(event,cVal)
   };
 
     if (dataType == "Coded") {
@@ -94,10 +94,7 @@ export default function FamilyHistory(props) {
     else if (data.datatype.display == "Text" || data.datatype.display == "N/A") {
       return (
         <div>
-          <TextType textdata={data} />
-          {successcheck &&
-          <Alert severity="success">Saved Successfully!</Alert>
-          }
+          <TextType textdata={data} onChange={handleValueChange} />
         </div>
       )
     }

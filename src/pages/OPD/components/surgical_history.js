@@ -26,19 +26,19 @@ export default function SurgicalHistory(props) {
   var data = props.answer
   var uuid = data.uuid;
     var [successcheck, setSuccesscheck] = useState(false);
-    const handleChange = (cVal) => {
+    const handleChange = (event,cVal) => {
       setSuccesscheck(true)
-      props.onChange(cVal)
+      props.onChange(event,cVal)
     };
 
-    const handleDateChange = (event) => {
+    const handleDateChange = (event,cVal) => {
     var btnvalue = event.target.value
     var cVal = {
       "name": uuid,
       "value":btnvalue
     }
     setSuccesscheck(false);
-    props.onChange(cVal)
+    props.onChange(event,cVal)
   };
 
     if (data.datatype.display == "Date") {

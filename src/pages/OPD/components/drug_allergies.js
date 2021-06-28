@@ -9,9 +9,9 @@ export default function DrugHistory(props) {
   var dataType = props.answer.datatype.display
 
     var [successcheck, setSuccesscheck] = useState(false);
-    const handleChange = (cVal) => {
+  const handleChange = (event,cVal) => {
       setSuccesscheck(true)
-      props.onChange(cVal)
+      props.onChange(event,cVal)
     };
 
     if (dataType == "Coded") {
@@ -21,9 +21,6 @@ export default function DrugHistory(props) {
       codeddata={data}
       onChange = {handleChange}
       />
-      {successcheck &&
-      <Alert severity="success">Saved Successfully!</Alert>
-      }
       </div>
       );
     }
@@ -32,11 +29,9 @@ export default function DrugHistory(props) {
         <div>
         <TextType
         textdata={data}
-        onChange = {props.onChange}
+        onChange = {handleChange}
         />
-        {successcheck &&
-        <Alert severity="success">Saved Successfully!</Alert>
-        }
+
         </div>
         )
     }

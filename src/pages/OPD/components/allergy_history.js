@@ -50,7 +50,7 @@ export default function AllergyHistory(props) {
     }
   });
 
-  const handleChange = (event) => {
+  const handleChange = (event,cVal) => {
     var btnid = event.target.id
     var btnvalue = event.target.value
     var cVal = {
@@ -70,12 +70,13 @@ export default function AllergyHistory(props) {
       setShowDrug(false);
     }
     setSuccesscheck(false);
-    props.onChange(cVal)
+    props.onChange(event,cVal)
   };
 
-  const handleValueChange = (cVal) => {
+  const handleValueChange = (event,cVal) => {
+    console.log(" Handle Changes ", cVal);
     setSuccesscheck(false);
-    props.onChange(cVal)
+    props.onChange(event,cVal)
   };
 
 
@@ -118,9 +119,6 @@ export default function AllergyHistory(props) {
               ))
           }
 
-        {successcheck &&
-        <Alert severity="success">Saved Successfully!</Alert>
-        }
       </div>
       );
       }

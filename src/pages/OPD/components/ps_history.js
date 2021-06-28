@@ -68,12 +68,12 @@ export default function PS_History(props) {
 
     }
     setSuccesscheck(false);
-    props.onChange(cVal)
+    props.onChange(event,cVal)
   };
 
-  const handleValueChange = (cVal) => {
+  const handleValueChange = (event,cVal) => {
     setSuccesscheck(false);
-    props.onChange(cVal)
+    props.onChange(event,cVal)
   };
 
   if (dataType == "Coded") {

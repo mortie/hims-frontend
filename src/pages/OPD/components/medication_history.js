@@ -10,9 +10,9 @@ export default function MedicationHistory(props) {
   var dataType = props.question.datatype.display
   var [successcheck, setSuccesscheck] = useState(false);
 
-  const handleChange = (cVal) => {
+  const handleChange = (event,cVal) => {
       setSuccesscheck(true)
-      props.onChange(cVal)
+      props.onChange(event,cVal)
   };
 
   if (dataType == "Coded") {
