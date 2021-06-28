@@ -2,6 +2,7 @@ import Billing from "./Billing";
 import Home from "./Home";
 import IPD from "./IPD";
 import Laboratory from "./Laboratory";
+import Triage from './Triage'
 import OPD from "./OPD";
 import PatientSearch from "./PatientSearch";
 import Pharmacy from "./Pharmacy";
@@ -16,6 +17,7 @@ export {
   Home,
   IPD,
   Laboratory,
+  Triage,
   OPD,
   PatientSearch,
   Pharmacy,

@@ -1,6 +1,7 @@
 import {
   Home,
   PatientSearch,
+  Triage,
   OPD,
   IPD,
   Pharmacy,
@@ -53,6 +54,24 @@ export const appRoutes = [
     visibleOnSidebar: false,
     icon: "fa fa-user-plus",
     component: PatientRegistration,
+    layout: "/app",
+  },
+  {
+    path: "/triage",
+    title: "Triage",
+    roles: [
+      "System Developer",
+      "Organizational: Doctor",
+      "Application: Enter ADT events",
+      "Application: Record allergies",
+      "Application: Requests appointments",
+      "Application: Sees appointment schedule",
+      "Application: Uses patient summary",
+      "Application: Writes clinical notes",
+    ],
+    visibleOnSidebar: true,
+    icon: "fas fa-heartbeat",
+    component: Triage,
     layout: "/app",
   },
   {
