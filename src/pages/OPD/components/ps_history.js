@@ -108,7 +108,8 @@ export default function PS_History(props) {
     else if (data.datatype.display == "Text" || data.datatype.display == "N/A") {
       return (
         <div>
-        <TextType textdata={data} />
+          <TextType textdata={data}
+            onChange={handleValueChange} />
         {successcheck &&
         <Alert severity="success">Saved Successfully!</Alert>
         }
