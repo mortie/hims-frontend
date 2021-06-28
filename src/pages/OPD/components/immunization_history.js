@@ -22,13 +22,15 @@ const useStyles = makeStyles((theme) => ({
 
 
 const createData = (uuid,
+  uuidDate,
+  uuidComment,
   eligibility,
   vaccines,
   dateCreated,
   comments,
   id
 ) => {
-  return { uuid,eligibility, vaccines, dateCreated, comments, id };
+  return { uuid,uuidDate,uuidComment,eligibility, vaccines, dateCreated, comments, id };
 };
 
 export default function ImmunizationTable(props) {
@@ -41,6 +43,8 @@ export default function ImmunizationTable(props) {
   let id = 0;
   var elig = "";
   var uuidval = "";
+  var uuidDate = "";
+  var uuidComment = "";
   var date = new Date();
 
   Object.entries(rowpros.answers).map(([key, value]) => {
@@ -56,12 +60,20 @@ export default function ImmunizationTable(props) {
         if (values.datatype.display == "N/A") {
             vac["vaccine_" + key] = values.display
         }
+        if (values.datatype.display == "Date") {
+            uuidDate = values.uuid
+        }
+        if (values.datatype.display == "Text") {
+            uuidComment = values.uuid
+        }
       })
 
     if (Object.entries(vac).length != 0) {
       storedata.push(
         createData(
           uuidval,
+          uuidDate,
+          uuidComment,
           elig,
           vac,
           date,
@@ -78,6 +90,12 @@ export default function ImmunizationTable(props) {
   const columns = [
         {
       field: 'uuid', headerName: 'UUID', hide:true
+    },
+            {
+      field: 'uuidDate', headerName: 'UUIDDate', hide:true
+    },
+                    {
+      field: 'uuidComment', headerName: 'UUIDComment', hide:true
     },
     {
       field: 'eligibility', headerName: 'Eligibility', width: 180,
@@ -117,18 +135,15 @@ export default function ImmunizationTable(props) {
     renderCell: (params) => {
         return(
           <TextField
-          // variant="outlined"
           label="Date"
           type="date"
           margin="dense"
-          name="surgicalDate"
-          id="surgicalDate"
-          defaultValue=""
-          maxDate={new Date()}
+          name="immuneDate"
+          id="immuneDate"
           InputLabelProps={{
           shrink: true,
-          }}
-          // className={classes.field}
+            }}
+          value={params.value}
           onChange = {(e)=>handleCellClick(e,params)}
           />
         )
@@ -141,19 +156,15 @@ export default function ImmunizationTable(props) {
     width: 450,
     editable: true,
     renderCell: (params) => {
-      console.log(" Params Value ",params.value)
         return(
           <TextField
-          // variant="outlined"
           label="Comment"
-          type="text"
+          multiline={true}
           margin="dense"
-          name="surgicalDate"
-          id="surgicalDate"
+          name="comments"
           InputLabelProps={{
           shrink: true,
           }}
-          // className={classes.field}
           value = {params.value}
           onChange={(e) => handleCellClick(e, params)}
           />
@@ -171,7 +182,6 @@ export default function ImmunizationTable(props) {
         let datavalue = props.value;
         const updatedRows = immuneData.map((row) => {
           if (row.id === id) {
-            console.log(" Rowsss : ",row, "data Value : ",datavalue)
             row['dateCreated'] = datavalue
           }
           // updateImmunzationData(row)
@@ -183,7 +193,9 @@ export default function ImmunizationTable(props) {
       else if (field == 'comments') {
         let datavalue = props.value;
         const updatedRows = immuneData.map((row) => {
+
           if (row.id === id) {
+            handleValue(row.uuidComment,datavalue)
             row['comments'] = datavalue
           }
           // updateImmunzationData(row)
@@ -196,18 +208,23 @@ export default function ImmunizationTable(props) {
     [immuneData],
   );
 
+  const handleValue = (uuidId, value) => {
+    let cVal = {
+      "name": uuidId,
+      "value":value,
+    }
+    props.onChange(cVal,cVal)
+
+  }
   const handleCellClick = (event,param) => {
-    console.log(" cell Event values ", event.target.value)
-    console.log(" cell  Param ", param)
 
     var cVal = {
-      "name": param.row.uuid,
+      "name": param.row.uuidDate,
       "value":event.target.value,
     }
   // if (param.colIndex === 2) {
   //   event.stopPropagation();
   // }
-    console.log(" Cell values DICT ",cVal)
     props.onChange(event,cVal)
 
   };
