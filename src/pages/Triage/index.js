@@ -379,7 +379,6 @@ export default function Triage() {
       .then((response) => {
         enqueueSnackbar("Patient History saved successfully.");
         setOpen(false);
-        setVitalSaved(true);
       })
       .catch((error) => {
         console.log(error);
@@ -411,6 +410,16 @@ export default function Triage() {
     setHistoryValues({ ...historyValues, [name]: value });
   };
 
+    const deleteHistoryChange = (event,hisConcept) => {
+    for (const key in historyValues) {
+      if (Object.hasOwnProperty.call(historyValues, key)) {
+        if (hisConcept.includes(key)) {
+          delete historyValues[key]
+          setHistoryValues(historyValues)
+        }
+      }
+    }
+  };
 
   const getObs = () => {
     let obs = [];
@@ -688,7 +697,8 @@ export default function Triage() {
               <GridContainer>
                 <ControlledAccordions
                   historyfields={historyfields}
-                  onChange={handleHistoryChange}
+                    onChange={handleHistoryChange}
+                    onDelete={deleteHistoryChange}
                   key="Accordians"
                 />
               </GridContainer>

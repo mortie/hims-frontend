@@ -9,7 +9,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-import ImmunizationTable from './components/immunization_history'
+import Immunize from './components/immunization'
 import MedicationHistory from './components/medication_history'
 import SurgicalHistory from './components/surgical_history'
 import PS_History from './components/ps_history'
@@ -44,21 +44,17 @@ const ControlledAccordions = (props) => {
   var ALLERGY_HISTORY = "Allergies History"
   var patientData = props.rowdata;
 
-  const onChange = (event, key) => {
-    setImmunization({
-      ...immunization,
-      [key]:event.target.value.display
-    })
+  const handleChange = (event, cVal) => {
+    props.onChange(event,cVal)
   };
 
-  const handleChange = (event,cVal) => {
-    console.log(" Handle Changes Immunzetions ", cVal);
-    props.onChange(event,cVal)
+  const deleteChange = (event,cVal) => {
+    props.onDelete(event,cVal)
   };
 
   const itemImmuneList = (items) => {
       // return items.answers.map((item1, index) => (
-       return( <ImmunizationTable
+       return( <Immunize
           rows={items}
          patientData={patientData}
          onChange = {handleChange}
@@ -80,7 +76,8 @@ const ControlledAccordions = (props) => {
     return items.answers.map((item1, index) => (
       <PS_History
         answer={item1}
-        onChange = {handleChange}
+        onChange={handleChange}
+        onDelete={deleteChange}
       />
     ))
   };
@@ -89,7 +86,8 @@ const ControlledAccordions = (props) => {
     return items.answers.map((item1, index) => (
       <FamilyHistory
         answer={item1}
-        onChange = {handleChange}
+        onChange={handleChange}
+        onDelete={deleteChange}
       />
     ))
   };
@@ -98,7 +96,8 @@ const ControlledAccordions = (props) => {
     return items.answers.map((item1, index) => (
       <AllergyHistory
         answer={item1}
-        onChange = {handleChange}
+        onChange={handleChange}
+        onDelete={deleteChange}
       />
     ))
   };
