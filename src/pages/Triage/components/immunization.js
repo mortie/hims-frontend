@@ -50,6 +50,13 @@ const rowpros = props.rows
   var uuidComment = "";
   var date = "";
 
+    var newDate = new Date();
+  var todayDate = [
+    newDate.getFullYear(),
+    ('0' + (newDate.getMonth() + 1)).slice(-2),
+    ('0' + newDate.getDate()).slice(-2),
+  ].join('-').toString();
+
   Object.entries(rowpros.answers).map(([key, value]) => {
 
     elig = value.display
@@ -141,7 +148,8 @@ const handleCellClick = (event,uuid,fieldType) => {
           InputLabelProps={{
           shrink: true,
             }}
-          onChange = {(e)=>handleCellClick(e,row.uuidDate,"date")}
+                  onChange={(e) => handleCellClick(e, row.uuidDate, "date")}
+                  inputProps={{ max: todayDate }}
           />
                       </TableCell>
                   <TableCell >

@@ -30,6 +30,12 @@ export default function SurgicalHistory(props) {
       setSuccesscheck(true)
       props.onChange(event,cVal)
     };
+  var newDate = new Date();
+  var todayDate = [
+    newDate.getFullYear(),
+    ('0' + (newDate.getMonth() + 1)).slice(-2),
+    ('0' + newDate.getDate()).slice(-2),
+  ].join('-').toString();
 
     const handleDateChange = (event,cVal) => {
     var btnvalue = event.target.value
@@ -58,7 +64,8 @@ export default function SurgicalHistory(props) {
           name="surgicalDate"
           id="surgicalDate"
           defaultValue=""
-          maxDate={new Date()}
+          inputProps={{ max: todayDate }}
+
           InputLabelProps={{
           shrink: true,
           }}

@@ -38,7 +38,7 @@ export default function FamilyHistory(props) {
   var [familyDetails, setFamilyDetails] = useState([]);
   var [nonfamilyDetails, setNonfamilyDetails] = useState([]);
   var uuidList = [];
-  var [alldruguuid, setAlldruguuid] = useState([]);
+  var [allfamilyuuid, setAllfamilyuuid] = useState([]);
 
   family_level_1.forEach(function (item, index) {
       if (item.display == FAMILY) {
@@ -61,15 +61,23 @@ export default function FamilyHistory(props) {
       setShowNonFamily(false);
       familyDetails.forEach(function (itemva, index) {
         uuidList.push(itemva.uuid)
-        setAlldruguuid(uuidList);
+        setAllfamilyuuid(uuidList);
+        itemva.answers.forEach(function (itemvas, index) {
+          uuidList.push(itemvas.uuid)
+          setAllfamilyuuid(uuidList);
+          itemvas.answers.forEach(function (itemvasl, index) {
+            uuidList.push(itemvasl.uuid)
+            setAllfamilyuuid(uuidList);
+        });
+        });
       });
     }
     else if (btnvalue == NO_FAMILY) {
       setShowNonFamily(true);
       setShowFamily(false);
-      props.onDelete(event,alldruguuid)
+      props.onDelete(event,allfamilyuuid)
     }
-    props.onChange(event,cVal)
+    // props.onChange(event,cVal)
   };
 
   const handleValueChange = (event, cVal) => {
@@ -91,7 +99,7 @@ export default function FamilyHistory(props) {
                 control={<Radio id={smoker.uuid} onChange={handleChange} />}
                 label={smoker.display}
                 className="yesClass"
-                key={smoker.uuid}
+                id={smoker.uuid}
               />
             ))}
           </RadioGroup>
