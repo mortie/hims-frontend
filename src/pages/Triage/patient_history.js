@@ -83,13 +83,20 @@ const ControlledAccordions = (props) => {
   };
 
   const itemFamilyList = (items) => {
-    return items.answers.map((item1, index) => (
+    // return items.answers.map((item1, index) => (
+    //   <FamilyHistory
+    //     answer={item1}
+    //     onChange={handleChange}
+    //     onDelete={deleteChange}
+    //   />
+    // ))
+        return (
       <FamilyHistory
-        answer={item1}
+        answer={items}
         onChange={handleChange}
         onDelete={deleteChange}
       />
-    ))
+    )
   };
 
   const itemAllergyList = (items) => {

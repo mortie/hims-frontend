@@ -1,37 +1,50 @@
 import React,{useState} from 'react';
 import Alert from '@material-ui/lab/Alert';
+import { makeStyles } from '@material-ui/core/styles';
 
 import CodedType from './codedType'
 import TextType from './textType'
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
 import Famiily_Level2_History from './family_history_level2'
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: 200,
+  },
+}));
 
 export default function FamilyHistory(props) {
 
-    var data = props.answer;
-    var dataType = props.answer.datatype.display
-    var [successcheck, setSuccesscheck] = useState(false);
-    var FATHER_ALIVE = "Father Alive - No"
-    var MOTHER_ALIVE = "Mother Alive - No"
-    var family_level_1 = data.answers;
-    var uuid= data.uuid;
-    var [showMotherDead, setShowMotherDead] = useState();
-    var [showFatherDead, setShowFatherDead] = useState();
-    var [deadMotherDetails, setDeadMotherDetails] = useState([]);
-    var [deadFatherDetails, setDeadFatherDetails] = useState([]);
-    var uuidList = [];
-    var [allfamilyuuid, setAllfamilyuuid] = useState([]);
+  const classes = useStyles();
+  var data = props.answer;
+  var dataType = "Coded"
+  var family_level_1 = data.answers;
+  var uuid = data.uuid;
+  var FAMILY = "Family History-Yes"
+  var NO_FAMILY = "Family History-No"
+  var [showFamily, setShowFamily] = useState(false);
+  var [showNonFamily, setShowNonFamily] = useState(false);
+  var [familyUuid, setFamilyUuid] = useState("");
+  var [nonfamilyUuid,setNonfamilyUuid] = useState("")
+  var [familyDetails, setFamilyDetails] = useState([]);
+  var [nonfamilyDetails, setNonfamilyDetails] = useState([]);
+  var uuidList = [];
+  var [alldruguuid, setAlldruguuid] = useState([]);
 
-
-    family_level_1.forEach(function (item, index) {
-    var title = item.display;
-      if (title.indexOf(MOTHER_ALIVE) > -1) {
-        if (deadMotherDetails.length == 0) {
-          setDeadMotherDetails(item.answers)
-        }
-      }
-      if (title.indexOf(FATHER_ALIVE) > -1) {
-        if (deadFatherDetails.length == 0) {
-          setDeadFatherDetails(item.answers)
+  family_level_1.forEach(function (item, index) {
+      if (item.display == FAMILY) {
+        if (familyDetails.length == 0) {
+          setFamilyUuid(item.uuid)
+          setFamilyDetails(item.answers)
         }
       }
   });
@@ -43,72 +56,62 @@ export default function FamilyHistory(props) {
       "name": uuid,
       "value":btnid
     }
-    deadMotherDetails.forEach(function (itemva, index) {
-    uuidList.push(itemva.uuid)
-    setAllfamilyuuid(uuidList);
-    });
-
-    deadFatherDetails.forEach(function (itemva, index) {
-    uuidList.push(itemva.uuid)
-    setAllfamilyuuid(uuidList);
-    });
-
-      if (btnvalue.indexOf(MOTHER_ALIVE) > -1) {
-        setShowMotherDead(true);
-      }
-      else if (btnvalue.indexOf(FATHER_ALIVE) > -1) {
-        setShowFatherDead(true);
-
-      }
-      else {
-      setShowMotherDead(false);
-      setShowFatherDead(false);
-      props.onDelete(event,allfamilyuuid)
-
+    if (btnvalue == FAMILY) {
+      setShowFamily(true);
+      setShowNonFamily(false);
+      familyDetails.forEach(function (itemva, index) {
+        uuidList.push(itemva.uuid)
+        setAlldruguuid(uuidList);
+      });
     }
-    setSuccesscheck(false);
+    else if (btnvalue == NO_FAMILY) {
+      setShowNonFamily(true);
+      setShowFamily(false);
+      props.onDelete(event,alldruguuid)
+    }
     props.onChange(event,cVal)
   };
 
-  const handleValueChange = (event,cVal) => {
-    setSuccesscheck(false);
+  const handleValueChange = (event, cVal) => {
     props.onChange(event,cVal)
   };
 
-    if (dataType == "Coded") {
-      return (
-        <div>
-          <CodedType codeddata={data}
-            onChange={handleChange}
-          />
+  const deleteChange = (event,cVal) => {
+    props.onDelete(event,cVal)
+  };
 
-          {showMotherDead &&
-              deadMotherDetails.map((item, index) => (
-                    <Famiily_Level2_History
-                  answer={item}
-                  onChange={handleValueChange}
-                  key={item.uuid}
-                    />
-              ))
-          }
+  if (dataType == "Coded") {
+    return (
+      <div>
+        <FormControl component="fieldset" className="medication">
+          <RadioGroup aria-label="gender" name="gender1" className="medi" >
+            {data.answers.map((smoker, index) => (
+              <FormControlLabel
+                value={smoker.display}
+                control={<Radio id={smoker.uuid} onChange={handleChange} />}
+                label={smoker.display}
+                className="yesClass"
+                key={smoker.uuid}
+              />
+            ))}
+          </RadioGroup>
+        </FormControl>
+        <br></br>
+        <br></br>
+        {showFamily &&
+          familyDetails.map((item, index) => (
+            <Famiily_Level2_History
+              answer={item}
+              onChange={handleValueChange}
+              key={item.uuid}
+              uuidDrug={familyUuid}
+              onDelete={deleteChange}
+            />
+          ))
+        }
 
-          {showFatherDead &&
-              deadFatherDetails.map((item, index) => (
-                    <Famiily_Level2_History
-                  answer={item}
-                  onChange={handleValueChange}
-                  key={item.uuid}
-                    />
-              ))
-          }
-          </div>
-        )
-    }
-    else if (data.datatype.display == "Text" || data.datatype.display == "N/A") {
-      return (
-        <div>
-          <TextType textdata={data} onChange={handleValueChange} />
-        </div>
-      )
-    }
+      </div>
+    )
+  }
+
 }
