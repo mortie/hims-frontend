@@ -64,12 +64,19 @@ const ControlledAccordions = (props) => {
   };
 
   const itemSurgicalList = (items) => {
-    return items.answers.map((item1, index) => (
+    // return items.answers.map((item1, index) => (
+    //   <SurgicalHistory
+    //     answer={item1}
+    //     onChange = {handleChange}
+    //   />
+    // ))
+        return (
       <SurgicalHistory
-        answer={item1}
-        onChange = {handleChange}
+        answer={items}
+        onChange={handleChange}
+        onDelete={deleteChange}
       />
-    ))
+    )
   };
 
   const itemSocialList = (items) => {
@@ -110,12 +117,19 @@ const ControlledAccordions = (props) => {
   };
 
     const itemMedicationList = (items) => {
-    return items.answers.map((item1, index) => (
+    // return items.answers.map((item1, index) => (
+    //   <MedicationHistory
+    //     question={item1}
+    //     onChange = {handleChange}
+    //   />
+    // ))
+          return (
       <MedicationHistory
-        question={item1}
-        onChange = {handleChange}
+        question={items}
+              onChange={handleChange}
+              onDelete={deleteChange}
       />
-    ))
+    )
   };
 
 return(

@@ -1,13 +1,14 @@
 import React,{useState} from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
 import Alert from '@material-ui/lab/Alert';
-import { GridContainer, GridItem } from "../../../components/Grid";
-import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
 
-
+import CodedType from './codedType'
 import TextType from './textType'
-
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
+import Surgical_Level2_History from './surgical_history_level2'
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -22,70 +23,103 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function SurgicalHistory(props) {
-    const classes = useStyles();
-  var data = props.answer
-  var uuid = data.uuid;
-    var [successcheck, setSuccesscheck] = useState(false);
-    const handleChange = (event,cVal) => {
-      setSuccesscheck(true)
-      props.onChange(event,cVal)
-    };
-  var newDate = new Date();
-  var todayDate = [
-    newDate.getFullYear(),
-    ('0' + (newDate.getMonth() + 1)).slice(-2),
-    ('0' + newDate.getDate()).slice(-2),
-  ].join('-').toString();
 
-    const handleDateChange = (event,cVal) => {
+  const classes = useStyles();
+  var data = props.answer;
+  var dataType = "Coded"
+  var surgical_level_1 = data.answers;
+  var uuid = data.uuid;
+  var SURGICAL = "Surgical History-Yes"
+  var NO_SURGICAL = "Surgical History-No"
+  var [showSurgical, setShowSurgical] = useState(false);
+  var [showNonSurgical, setShowNonSurgical] = useState(false);
+  var [surgicalUuid, setSurgicalUuid] = useState("");
+  var [nonfamilyUuid,setNonfamilyUuid] = useState("")
+  var [surgicalDetails, setSurgicalDetails] = useState([]);
+  var [nonfamilyDetails, setNonfamilyDetails] = useState([]);
+  var uuidList = [];
+  var [allsurgicaluuid, setAllsurgicaluuid] = useState([]);
+
+  surgical_level_1.forEach(function (item, index) {
+      if (item.display == SURGICAL) {
+        if (surgicalDetails.length == 0) {
+          setSurgicalUuid(item.uuid)
+          setSurgicalDetails(item.answers)
+        }
+      }
+  });
+
+  const handleChange = (event,cVal) => {
+    var btnid = event.target.id
     var btnvalue = event.target.value
     var cVal = {
       "name": uuid,
-      "value":btnvalue
+      "value":btnid
     }
-    setSuccesscheck(false);
+    if (btnvalue == SURGICAL) {
+      setShowSurgical(true);
+      setShowNonSurgical(false);
+      surgicalDetails.forEach(function (itemva, index) {
+        uuidList.push(itemva.uuid)
+        setAllsurgicaluuid(uuidList);
+        itemva.answers.forEach(function (itemvas, index) {
+          uuidList.push(itemvas.uuid)
+          setAllsurgicaluuid(uuidList);
+          itemvas.answers.forEach(function (itemvasl, index) {
+            uuidList.push(itemvasl.uuid)
+            setAllsurgicaluuid(uuidList);
+        });
+        });
+      });
+    }
+    else if (btnvalue == NO_SURGICAL) {
+      setShowNonSurgical(true);
+      setShowSurgical(false);
+      props.onDelete(event,allsurgicaluuid)
+    }
+    // props.onChange(event,cVal)
+  };
+
+  const handleValueChange = (event, cVal) => {
     props.onChange(event,cVal)
   };
 
-    if (data.datatype.display == "Date") {
-      return (
-          <GridContainer>
-            <GridItem item xs={12} sm={6} md={6}>
-                <Typography variant="body1" className={classes.type}>
-                {data.display}
-                </Typography>
-            </GridItem>
-            <GridItem item xs={12} sm={6} md={6}>
-          <TextField
-          variant="outlined"
-          label={data.display}
-          type="date"
-          margin="dense"
-          name="surgicalDate"
-          id="surgicalDate"
-          defaultValue=""
-          inputProps={{ max: todayDate }}
+  const deleteChange = (event,cVal) => {
+    props.onDelete(event,cVal)
+  };
 
-          InputLabelProps={{
-          shrink: true,
-          }}
-          className={classes.field}
-          onChange = {handleDateChange}
-          />
-</GridItem>
-</GridContainer>
-      )
-    }
-    else if (data.datatype.display == "Text") {
-      return (
-        <div>
-          <TextType textdata={data}
-          onChange = {handleChange}
-          />
-          {/* {successcheck &&
-          <Alert severity="success">Saved Successfully!</Alert>
-          } */}
-        </div>
-      )
-    }
+  if (dataType == "Coded") {
+    return (
+      <div>
+        <FormControl component="fieldset" className="medication">
+          <RadioGroup aria-label="gender" name="gender1" className="medi" >
+            {data.answers.map((smoker, index) => (
+              <FormControlLabel
+                value={smoker.display}
+                control={<Radio id={smoker.uuid} onChange={handleChange} />}
+                label={smoker.display}
+                className="yesClass"
+                id={smoker.uuid}
+              />
+            ))}
+          </RadioGroup>
+        </FormControl>
+        <br></br>
+        <br></br>
+        {showSurgical &&
+          surgicalDetails.map((item, index) => (
+            <Surgical_Level2_History
+              answer={item}
+              onChange={handleValueChange}
+              key={item.uuid}
+              uuidDrug={surgicalUuid}
+              onDelete={deleteChange}
+            />
+          ))
+        }
+
+      </div>
+    )
+  }
+
 }
