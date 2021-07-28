@@ -573,6 +573,14 @@ export default function PatientRegistration() {
         ],
         attributes: [
           {
+            attributeType: "9fcb80cb-a417-4e6d-84dd-09355cee06fb",
+            value: "DDU"
+          },
+          {
+            attributeType: "97941f41-7377-4456-b999-a424ec904796",
+            value: "Shimla"
+          },
+          {
             attributeType: "75f95cc0-aff4-4025-9f69-27029d186e95",
             value: "PERNO",
           },
@@ -600,6 +608,8 @@ export default function PatientRegistration() {
       location: location[0].appointmentBlock.location.uuid,
       attributes: getAttributes(visitAttributeTypes),
     };
+
+    console.log(patient);
 
     postAPI("/patient", patient)
       .then((patientResponse) => {
