@@ -291,13 +291,15 @@ export default function PatientRegistration() {
                             formValues[formValues[display]?.display]?.display
                           ]?.display
                         }
-                        labelName={getLabelName(
-                          formValues[
-                            formValues[formValues[display]?.display]?.display
-                          ]?.names )||
+                        labelName={
+                          getLabelName(
                             formValues[
                               formValues[formValues[display]?.display]?.display
-                            ]?.display
+                            ]?.names
+                          ) ||
+                          formValues[
+                            formValues[formValues[display]?.display]?.display
+                          ]?.display
                         }
                         formValues={formValues}
                         formErrors={formErrors}
@@ -573,6 +575,14 @@ export default function PatientRegistration() {
         ],
         attributes: [
           {
+            attributeType: "acd05df0-e499-4613-ab8f-818c5470c79e",
+            value: "Shimla Hospital",
+          },
+          {
+            attributeType: "64016214-2231-4cf2-9ae1-1c18d4dc1ec0",
+            value: "Shimla",
+          },
+          {
             attributeType: "75f95cc0-aff4-4025-9f69-27029d186e95",
             value: "PERNO",
           },
@@ -600,6 +610,8 @@ export default function PatientRegistration() {
       location: location[0].appointmentBlock.location.uuid,
       attributes: getAttributes(visitAttributeTypes),
     };
+
+    console.log(patient);
 
     postAPI("/patient", patient)
       .then((patientResponse) => {
