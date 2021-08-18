@@ -16,3 +16,18 @@ export const WEIGHT = "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 export const BMI = "d7d7dc30-13d5-4661-942e-f69fd1701079";
 export const SYSTOLIC = "5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 export const DIASTOLIC = "5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+
+export const CONCEPT_SYMPTOPM = "Symptom"
+export const CONCEPT_DIAGNOSIS = "Diagnosis"
+export const CONCEPT_PROCEDURE = "Procedure"
+export const CONCEPT_INVESTIGATION = "Finding"
+export const CONCEPT_DRUG = "Drug"
+export const CONCEPT_VITAL="Vital"
+
+export const ENCOUNTER_TYPE_VITALS = "Vitals"
+export const ENCOUNTER_TYPE_VISIT_NOTE = "Visit Note"
+export const ENCOUNTER_TYPE_VISIT_INFO = "Visit Info"
+export const ENCOUNTER_TYPE_PATIENT_HISTORY = "Patient History"
+export const ENCOUNTER_TYPE_DISCHARGE = "Discharge"
+export const ENCOUNTER_TYPE_CHECK_IN = "Check In"
+
