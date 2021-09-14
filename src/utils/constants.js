@@ -17,7 +17,7 @@ export const DIASTOLIC = "5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 export const CONCEPT_SYMPTOPM = "Symptom"
 export const CONCEPT_DIAGNOSIS = "Diagnosis"
 export const CONCEPT_PROCEDURE = "Procedure"
-export const CONCEPT_INVESTIGATION = "Finding"
+export const CONCEPT_INVESTIGATION = "Test"
 export const CONCEPT_DRUG = "Drug"
 export const CONCEPT_VITAL="Vital"
 

@@ -29,8 +29,10 @@ export const loadPatientAndConcepts = (patientId) => async (dispatch, getState) 
     let symptom = await Concept.getSymptoms();
     let diagnosis = await Concept.getDiagnosis()
     let drug = await Concept.getDrugs()
-    let finding = await Concept.getInvestigations()
+    let investigation = await Concept.getInvestigations()
     let procedure = await Concept.getProcedures()
+    let allConcepts = await Concept.getAllConcepts()
+
     let vitals = await Concept.getVitals();
 
     dispatch({
@@ -39,9 +41,10 @@ export const loadPatientAndConcepts = (patientId) => async (dispatch, getState) 
             symptom,
             diagnosis,
             drug,
-            finding,
+            investigation,
             procedure,
-            vitals
+            vitals,
+            allConcepts
         }
     })
 
@@ -54,15 +57,14 @@ export const loadPatientAndConcepts = (patientId) => async (dispatch, getState) 
         }
     })
 
-    console.log("encounter types outside is ", encounterTypes)
-
     let patientDetail = await Patient.getPatientWithId(patientId);
+
+    console.log("patient detail is ",patientDetail, encounterTypes)
 
     dispatch({
         type: PATIENT_LOADED,
         payload: patientDetail
     })
-    console.log("in here patient detail is ", patientDetail)
 }
 
 export const savePatientDiagnosys = (details) => async (dispatch, getState) => {

@@ -1,0 +1,471 @@
+import { AppBar, Box, Button, Chip, FormControlLabel, Grid, Radio, RadioGroup, Tab, Tabs, TextareaAutosize, TextField, Typography, Dialog, DialogTitle, DialogContent, InputLabel, Tooltip, DialogActions } from '@material-ui/core';
+import { useContext, useState } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import { useEffect } from 'react';
+import { connect } from 'react-redux'
+import { loadPatientAndConcepts, savePatientDiagnosys } from '../../../actions/patientAction'
+import PropTypes from 'prop-types';
+import { PatientContext } from '../Contexts/PatientContext';
+import TransferList from './TransferListComponent';
+import { CONCEPT_DIAGNOSIS, CONCEPT_INVESTIGATION, CONCEPT_PROCEDURE, CONCEPT_SYMPTOPM, ENCOUNTER_TYPE_VITALS } from '../../../utils/constants';
+
+function TabPanel(props) {
+    const { children, value, index, ...other } = props;
+
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`tabpanel-${index}`}
+            aria-labelledby={`tab-${index}`}
+            {...other}
+        >
+            {value === index && (
+                <Box p={3}>
+                    <Typography>{children}</Typography>
+                </Box>
+            )}
+        </div>
+    );
+}
+TabPanel.propTypes = {
+    children: PropTypes.node,
+    index: PropTypes.any.isRequired,
+    value: PropTypes.any.isRequired,
+};
+
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        flexGrow: 1,
+        backgroundColor: theme.palette.background.default,
+    },
+    inputField: {
+        width: 400,
+        alignContent: 'left'
+    }
+}));
+
+
+function Patient({
+    loadPatientAndConcepts,
+    patientObject,
+    loadingPatient,
+    symptom,
+    diagnosis,
+    investigation,
+    procedure,
+    vitals,
+    allConcepts
+}) {
+
+    console.log("Melaeke investigation prop is ", investigation)
+    const classes = useStyles();
+    const [value, setValue] = useState(0);
+    const [showVitalDialog, setShowVitalDialog] = useState(false);
+    const [symptomsObject, setSymptomsObject] = useState([])
+    const [diagnosisObject, setDiagnosisObject] = useState([])
+    const [procedureObject, setProcedureObject] = useState([])
+    const [investigationObject, setInvestigationObject] = useState([])
+    const [visitOutcome, setVisitOutcome] = useState("")
+    const [selectedInvestigation, setSelectedInvestigation] = useState([])
+    const [extraDiagnosis, setExtraDiagnosis] = useState([])
+    const [extraSymptoms, setExtraSymptoms] = useState([])
+    const [extraInvestigations, setExtraInvestigations] = useState([])
+    const [extraProcedures, setExtraProcedures] = useState([])
+    const { selectedPatientId, selectPatientId } = useContext(PatientContext)
+    const [editVitals, setEditVitals] = useState(false)
+
+
+    let latestVitalEncounter = null;
+
+    if (patientObject) {
+        patientObject.encounters.forEach(encounter => {
+            if (encounter.encounterType.display === ENCOUNTER_TYPE_VITALS) {
+                //This is a vital encounter
+                if (latestVitalEncounter === null || (new Date(latestVitalEncounter.encounterDateTime) < new Date(encounter.encounterDateTime))) {
+                    latestVitalEncounter = encounter
+                }
+            }
+        })
+        console.log("encounters comparison", patientObject.encounters, latestVitalEncounter)
+    }
+
+    const getSelectedValues = (theArray) => {
+        let temp =  theArray.filter(obj => {
+            console.log(obj.selected)
+            return obj.selected;
+        })
+
+        console.log("filtered value is ",temp)
+    }
+
+    const handleSaveClick = () => {
+
+
+        console.log("Trying to save now", getSelectedValues(diagnosisObject))
+        //savePatientDiagnosys(selectedSymptoms)
+    }
+
+    const handleVitalDialogClose = () => {
+        setShowVitalDialog(false)
+    }
+
+    const handleVitalDialogOpen = () => {
+        setShowVitalDialog(true)
+    }
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue)
+    }
+
+    const getMembers = (objects) => {
+        let children = []
+        objects.forEach(item => {
+            if (item.selected)
+                item.setMembers.forEach(element => {
+                    let conceptClass = allConcepts[element.uuid].conceptClass.display
+
+                    let selected = false;
+                    let conceptClassFound = false;
+                    switch (conceptClass) {
+                        case CONCEPT_DIAGNOSIS: {
+                            selected = diagnosisObject.filter(obj => { return obj.uuid === element.uuid })[0].selected
+                            conceptClassFound = true;
+                            break;
+                        }
+                        case CONCEPT_INVESTIGATION: {
+                            selected = investigationObject.filter(obj => { return obj.uuid === element.uuid })[0].selected
+                            conceptClassFound = true;
+                            break;
+                        }
+                        case CONCEPT_PROCEDURE: {
+                            selected = procedureObject.filter(obj => { return obj.uuid === element.uuid })[0].selected
+                            conceptClassFound = true;
+                            break;
+                        }
+                        case CONCEPT_SYMPTOPM: {
+                            selected = symptomsObject.filter(obj => { return obj.uuid === element.uuid })[0].selected
+                            conceptClassFound = true;
+                            break;
+                        } default: {
+                            break;
+                        }
+                    }
+                    if (conceptClassFound && !selected) {
+                        children.push(element)
+                    }
+                })
+        })
+
+        if (children.length > 0) {
+            let newArray = []
+            children.forEach(child => {
+                let concept = allConcepts[child.uuid]
+                child.display = concept.display
+                child.hidden = false
+                child.selected = false
+                child.checked = false
+            })
+            return children
+        }
+        return []
+    }
+
+
+    const handleInvestigationSelect = () => {
+        setExtraInvestigations(getMembers(investigationObject))
+    }
+
+    const handleInvestigationUnselect = (tests) => {
+        setExtraInvestigations(getMembers(investigationObject))
+    }
+
+    const handleDiagnosisSelect = (diagnosis) => {
+        let newDiagnosis = [...diagnosisObject];
+
+        newDiagnosis.forEach(diag=>{
+            diagnosis.forEach(diagn =>{
+                if(diag.uuid === diagn.uuid){
+                    diag.selected = true;
+                    diag.hidden = false;
+                }
+            })
+        })
+
+        setDiagnosisObject(newDiagnosis)
+        //setExtraDiagnosis(getMembers(diagnosisObject))
+    }
+
+    const handleDiagnosisUnselect = (diagnosis) => {
+        setExtraDiagnosis(getMembers(diagnosisObject))
+    }
+
+    const handleSymptomSelect = (symptoms) => {
+        setExtraSymptoms(getMembers(investigationObject))
+    }
+
+    const handleSymptomUnselect = (symptoms) => {
+        setExtraSymptoms(getMembers(symptomsObject))
+    }
+
+
+    const handleProcedureSelect = (procedure) => {
+        setExtraProcedures(getMembers(procedureObject))
+    }
+    const handleProcedureUnselect = (procedure) => {
+        setExtraProcedures(getMembers(procedureObject))
+    }
+
+    const handleVisitOutcomeChange = (event) => {
+        setVisitOutcome(event.target.value)
+    }
+
+    const handleExtraSelect = (value) => {
+        let conceptClass = allConcepts[value.uuid].conceptClass.display
+
+        switch (conceptClass) {
+            case CONCEPT_DIAGNOSIS: {
+
+                break;
+            }
+            case CONCEPT_INVESTIGATION: {
+                let newObj = [...investigationObject]
+                newObj.filter(obj => { return obj.uuid === value.uuid })[0].selected = true
+                setInvestigationObject(newObj);
+                break;
+            }
+            case CONCEPT_PROCEDURE: {
+
+                break;
+            }
+            case CONCEPT_SYMPTOPM: {
+                break;
+            } default: {
+                break;
+            }
+        }
+        setExtraInvestigations(getMembers(investigationObject))
+        setExtraDiagnosis(getMembers(diagnosisObject))
+        setExtraSymptoms(getMembers(symptomsObject))
+        setExtraProcedures(getMembers(procedureObject))
+    }
+
+
+    useEffect(() => {
+        loadPatientAndConcepts(selectedPatientId)
+    }, [])
+
+    const initializeObjects = (obj) => {
+        //using string to make a deep copy.
+        let newObj = JSON.parse(JSON.stringify(obj))
+        newObj.forEach((obj, i) => {
+            obj.hidden = false
+            obj.selected = false
+            obj.sortIndex = i
+            obj.checked = false
+
+            if (obj.display.startsWith('A') || obj.display.startsWith('B')) {
+                obj.hidden = true;
+            }
+        })
+
+        newObj.sort((a, b) => (a.display > b.display) ? 1 : -1)
+        return newObj
+    }
+
+    //initialize diagnosis object.
+    useEffect(() => {
+        if (diagnosis) {
+            setDiagnosisObject(initializeObjects(diagnosis));
+        }
+    }, [diagnosis])
+
+    //initialize symptoms object
+    useEffect(() => {
+        if (symptom) {
+            setSymptomsObject(initializeObjects(symptom))
+        }
+    }, [symptom])
+
+    useEffect(() => {
+        if (procedure) {
+            setProcedureObject(initializeObjects(procedure))
+        }
+    }, [procedure])
+
+    useEffect(() => {
+        if (investigation) {
+            setInvestigationObject(initializeObjects(investigation))
+        }
+    }, [investigation])
+
+
+
+    return (
+        /**
+         * TODO 
+         * make the Transfer lists in their own separate components so that reloading doesn't take that much time.
+         * 
+         */
+        <div className={classes.root}>
+            {!loadingPatient && patientObject ?
+                <>
+                    <Grid container spacing={3}>
+                        <Grid item xs={6}>
+                            <h2>{patientObject.person.display}</h2>
+                        </Grid>
+                        <Grid item xs={3}>
+                            <h2>{patientObject.person.gender === "M" ? "Male" : "Female"}</h2>
+                        </Grid>
+                        <Grid item xs={3}>
+                            <h2>{patientObject.identifiers[0].identifier}</h2>
+                        </Grid>
+                    </Grid>
+                    <br />
+                    <AppBar position="static">
+                        <Tabs value={value} variant="fullWidth" onChange={handleChange} aria-label="Tabs">
+                            <Tab label="Clinical notes" />
+                            <Tab label="Dashboard" />
+                        </Tabs>
+                    </AppBar>
+                    <TabPanel value={value} index={0}>
+                        <Dialog open={showVitalDialog}
+                            maxWidth="lg"
+                            onClose={handleVitalDialogClose}
+                            fullWidth
+                        >
+                            <DialogTitle id="vitalsDialogTitle" >
+                                <h3 style={{ margin: 0 }}>Vital Signs</h3>
+                                <Chip
+                                    label={`${patientObject.person.display}`} />
+                            </DialogTitle>
+
+                            <DialogContent dividers>
+                                <Grid container spacing={2}>
+                                    {
+                                        vitals.map(vital => {
+                                            let value = ""
+                                            if (latestVitalEncounter) {
+                                                latestVitalEncounter.obs.forEach(observation => {
+                                                    if (observation.display.startsWith(vital.display)) {
+                                                        console.log(observation, vital)
+                                                        value = observation.display.split(":")[1].trim()
+                                                        return;
+                                                    }
+                                                })
+                                            }
+                                            return (
+                                                <Grid item xs={12} sm={6} md={3} key={vital.uuid}>
+                                                    <Tooltip title={vital.display}>
+                                                        <TextField InputProps={{ readOnly: !editVitals }} id={vital.display} label={vital.display} value={value} />
+                                                    </Tooltip>
+
+                                                </Grid>
+                                            )
+                                        })
+
+                                    }
+                                </Grid>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={(() => {
+                                    console.log("editing vitals")
+                                    setEditVitals(false)
+                                })} >Edit</Button>
+                                <Button type="submit" color="primary">Save</Button>
+                            </DialogActions>
+
+                        </Dialog>
+                        <Button
+                            onClick={handleVitalDialogOpen}
+                        >
+                            Vitals
+                        </Button>
+                        <TransferList label="Diagnosis"
+                            options={diagnosisObject}
+                            extraOptions={extraDiagnosis}
+                            handleExtraSelect={handleExtraSelect}
+                            handleSelect={handleDiagnosisSelect}
+                            handleUnselect={handleDiagnosisUnselect}></TransferList>
+                        <br />
+                        <TransferList label="Symptoms"
+                            options={symptomsObject}
+                            handleExtraSelect={handleExtraSelect}
+                            extraOptions={extraSymptoms}
+                            handleSelect={handleSymptomSelect}
+                            handleUnselect={handleSymptomUnselect}>
+
+                        </TransferList>
+                        <br />
+                        <TransferList label="Investigation"
+                            extraOptions={extraInvestigations}
+                            options={investigationObject}
+                            handleExtraSelect={handleExtraSelect}
+                            handleSelect={handleInvestigationSelect}
+                            handleUnselect={handleInvestigationUnselect}
+                        ></TransferList>
+                        <br />
+                        <TransferList label="Procedure"
+                            extraOptions={extraProcedures}
+                            handleExtraSelect={handleExtraSelect}
+                            options={procedureObject}
+                            handleSelect={handleProcedureSelect}
+                            handleUnselect={handleProcedureUnselect}
+                        ></TransferList>
+                        <br />
+                        <hr />
+                        <h4>
+                            Oter Instructions:
+                        </h4>
+                        <TextareaAutosize aria-label="minimum height" width={400} minRows={2} />
+                        <h4>
+                            OPD Visit outcome:
+                        </h4>
+                        <RadioGroup row aria-label="OPD-visit-outcome" name="visitOutcome" value={visitOutcome} onChange={handleVisitOutcomeChange}>
+                            <FormControlLabel value="followUp" control={<Radio />} label="Follow up" />
+                            <FormControlLabel value="cured" control={<Radio />} label="Cured" />
+                            <FormControlLabel value="reviewed" control={<Radio />} label="Reviewed" />
+                            <FormControlLabel value="admit" control={<Radio />} label="Admit" />
+                        </RadioGroup>
+
+                        <Button
+                            onClick={handleSaveClick}
+                        >
+                            Save
+                        </Button>
+
+                    </TabPanel>
+                    <TabPanel value={value} index={1}>
+                        Dashboard
+                    </TabPanel></>
+                :
+                <>
+                    Loading patient
+                </>
+            }
+        </div>
+    )
+}
+
+
+const mapStateToProps = state => {
+    return {
+        patientObject: state.patient.patient,
+        loadingPatient: state.patient.loadingPatient,
+        symptom: state.concepts.symptom,
+        diagnosis: state.concepts.diagnosis,
+        procedure: state.concepts.procedure,
+        investigation: state.concepts.investigation,
+        vitals: state.concepts.vitals,
+        allConcepts: state.concepts.allConcepts
+    }
+}
+
+const mapDispatchToProps = {
+    loadPatientAndConcepts,
+    savePatientDiagnosys
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Patient);
