@@ -89,11 +89,11 @@ export default function TransferList({ options, handleSelect, handleUnselect, la
 
 
     const handleAllRight = () => {
-        let newOptions = [...options]
+        //let newOptions = [...options]
 
         let selectedOnes = []
 
-        newOptions.forEach(option => {
+        allOptions.forEach(option => {
             if (option.selected === false) {
                 if (
                     searchText === "" && option.hidden === false || (
@@ -101,53 +101,37 @@ export default function TransferList({ options, handleSelect, handleUnselect, la
                     )
                 ) {
                     selectedOnes.push(option)
-                    option.selected = true
-                    option.checked = false
                 }
             }
         })
-        setLeftLength(0);
+        //setLeftLength(0);
         //setRightLength(selectedOnes.length);
         //Inform parent of operation.
         handleSelect(selectedOnes);
 
-        setAllOptions(newOptions)
+        //setAllOptions(newOptions)
     };
 
     const handleAllLeft = () => {
-        let newOptions = [...options]
+        let unselectedItems = []
 
-        let selectedOnes = []
-
-        newOptions.forEach(option => {
+        allOptions.forEach(option => {
             if (option.selected === true) {
-                selectedOnes.push(option)
-                option.selected = false
-                option.checked = false
-
+                unselectedItems.push(option)
             }
         })
-        setRightLength(0);
         //setRightLength(selectedOnes.length);
         //Inform parent of operation.
-        handleSelect(selectedOnes);
-
-        setAllOptions(newOptions)
+        handleUnselect(unselectedItems);
     };
 
     const handleCheckedRight = () => {
-
-        let newOptions = [...allOptions]
-
         let selectedItems = []
-        newOptions.forEach(i => {
-            let item = newOptions[newOptions.indexOf(i)]
+        allOptions.forEach(item => {
             //check if it is on the left side. If it is not selected perform nothing.
             if (item.selected === false && item.checked === true) {
                 //select the item
                 selectedItems.push(item)
-                item.selected = true;
-                item.checked = false;
             }
         })
 
@@ -156,22 +140,15 @@ export default function TransferList({ options, handleSelect, handleUnselect, la
             //inform parent about change
             handleSelect(selectedItems)
         }
-        console.log("Melaeke selected items is ", selectedItems)
-        setAllOptions(newOptions)
     };
 
     const handleCheckedLeft = () => {
-        let newOptions = [...allOptions]
-
         let unselectedItems = []
 
-        newOptions.forEach(i => {
-            let item = newOptions[newOptions.indexOf(i)]
+        allOptions.forEach(item => {
             //filter out only selected and checked items
             if (item.selected === true && item.checked === true) {
                 unselectedItems.push(item)
-                item.selected = false;
-                item.checked = false;
             }
         })
 
@@ -179,8 +156,6 @@ export default function TransferList({ options, handleSelect, handleUnselect, la
             //inform parent about change
             handleUnselect(unselectedItems)
         }
-
-        setAllOptions(newOptions)
     };
 
     const handleSearchTextChange = (text) => {

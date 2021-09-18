@@ -28,3 +28,4 @@ export const ENCOUNTER_TYPE_PATIENT_HISTORY = "Patient History"
 export const ENCOUNTER_TYPE_DISCHARGE = "Discharge"
 export const ENCOUNTER_TYPE_CHECK_IN = "Check In"
 
+export const ANSWER_YES = "Yes"

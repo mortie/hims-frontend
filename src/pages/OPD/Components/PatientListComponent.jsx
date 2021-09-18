@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
 
 function PatientList({ getAllVisitsAction, loadingVisits, visits }) {
     const { location, changeLocation } = useContext(LocationContext)
-    const { selectedPatientId, selectPatientId } = useContext(PatientContext)
+    const { selectedVisit, selectVisit } = useContext(PatientContext)
 
     //Created a state variable here because it will not be used anywhere else. 
     const [searchText, setSearchText] = useState("");
@@ -54,19 +54,14 @@ function PatientList({ getAllVisitsAction, loadingVisits, visits }) {
         { field: 'time', hederName: "Time" }
     ]
 
-    const patients = [
-        { id: 'id1', name: "name1", gender: "male", patient: { patientId: "patientId1", patientName: "Pname1" } },
-        { id: 'id2', name: "name2", gender: "male", patient: { patientId: "patientId2", patientName: "Pname2" } },
-        { id: 'id3', name: "name3", gender: "male", patient: { patientId: "patientId3", patientName: "Pname3" } }
-    ]
 
     const handleSelectPatient = (selectedRow) => {
-        selectPatientId(selectedRow.id)
+        selectVisit(selectedRow.row)
     }
 
     return (
         <div>
-            {selectedPatientId===null ?
+            {selectedVisit===null ?
                 <>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} md={9}>

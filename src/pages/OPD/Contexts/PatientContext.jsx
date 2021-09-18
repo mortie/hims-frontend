@@ -7,13 +7,17 @@ import {
 export const PatientContext = createContext();
 
 const PatientContextProvider = (props) => {
-    const [selectedPatientId, setSelectedPatientId] = useState(null);
+    /**
+     * For the visit, id is the patient ID, 
+     * visit is the visit id.
+     */
+    const [selectedVisit, setSelectedVisit] = useState(null);
 
-    const selectPatientId = (patientId) => {
-        setSelectedPatientId(patientId)
+    const selectVisit = (visit) => {
+        setSelectedVisit(visit)
     }
 
-    const valuesToReturn = { selectedPatientId, selectPatientId }
+    const valuesToReturn = { selectedVisit, selectVisit }
 
     return (
         <PatientContext.Provider value={valuesToReturn}>

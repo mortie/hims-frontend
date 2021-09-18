@@ -7,6 +7,7 @@ import { loadPatientAndConcepts, savePatientDiagnosys } from '../../../actions/p
 import PropTypes from 'prop-types';
 import { PatientContext } from '../Contexts/PatientContext';
 import TransferList from './TransferListComponent';
+import renderOutcomeOptions from './OutcomeOptions';
 import { CONCEPT_DIAGNOSIS, CONCEPT_INVESTIGATION, CONCEPT_PROCEDURE, CONCEPT_SYMPTOPM, ENCOUNTER_TYPE_VITALS } from '../../../utils/constants';
 
 function TabPanel(props) {
@@ -56,7 +57,8 @@ function Patient({
     investigation,
     procedure,
     vitals,
-    allConcepts
+    allConcepts,
+    savePatientDiagnosys
 }) {
 
     console.log("Melaeke investigation prop is ", investigation)
@@ -73,7 +75,7 @@ function Patient({
     const [extraSymptoms, setExtraSymptoms] = useState([])
     const [extraInvestigations, setExtraInvestigations] = useState([])
     const [extraProcedures, setExtraProcedures] = useState([])
-    const { selectedPatientId, selectPatientId } = useContext(PatientContext)
+    const { selectedVisit, selectVisit } = useContext(PatientContext)
     const [editVitals, setEditVitals] = useState(false)
 
 
@@ -88,23 +90,23 @@ function Patient({
                 }
             }
         })
-        console.log("encounters comparison", patientObject.encounters, latestVitalEncounter)
     }
 
     const getSelectedValues = (theArray) => {
-        let temp =  theArray.filter(obj => {
-            console.log(obj.selected)
+        return theArray.filter(obj => {
             return obj.selected;
         })
-
-        console.log("filtered value is ",temp)
     }
 
     const handleSaveClick = () => {
-
-
-        console.log("Trying to save now", getSelectedValues(diagnosisObject))
-        //savePatientDiagnosys(selectedSymptoms)
+        let payload = {
+            selectedDiagnosis: getSelectedValues(diagnosisObject),
+            selectedSymptoms: getSelectedValues(symptomsObject),
+            selectedInvestigation: getSelectedValues(investigationObject),
+            selectedProcedures: getSelectedValues(procedureObject),
+            visit: selectedVisit
+        }
+        savePatientDiagnosys(payload)
     }
 
     const handleVitalDialogClose = () => {
@@ -173,48 +175,87 @@ function Patient({
     }
 
 
-    const handleInvestigationSelect = () => {
-        setExtraInvestigations(getMembers(investigationObject))
+    const handleInvestigationSelect = (investigations) => {
+        let newInvestigations = genericSelect({ theObject: investigationObject, selectedArray: investigations })
+
+        setInvestigationObject(newInvestigations)
+        setExtraSymptoms(getMembers(newInvestigations))
     }
 
-    const handleInvestigationUnselect = (tests) => {
-        setExtraInvestigations(getMembers(investigationObject))
+    const handleInvestigationUnselect = (investigations) => {
+        let newInvestigations = genericUnSelect({ theObject: investigationObject, selectedArray: investigations })
+
+        setInvestigationObject(newInvestigations)
+        setExtraSymptoms(getMembers(newInvestigations))
     }
 
-    const handleDiagnosisSelect = (diagnosis) => {
-        let newDiagnosis = [...diagnosisObject];
-
-        newDiagnosis.forEach(diag=>{
-            diagnosis.forEach(diagn =>{
-                if(diag.uuid === diagn.uuid){
-                    diag.selected = true;
-                    diag.hidden = false;
+    const genericSelect = ({ theObject, selectedArray }) => {
+        let newObj = [...theObject]
+        newObj.forEach(obj => {
+            selectedArray.forEach(selectedObj => {
+                if (obj.uuid === selectedObj.uuid) {
+                    obj.selected = true
                 }
             })
         })
 
+        return newObj
+    }
+
+
+    const genericUnSelect = ({ theObject, selectedArray }) => {
+        let newObj = [...theObject]
+        newObj.forEach(obj => {
+            selectedArray.forEach(selectedObj => {
+                if (obj.uuid === selectedObj.uuid) {
+                    obj.selected = false
+                }
+            })
+        })
+
+        return newObj
+    }
+
+    const handleDiagnosisSelect = (diagnosis) => {
+        let newDiagnosis = genericSelect({ theObject: diagnosisObject, selectedArray: diagnosis })
+
         setDiagnosisObject(newDiagnosis)
-        //setExtraDiagnosis(getMembers(diagnosisObject))
+        setExtraDiagnosis(getMembers(newDiagnosis))
     }
 
     const handleDiagnosisUnselect = (diagnosis) => {
+        let newDiagnosis = genericUnSelect({ theObject: diagnosisObject, selectedArray: diagnosis })
+
+        setDiagnosisObject(newDiagnosis)
         setExtraDiagnosis(getMembers(diagnosisObject))
     }
 
     const handleSymptomSelect = (symptoms) => {
-        setExtraSymptoms(getMembers(investigationObject))
+        let newSymptoms = genericSelect({ theObject: symptomsObject, selectedArray: symptoms })
+
+        setSymptomsObject(newSymptoms)
+        setExtraSymptoms(getMembers(newSymptoms))
     }
 
     const handleSymptomUnselect = (symptoms) => {
-        setExtraSymptoms(getMembers(symptomsObject))
+        let newSymptoms = genericUnSelect({ theObject: symptomsObject, selectedArray: symptoms })
+
+        setSymptomsObject(newSymptoms)
+        setExtraSymptoms(getMembers(newSymptoms))
     }
 
 
-    const handleProcedureSelect = (procedure) => {
-        setExtraProcedures(getMembers(procedureObject))
+    const handleProcedureSelect = (procedures) => {
+        let newProcedures = genericSelect({ theObject: procedureObject, selectedArray: procedures })
+
+        setProcedureObject(newProcedures)
+        setExtraProcedures(getMembers(newProcedures))
     }
-    const handleProcedureUnselect = (procedure) => {
-        setExtraProcedures(getMembers(procedureObject))
+    const handleProcedureUnselect = (procedures) => {
+        let newProcedures = genericUnSelect({ theObject: procedureObject, selectedArray: procedures })
+
+        setProcedureObject(newProcedures)
+        setExtraProcedures(getMembers(newProcedures))
     }
 
     const handleVisitOutcomeChange = (event) => {
@@ -253,7 +294,7 @@ function Patient({
 
 
     useEffect(() => {
-        loadPatientAndConcepts(selectedPatientId)
+        loadPatientAndConcepts(selectedVisit.id)
     }, [])
 
     const initializeObjects = (obj) => {
@@ -420,14 +461,22 @@ function Patient({
                         </h4>
                         <TextareaAutosize aria-label="minimum height" width={400} minRows={2} />
                         <h4>
-                            OPD Visit outcome:
+                            OPD Visit outcome*:
                         </h4>
                         <RadioGroup row aria-label="OPD-visit-outcome" name="visitOutcome" value={visitOutcome} onChange={handleVisitOutcomeChange}>
-                            <FormControlLabel value="followUp" control={<Radio />} label="Follow up" />
                             <FormControlLabel value="cured" control={<Radio />} label="Cured" />
+                            <FormControlLabel value="referred" control={<Radio />} label="Referred" />
                             <FormControlLabel value="reviewed" control={<Radio />} label="Reviewed" />
+                            <FormControlLabel value="followup" control={<Radio />} label="Follow up" />
+                            <FormControlLabel value="dead" control={<Radio />} label="Dead" />
                             <FormControlLabel value="admit" control={<Radio />} label="Admit" />
                         </RadioGroup>
+
+                        {visitOutcome &&
+                            <>
+                                {renderOutcomeOptions(visitOutcome)}
+                            </>
+                        }
 
                         <Button
                             onClick={handleSaveClick}

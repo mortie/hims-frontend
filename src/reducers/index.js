@@ -8,6 +8,7 @@ import concepts from "./conceptsReducer"
 import patient from "./patientReducer"
 import appointmentBlockWithTimeSlots from "./appointmentBlockWithTimeSlotReducer";
 import encounters from './encountersReducer'
+import patientHistory  from "./patientHistoryReducer";
 
 export default combineReducers({
   avatar,
@@ -18,5 +19,6 @@ export default combineReducers({
   visits,
   concepts,
   patient,
-  encounters
+  encounters,
+  patientHistory
 });

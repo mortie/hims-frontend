@@ -11,7 +11,7 @@ export class Concept {
     static conceptsByClass = {};
 
     static initConceptClasses = async () => {
-        const conceptsUrl = '/concept?v=custom:(uuid,display,conceptClass:(uuid,display),setMembers:(uuid))'
+        const conceptsUrl = '/concept?v=custom:(uuid,display,answers,datatype,conceptClass:(uuid,display),setMembers:(uuid))'
 
         let concepts = (await getAPI(conceptsUrl)).data.results
 

@@ -18,6 +18,10 @@ import {
     Encounter
 } from './Encounter'
 
+import {
+    PatientHistory
+} from './PatientHistory'
+
 
 
 export {
@@ -25,5 +29,6 @@ export {
     Visit,
     Concept,
     Patient,
-    Encounter
+    Encounter,
+    PatientHistory
 };
