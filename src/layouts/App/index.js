@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { connect } from "react-redux";
 import {
   Switch,
   Route,
@@ -13,25 +13,22 @@ import { logout, hasAccess, isLogin } from "../../utils";
 import { appRoutes as routes } from "../../routes";
 import { AppBar, SideBar, Footer } from "../../components";
 import styles from "./styles";
-import { getAPI, deleteAPI } from "../../services";
+import { deleteAPI } from "../../services";
 import { SESSION_TIME_OUT } from "../../utils/constants";
 
-import { addLocations } from "../../actions/locationActions";
+import { getAllLocationsAction } from "../../actions/locationActions";
 
 const useStyles = makeStyles(styles);
 
-function App({ ...rest }) {
-  const dispatch = useDispatch();
+function App({ getAllLocationsAction, ...rest }) {
   const classes = useStyles();
   const history = useHistory();
   const match = useRouteMatch();
   const [drawer, setDrawer] = useState(true);
 
   useEffect(() => {
-    getAPI("/location?v=custom:(uuid,display)")
-      .then((response) => dispatch(addLocations(response.data.results)))
-      .catch((error) => console.log(error));
-  }, [dispatch]);
+    getAllLocationsAction();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -100,4 +97,15 @@ function App({ ...rest }) {
   );
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    loadingLocations: state.locations.loadingLocations,
+    locations: state.locations.locations,
+  };
+};
+
+const mapDispatchToProps = {
+  getAllLocationsAction,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

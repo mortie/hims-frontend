@@ -94,7 +94,7 @@ export default function PrintPatientRegistration({ data }) {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell style={{ background: "red" }}>
+              <TableCell >
                 <Typography>PATIENT'S NAME</Typography>
               </TableCell>
               <TableCell colSpan={3}>
@@ -102,13 +102,13 @@ export default function PrintPatientRegistration({ data }) {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell style={{ background: "red" }}>
+              <TableCell >
                 <Typography>GENDER</Typography>
               </TableCell>
               <TableCell>
                 <Typography>{getGenderString(gender)}</Typography>
               </TableCell>
-              <TableCell style={{ background: "red" }}>
+              <TableCell >
                 <Typography>AGE</Typography>
               </TableCell>
               <TableCell>
@@ -116,13 +116,13 @@ export default function PrintPatientRegistration({ data }) {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell style={{ background: "red" }}>
+              <TableCell >
                 <Typography>DEPARTMENT NAME</Typography>
               </TableCell>
               <TableCell>
                 <Typography>{types[0].display}</Typography>
               </TableCell>
-              <TableCell style={{ background: "red" }}>
+              <TableCell >
                 <Typography>REPORTING PLACE</Typography>
               </TableCell>
               <TableCell>
@@ -130,13 +130,13 @@ export default function PrintPatientRegistration({ data }) {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell style={{ background: "red" }}>
+              <TableCell >
                 <Typography>DOCTOR NAME</Typography>
               </TableCell>
               <TableCell>
                 <Typography>{provider.person.display}</Typography>
               </TableCell>
-              <TableCell style={{ background: "red" }}>
+              <TableCell >
                 <Typography>REPORTING TIME</Typography>
               </TableCell>
               <TableCell>

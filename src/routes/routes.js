@@ -42,6 +42,21 @@ export const appRoutes = [
     layout: "/app",
   },
   {
+    path: "/online-appointments",
+    title: "Online Appointments",
+    roles: [
+      "System Developer",
+      "Organizational: Registration clerk",
+      "Application: Registers Patients",
+      "Application: Schedules appointments",
+      "Application: Sees appointment schedule",
+    ],
+    visibleOnSidebar: true,
+    icon: "fa fa-calendar-check",
+    component: PatientSearch,
+    layout: "/app",
+  },
+  {
     path: "/patient-registration",
     title: "Patient Registration",
     roles: [

@@ -26,6 +26,13 @@ import {
 import styles from "./styles";
 import AutocompleteComponent from "./components/AutocompleteComponent";
 import TextFieldComponent from "./components/TextFieldComponent";
+import {
+  HOSPITAL_DISTRICT,
+  HOSPITAL_NAME,
+  MPI_ID,
+  PATIENT_UPDATED,
+  PERSON_UPDATED,
+} from "../../utils/constants";
 
 const useStyles = makeStyles(styles);
 
@@ -575,19 +582,23 @@ export default function PatientRegistration() {
         ],
         attributes: [
           {
-            attributeType: "acd05df0-e499-4613-ab8f-818c5470c79e",
-            value: "Shimla Hospital",
+            attributeType: HOSPITAL_NAME,
+            value: "Deendyal Upadhyay Zonal Hospital",
           },
           {
-            attributeType: "64016214-2231-4cf2-9ae1-1c18d4dc1ec0",
+            attributeType: HOSPITAL_DISTRICT,
             value: "Shimla",
           },
           {
-            attributeType: "75f95cc0-aff4-4025-9f69-27029d186e95",
+            attributeType: PERSON_UPDATED,
             value: "PERNO",
           },
           {
-            attributeType: "4ea2ceb4-2edf-454f-af76-ef7e8d777901",
+            attributeType: PATIENT_UPDATED,
+            value: "PATNO",
+          },
+          {
+            attributeType: MPI_ID,
             value: "NA",
           },
           ...getAttributes(personAttributeTypes),

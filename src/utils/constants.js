@@ -29,3 +29,15 @@ export const ENCOUNTER_TYPE_DISCHARGE = "Discharge"
 export const ENCOUNTER_TYPE_CHECK_IN = "Check In"
 
 export const ANSWER_YES = "Yes"
+
+export const HOSPITAL_NAME =
+  process.env.NODE_ENV === "development"
+    ? "9fcb80cb-a417-4e6d-84dd-09355cee06fb"
+    : "acd05df0-e499-4613-ab8f-818c5470c79e";
+export const HOSPITAL_DISTRICT =
+  process.env.NODE_ENV === "development"
+    ? "97941f41-7377-4456-b999-a424ec904796"
+    : "64016214-2231-4cf2-9ae1-1c18d4dc1ec0";
+export const PERSON_UPDATED = "75f95cc0-aff4-4025-9f69-27029d186e95";
+export const PATIENT_UPDATED = "7317240c-13c9-4dc0-9c8c-7916d568fc47";
+export const MPI_ID = "4ea2ceb4-2edf-454f-af76-ef7e8d777901";
