@@ -6,7 +6,6 @@ import { useSnackbar } from "notistack";
 import {
   makeStyles,
   TextField,
-  Button,
   MenuItem,
   FormControl,
   FormHelperText,
@@ -23,6 +22,8 @@ import {
   LinearProgress,
   Tooltip,
 } from "@material-ui/core";
+import Button from '@mui/material/Button';
+
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -83,6 +84,18 @@ const createPatientList = (results) => {
       (encounter) => encounter.encounterType.display === "Vitals"
     );
 
+    const encountersHistory = result.encounters.filter(
+      (encounter) => encounter.encounterType.display === "Patient History"
+    );
+
+    encountersHistory.sort((a, b) =>
+      moment(a.encounterDatetime) > moment(b.encounterDatetime)
+        ? -1
+        : moment(a.encounterDatetime) < moment(b.encounterDatetime)
+        ? 1
+        : 0
+    );
+
     encounters.sort((a, b) =>
       moment(a.encounterDatetime) > moment(b.encounterDatetime)
         ? -1
@@ -105,14 +118,17 @@ const createPatientList = (results) => {
         <Button
           variant="text"
           size="small"
-          color="primary"
+          color= {encounters[0]?.uuid ? "success":"primary"}
           endIcon={encounters[0]?.uuid && <Check />}
         >
           Vitals
         </Button>
       ),
       history: (
-        <Button variant="text" color="primary">
+        <Button variant="text"
+          color={encountersHistory[0]?.uuid ? "success":"primary"}
+          endIcon={encountersHistory[0]?.uuid && <Check />}
+        >
           History
         </Button>
       ),
@@ -142,6 +158,7 @@ const col = [
     headerName: "Triage",
     type: "string",
     renderCell: (params) => params.value,
+    width: 120
   },
 
   {
@@ -149,6 +166,7 @@ const col = [
     headerName: "History",
     type: "string",
     renderCell: (params) => params.value,
+    width: 150
   },
 ];
 
