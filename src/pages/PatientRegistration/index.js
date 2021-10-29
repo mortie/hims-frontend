@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getAPI, postAPI } from "../../services/index";
+import { getAPI, postAPI,getaddressAPI } from "../../services/index";
 import { Autocomplete } from "@material-ui/lab";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/material.css";
@@ -10,6 +10,7 @@ import PrintPatientRegistration from "./components/PrintPatientRegistration";
 import AvailableTimeSlots from "./components/AvailableTimeSlots";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
+
 
 import {
   Paper,
@@ -62,6 +63,7 @@ export default function PatientRegistration() {
   const [personAttributeTypes, setPersonAttributeTypes] = useState();
   const [visitAttributeTypes, setVisitAttributeTypes] = useState();
   const [registrationSuccessData, setRegistrationSuccessData] = useState(null);
+  const [addressfields, setaddessfields]=useState();
 
   useEffect(() => {
     getAPI(
@@ -107,6 +109,32 @@ export default function PatientRegistration() {
       .catch((error) => {
         console.log(error);
       });
+
+    const getAddress = async () => {
+        const url = `/addresslist?address_name=address-hierarchy`;
+        try{
+          let address = (await getaddressAPI(url)).data;
+          return address;
+        }
+        catch(error)
+        {
+          return null;
+        }
+      //return patient
+
+    }
+    getAddress();
+
+    const fetchAddressData=  async () => {
+     
+      let fetchstateprovience=(await getAddress());
+      console.log(fetchstateprovience);
+      setaddessfields(fetchstateprovience);
+
+    }
+    fetchAddressData();
+
+
   }, []);
 
   function getStepContent(step) {
@@ -129,7 +157,7 @@ export default function PatientRegistration() {
           />
         ) : (
           <>
-            {stepsWithContent[step - 1].answers.map((element, index) => {
+            {stepsWithContent[step - 1].answers.map((element, index) => { 
               const { uuid, display, answers, datatype, synonyms, names } =
                 element;
 
@@ -219,105 +247,214 @@ export default function PatientRegistration() {
               }
 
               if (datatype.display === "Coded") {
-                return (
-                  <React.Fragment key={uuid}>
-                    <AutocompleteComponent
-                      display={display}
-                      labelName={getLabelName(names) || display}
-                      answers={answers}
-                      formErrors={formErrors}
-                      formValues={formValues}
-                      autoFocus={index === 0}
-                      classes={classes}
-                      onAutocompleteChange={onAutocompleteChange}
-                      validateAutocomplete={validateAutocomplete}
-                    />
-
-                    {formValues[display]?.datatype?.display === "Coded" && (
+                if(display === 'State' || display === 'District' || display === 'Town/City')
+                {
+                  const getactualadressdata=getSpecifiyFielddata(display,addressfields);
+                  return (
+      
+                    <React.Fragment key={uuid}>
                       <AutocompleteComponent
-                        display={formValues[display].display}
-                        labelName={
-                          getLabelName(formValues[display].names) ||
-                          formValues[display].display
-                        }
-                        answers={formValues[display].answers}
+                        display={display}
+                        labelName={getLabelName(names) || display}
+                        answers={getactualadressdata}
                         formErrors={formErrors}
                         formValues={formValues}
-                        autoFocus={true}
-                        classes={classes}
-                        onAutocompleteChange={onAutocompleteChange}
-                        validateAutocomplete={validateAutocomplete}
-                      />
-                    )}
-
-                    {formValues[display]?.datatype?.display === "Text" && (
-                      <TextFieldComponent
-                        display={formValues[display].display}
-                        labelName={
-                          getLabelName(formValues[display].names) ||
-                          formValues[display].display
-                        }
-                        formValues={formValues}
-                        formErrors={formErrors}
-                        classes={classes}
                         autoFocus={index === 0}
-                        onTextChange={onTextChange}
-                        validateText={validateText}
-                      />
-                    )}
-
-                    {formValues[formValues[display]?.display]?.datatype
-                      ?.display === "Coded" && (
-                      <AutocompleteComponent
-                        display={
-                          formValues[formValues[display]?.display]?.display
-                        }
-                        labelName={
-                          getLabelName(
-                            formValues[formValues[display]?.display]?.names
-                          ) || formValues[formValues[display]?.display]?.display
-                        }
-                        answers={
-                          formValues[formValues[display]?.display]?.answers
-                        }
-                        formErrors={formErrors}
-                        formValues={formValues}
-                        autoFocus={true}
                         classes={classes}
                         onAutocompleteChange={onAutocompleteChange}
                         validateAutocomplete={validateAutocomplete}
                       />
-                    )}
-
-                    {formValues[
-                      formValues[formValues[display]?.display]?.display
-                    ]?.datatype?.display === "Numeric" && (
-                      <TextFieldComponent
-                        display={
-                          formValues[
+                      
+                      {formValues[display]?.datatype?.display === "Coded" && (
+                       
+                        <AutocompleteComponent
+                          display={formValues[display].display}
+                          labelName={
+                            getLabelName(formValues[display].names) ||
+                            formValues[display].display
+                          }
+                          answers={formValues[display].answers}
+                          formErrors={formErrors}
+                          formValues={formValues}
+                          autoFocus={true}
+                          classes={classes}
+                          onAutocompleteChange={onAutocompleteChange}
+                          validateAutocomplete={validateAutocomplete}
+                        />
+                      )}
+  
+                      {formValues[display]?.datatype?.display === "Text" && (
+                        <TextFieldComponent
+                          display={formValues[display].display}
+                          labelName={
+                            getLabelName(formValues[display].names) ||
+                            formValues[display].display
+                          }
+                          formValues={formValues}
+                          formErrors={formErrors}
+                          classes={classes}
+                          autoFocus={index === 0}
+                          onTextChange={onTextChange}
+                          validateText={validateText}
+                        />
+                      )}
+  
+                      {formValues[formValues[display]?.display]?.datatype
+                        ?.display === "Coded" && (
+                        <AutocompleteComponent
+                          display={
                             formValues[formValues[display]?.display]?.display
-                          ]?.display
-                        }
-                        labelName={
-                          getLabelName(
+                          }
+                          labelName={
+                            getLabelName(
+                              formValues[formValues[display]?.display]?.names
+                            ) || formValues[formValues[display]?.display]?.display
+                          }
+                          answers={
+                            formValues[formValues[display]?.display]?.answers
+                          }
+                          formErrors={formErrors}
+                          formValues={formValues}
+                          autoFocus={true}
+                          classes={classes}
+                          onAutocompleteChange={onAutocompleteChange}
+                          validateAutocomplete={validateAutocomplete}
+                        />
+                      )}
+  
+                      {formValues[
+                        formValues[formValues[display]?.display]?.display
+                      ]?.datatype?.display === "Numeric" && (
+                        <TextFieldComponent
+                          display={
                             formValues[
                               formValues[formValues[display]?.display]?.display
-                            ]?.names
-                          ) ||
-                          formValues[
-                            formValues[formValues[display]?.display]?.display
-                          ]?.display
-                        }
-                        formValues={formValues}
+                            ]?.display
+                          }
+                          labelName={
+                            getLabelName(
+                              formValues[
+                                formValues[formValues[display]?.display]?.display
+                              ]?.names
+                            ) ||
+                            formValues[
+                              formValues[formValues[display]?.display]?.display
+                            ]?.display
+                          }
+                          formValues={formValues}
+                          formErrors={formErrors}
+                          classes={classes}
+                          autoFocus={index === 0}
+                          onTextChange={onTextChange}
+                          validateText={validateText}
+                        />
+                      )}
+                    </React.Fragment>
+                  );
+                }
+                else{
+                  return (
+      
+                    <React.Fragment key={uuid}>
+                      <AutocompleteComponent
+                        display={display}
+                        labelName={getLabelName(names) || display}
+                        answers={answers}
                         formErrors={formErrors}
-                        classes={classes}
+                        formValues={formValues}
                         autoFocus={index === 0}
-                        onTextChange={onTextChange}
-                        validateText={validateText}
+                        classes={classes}
+                        onAutocompleteChange={onAutocompleteChange}
+                        validateAutocomplete={validateAutocomplete}
                       />
-                    )}
-                  </React.Fragment>
-                );
+                      
+                      {formValues[display]?.datatype?.display === "Coded" && (
+                       
+                        <AutocompleteComponent
+                          display={formValues[display].display}
+                          labelName={
+                            getLabelName(formValues[display].names) ||
+                            formValues[display].display
+                          }
+                          answers={formValues[display].answers}
+                          formErrors={formErrors}
+                          formValues={formValues}
+                          autoFocus={true}
+                          classes={classes}
+                          onAutocompleteChange={onAutocompleteChange}
+                          validateAutocomplete={validateAutocomplete}
+                        />
+                      )}
+  
+                      {formValues[display]?.datatype?.display === "Text" && (
+                        <TextFieldComponent
+                          display={formValues[display].display}
+                          labelName={
+                            getLabelName(formValues[display].names) ||
+                            formValues[display].display
+                          }
+                          formValues={formValues}
+                          formErrors={formErrors}
+                          classes={classes}
+                          autoFocus={index === 0}
+                          onTextChange={onTextChange}
+                          validateText={validateText}
+                        />
+                      )}
+  
+                      {formValues[formValues[display]?.display]?.datatype
+                        ?.display === "Coded" && (
+                        <AutocompleteComponent
+                          display={
+                            formValues[formValues[display]?.display]?.display
+                          }
+                          labelName={
+                            getLabelName(
+                              formValues[formValues[display]?.display]?.names
+                            ) || formValues[formValues[display]?.display]?.display
+                          }
+                          answers={
+                            formValues[formValues[display]?.display]?.answers
+                          }
+                          formErrors={formErrors}
+                          formValues={formValues}
+                          autoFocus={true}
+                          classes={classes}
+                          onAutocompleteChange={onAutocompleteChange}
+                          validateAutocomplete={validateAutocomplete}
+                        />
+                      )}
+  
+                      {formValues[
+                        formValues[formValues[display]?.display]?.display
+                      ]?.datatype?.display === "Numeric" && (
+                        <TextFieldComponent
+                          display={
+                            formValues[
+                              formValues[formValues[display]?.display]?.display
+                            ]?.display
+                          }
+                          labelName={
+                            getLabelName(
+                              formValues[
+                                formValues[formValues[display]?.display]?.display
+                              ]?.names
+                            ) ||
+                            formValues[
+                              formValues[formValues[display]?.display]?.display
+                            ]?.display
+                          }
+                          formValues={formValues}
+                          formErrors={formErrors}
+                          classes={classes}
+                          autoFocus={index === 0}
+                          onTextChange={onTextChange}
+                          validateText={validateText}
+                        />
+                      )}
+                    </React.Fragment>
+                  );
+                }
               }
               return null;
             })}
@@ -366,7 +503,33 @@ export default function PatientRegistration() {
     const shortName = names.filter((name) => name.conceptNameType === "SHORT");
     return shortName.length ? shortName[0].display : null;
   }
-
+  function getSpecifiyFielddata(field,obj) {
+    if(field === 'State')
+    {
+      return [...obj.state_province];
+    }
+    else if(field === 'District')
+    {
+      let arr=[];
+      obj.state_province.map((elem)=>{
+      elem.county_district.map((items)=>{
+       arr.push(items);
+      });
+      });
+      return arr;
+    }
+    else{
+      let arrvillage=[];
+      obj.state_province.map((elem)=>{
+      elem.county_district.map((items)=>{
+       items.city_village.map((viallage)=>{
+        arrvillage.push(viallage);
+       });
+      });
+      });
+      return arrvillage;
+    }
+  }
   function getTimeSlots(type) {
     setSelectedTimeSlot(null);
     const fromDate = new Date();
@@ -407,7 +570,6 @@ export default function PatientRegistration() {
 
   function onEmailChange(e) {
     const { name, value } = e.target;
-
     setFormValues({
       ...formValues,
       [name]: value,

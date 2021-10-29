@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { updateSession } from "../utils/authentication";
-import { JSESSIONID, BASE_URL } from "../utils/constants";
+import { JSESSIONID, BASE_URL,ADRESSBASE_URL_API} from "../utils/constants";
 
 export function getAPI(endpoint, authorization = Cookies.get(JSESSIONID)) {
   updateSession();
@@ -11,6 +11,16 @@ export function getAPI(endpoint, authorization = Cookies.get(JSESSIONID)) {
     },
   };
   return axios.get(BASE_URL + endpoint, config);
+}
+
+export function getaddressAPI(endpoint, authorization = Cookies.get(JSESSIONID)) {
+  updateSession();
+  const config = {
+    headers: {
+      Authorization: authorization,
+    },
+  };
+  return axios.get(ADRESSBASE_URL_API + endpoint, config);
 }
 
 export function getImageAPI(endpoint, authorization = Cookies.get(JSESSIONID)) {
