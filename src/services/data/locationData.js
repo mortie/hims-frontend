@@ -11,7 +11,8 @@ export class Location {
     static getAll = async ({
         fields = [
             'uuid',
-            'display'
+            'display',
+            'tags'
         ]
     }) => {
         let locations = (await getAPI(

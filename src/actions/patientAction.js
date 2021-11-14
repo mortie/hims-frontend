@@ -15,7 +15,7 @@ import {
     PatientHistory,
     VitalSigns
 } from '../services/data/'
-import { ANSWER_YES } from "../utils/constants";
+import { ANSWER_YES, CONCEPT_OPD_VISIT_OUTCOME_UUID, VISIT_OUTCOME_ADMIT, VISIT_OUTCOME_DIED, VISIT_OUTCOME_FOLLOW_UP } from "../utils/constants";
 
 export const loadPatientAndConcepts = (patientId) => async (dispatch, getState) => {
     //We need to first dispatch the loading action so that we can notify user.
@@ -34,6 +34,7 @@ export const loadPatientAndConcepts = (patientId) => async (dispatch, getState) 
     let drug = await Concept.getDrugs()
     let investigation = await Concept.getInvestigations()
     let procedure = await Concept.getProcedures()
+    let visitOutcomes = await Concept.getVisitOutcomes();
     let allConcepts = await Concept.getAllConcepts()
 
     let vitals = await Concept.getVitals();
@@ -47,6 +48,7 @@ export const loadPatientAndConcepts = (patientId) => async (dispatch, getState) 
             investigation,
             procedure,
             vitals,
+            visitOutcomes,
             allConcepts
         }
     })
@@ -110,7 +112,17 @@ export const savePatientDiagnosys = (details) => async (dispatch, getState) => {
     addAnswer(payload.obs, details.selectedSymptoms)
     addAnswer(payload.obs, details.selectedInvestigation)
     addAnswer(payload.obs, details.selectedProcedures)
-    
+
+    payload.obs.push({ concept: CONCEPT_OPD_VISIT_OUTCOME_UUID, value: details.visitOutcomeDetails.visitOutcome.uuid })
+    if (details.visitOutcomeDetails.visitOutcome.display === VISIT_OUTCOME_DIED ||
+        details.visitOutcomeDetails.visitOutcome.display === VISIT_OUTCOME_FOLLOW_UP) {
+        payload.obs.push({ concept: details.visitOutcomeDetails.visitOutcome.uuid, value: details.visitOutcomeDetails.selectedDate })
+    }
+    if(details.visitOutcomeDetails.visitOutcome.display === VISIT_OUTCOME_ADMIT){
+        payload.obs.push({ concept: details.visitOutcomeDetails.visitOutcome.uuid, value: details.visitOutcomeDetails.selectedLocation })
+    }
+
+
     dispatch({
         type: SAVING_PATIENT_HISTORY,
         payload: payload

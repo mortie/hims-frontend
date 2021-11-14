@@ -10,7 +10,8 @@ const initialState = {
     procedure: null,
     investigation: null,
     drug: null,
-    vitals: null
+    vitals: null,
+    visitOutcomes: null
 };
 
 function conceptsReducer(state = initialState, action) {
@@ -25,6 +26,7 @@ function conceptsReducer(state = initialState, action) {
                 investigation: null,
                 drug: null,
                 vitals: null,
+                visitOutcomes: null
             };
             break;
         case CONCEPTS_LOADED:
@@ -37,7 +39,8 @@ function conceptsReducer(state = initialState, action) {
                 investigation: action.payload.investigation,
                 //drug: action.payload.finding,
                 vitals: action.payload.vitals,
-                allConcepts: action.payload.allConcepts
+                allConcepts: action.payload.allConcepts,
+                visitOutcomes: action.payload.visitOutcomes
             }
             break;
         default:

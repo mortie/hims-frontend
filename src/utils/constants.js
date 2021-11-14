@@ -20,6 +20,7 @@ export const CONCEPT_PROCEDURE = "Procedure"
 export const CONCEPT_INVESTIGATION = "Test"
 export const CONCEPT_DRUG = "Drug"
 export const CONCEPT_VITAL="Vital"
+export const CONCEPT_OPD_VISIT_OUTCOME_UUID = "2da0546f-c201-4885-8a99-b09317894adc"
 
 export const ENCOUNTER_TYPE_VITALS = "Vitals"
 export const ENCOUNTER_TYPE_VISIT_NOTE = "Visit Note"
@@ -27,6 +28,16 @@ export const ENCOUNTER_TYPE_VISIT_INFO = "Visit Info"
 export const ENCOUNTER_TYPE_PATIENT_HISTORY = "Patient History"
 export const ENCOUNTER_TYPE_DISCHARGE = "Discharge"
 export const ENCOUNTER_TYPE_CHECK_IN = "Check In"
+
+
+export const VISIT_OUTCOME_CURED = "Cured"
+export const VISIT_OUTCOME_REVIEWED = "Reviewed"
+export const VISIT_OUTCOME_DIED = "Died"
+export const VISIT_OUTCOME_FOLLOW_UP = "Follow Up"
+export const VISIT_OUTCOME_ADMIT = "Admit"
+
+export const LOCATION_OUTPATIENT_TAG = "OPD Location"
+export const LOCATION_INPATIENT_TAG = "IPD Location"
 
 export const ANSWER_YES = "Yes"
 

@@ -9,6 +9,7 @@ import { PatientContext } from '../Contexts/PatientContext';
 import TransferList from './TransferListComponent';
 import renderOutcomeOptions from './OutcomeOptions';
 import { CONCEPT_DIAGNOSIS, CONCEPT_INVESTIGATION, CONCEPT_PROCEDURE, CONCEPT_SYMPTOPM, ENCOUNTER_TYPE_VITALS } from '../../../utils/constants';
+import VisitOutcomeComponent from './VisitOutcomeComponent';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -69,12 +70,15 @@ function Patient({
     const [diagnosisObject, setDiagnosisObject] = useState([])
     const [procedureObject, setProcedureObject] = useState([])
     const [investigationObject, setInvestigationObject] = useState([])
-    const [visitOutcome, setVisitOutcome] = useState("")
+    
     const [selectedInvestigation, setSelectedInvestigation] = useState([])
     const [extraDiagnosis, setExtraDiagnosis] = useState([])
     const [extraSymptoms, setExtraSymptoms] = useState([])
     const [extraInvestigations, setExtraInvestigations] = useState([])
     const [extraProcedures, setExtraProcedures] = useState([])
+
+    const [visitOutcomeDetails, setVisitOutcomeDetails] = useState(null)
+
     const { selectedVisit, selectVisit } = useContext(PatientContext)
     const [editVitals, setEditVitals] = useState(false)
 
@@ -104,7 +108,8 @@ function Patient({
             selectedSymptoms: getSelectedValues(symptomsObject),
             selectedInvestigation: getSelectedValues(investigationObject),
             selectedProcedures: getSelectedValues(procedureObject),
-            visit: selectedVisit
+            visit: selectedVisit,
+            visitOutcomeDetails: visitOutcomeDetails
         }
         savePatientDiagnosys(payload)
     }
@@ -258,10 +263,6 @@ function Patient({
         setExtraProcedures(getMembers(newProcedures))
     }
 
-    const handleVisitOutcomeChange = (event) => {
-        setVisitOutcome(event.target.value)
-    }
-
     const handleExtraSelect = (value) => {
         let conceptClass = allConcepts[value.uuid].conceptClass.display
 
@@ -340,7 +341,6 @@ function Patient({
             setInvestigationObject(initializeObjects(investigation))
         }
     }, [investigation])
-
 
 
     return (
@@ -423,13 +423,6 @@ function Patient({
                         >
                             Vitals
                         </Button>
-                        <TransferList label="Diagnosis"
-                            options={diagnosisObject}
-                            extraOptions={extraDiagnosis}
-                            handleExtraSelect={handleExtraSelect}
-                            handleSelect={handleDiagnosisSelect}
-                            handleUnselect={handleDiagnosisUnselect}></TransferList>
-                        <br />
                         <TransferList label="Symptoms"
                             options={symptomsObject}
                             handleExtraSelect={handleExtraSelect}
@@ -439,13 +432,12 @@ function Patient({
 
                         </TransferList>
                         <br />
-                        <TransferList label="Investigation"
-                            extraOptions={extraInvestigations}
-                            options={investigationObject}
+                        <TransferList label="Diagnosis"
+                            options={diagnosisObject}
+                            extraOptions={extraDiagnosis}
                             handleExtraSelect={handleExtraSelect}
-                            handleSelect={handleInvestigationSelect}
-                            handleUnselect={handleInvestigationUnselect}
-                        ></TransferList>
+                            handleSelect={handleDiagnosisSelect}
+                            handleUnselect={handleDiagnosisUnselect}></TransferList>
                         <br />
                         <TransferList label="Procedure"
                             extraOptions={extraProcedures}
@@ -455,28 +447,24 @@ function Patient({
                             handleUnselect={handleProcedureUnselect}
                         ></TransferList>
                         <br />
+                        <TransferList label="Investigation"
+                            extraOptions={extraInvestigations}
+                            options={investigationObject}
+                            handleExtraSelect={handleExtraSelect}
+                            handleSelect={handleInvestigationSelect}
+                            handleUnselect={handleInvestigationUnselect}
+                        ></TransferList>
+                        <br />
                         <hr />
                         <h4>
                             Oter Instructions:
                         </h4>
                         <TextareaAutosize aria-label="minimum height" width={400} minRows={2} />
-                        <h4>
-                            OPD Visit outcome*:
-                        </h4>
-                        <RadioGroup row aria-label="OPD-visit-outcome" name="visitOutcome" value={visitOutcome} onChange={handleVisitOutcomeChange}>
-                            <FormControlLabel value="cured" control={<Radio />} label="Cured" />
-                            <FormControlLabel value="referred" control={<Radio />} label="Referred" />
-                            <FormControlLabel value="reviewed" control={<Radio />} label="Reviewed" />
-                            <FormControlLabel value="followup" control={<Radio />} label="Follow up" />
-                            <FormControlLabel value="dead" control={<Radio />} label="Dead" />
-                            <FormControlLabel value="admit" control={<Radio />} label="Admit" />
-                        </RadioGroup>
 
-                        {visitOutcome &&
-                            <>
-                                {renderOutcomeOptions(visitOutcome)}
-                            </>
-                        }
+                        <br/>
+
+                        <VisitOutcomeComponent setVisitOutcomeDetails={setVisitOutcomeDetails}></VisitOutcomeComponent>
+                        
 
                         <Button
                             onClick={handleSaveClick}
