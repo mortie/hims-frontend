@@ -7,6 +7,7 @@ export const BASE_URL =
     ? "https://ln3.hispindia.org/openmrs/ws/rest/v1"
     : "https://ln3.hispindia.org/openmrs/ws/rest/v1";
 
+/*Add Adress Hierarcy path provided by new api*/
 export const ADRESSBASE_URL_API=
 process.env.NODE_ENV === "development"
     ? "https://ln3.hispindia.org/openmrs/ws/hisp/rest"
