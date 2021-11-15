@@ -143,7 +143,7 @@ export const appRoutes = [
       "Application: Billing Administrator",
       "Application: Billing Clerk",
     ],
-    visibleOnSidebar: true,
+    visibleOnSidebar: false,
     icon: "fa fa-receipt",
     component: Billing,
     layout: "/app",
