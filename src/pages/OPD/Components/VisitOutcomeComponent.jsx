@@ -16,7 +16,7 @@ function VisitOutcome({ getAllLocationsAction, loadingLocations, locations, visi
     const [selectedDate, setSelectedDate] = useState("")
 
     const handleVisitOutcomeChange = (event) => {
-        console.log("melaeke vis visit outcomes are ",visitOutcomes)
+        console.log("melaeke vis visit outcomes are ", visitOutcomes)
         setVisitOutcome(visitOutcomes.answers.filter(element => element.display === event.target.value)[0])
         setSelectedDate("")
         setSelectedLocation(null)
@@ -24,7 +24,7 @@ function VisitOutcome({ getAllLocationsAction, loadingLocations, locations, visi
 
     useEffect(() => {
         //here validate if the visit outcome is valid or not.
-        setVisitOutcomeDetails({ visitOutcome, selectedLocation, selectedDate, valid:false })
+        setVisitOutcomeDetails({ visitOutcome, selectedLocation, selectedDate, valid: false })
     }, [visitOutcome, selectedLocation, selectedDate])
 
     return (
@@ -34,7 +34,7 @@ function VisitOutcome({ getAllLocationsAction, loadingLocations, locations, visi
             </h4>
             <RadioGroup row aria-label="OPD-visit-outcome" name="visitOutcome" value={visitOutcome ? visitOutcome.display : ""} onChange={handleVisitOutcomeChange}>
                 {
-                    visitOutcomes.answers.map(answer =>
+                    visitOutcomes.answers && visitOutcomes.answers.length > 0 && visitOutcomes.answers.map(answer =>
                         <FormControlLabel value={answer.display} control={<Radio />} label={answer.display} />
                     )
                 }
