@@ -4,8 +4,14 @@ export const JSESSIONID = "JSESSIONID";
 export const SESSION_TIME_OUT = 1 / 48;
 export const BASE_URL =
   process.env.NODE_ENV === "development"
-    ? "http://localhost:8080/openmrs/ws/rest/v1"
+    ? "https://ln3.hispindia.org/openmrs/ws/rest/v1"
     : "https://ln3.hispindia.org/openmrs/ws/rest/v1";
+
+/*Add Adress Hierarcy path provided by new api*/
+export const ADRESSBASE_URL_API=
+process.env.NODE_ENV === "development"
+    ? "https://ln3.hispindia.org/openmrs/ws/hisp/rest"
+    : "https://ln3.hispindia.org/openmrs/ws/hisp/rest";
 
 // Concepts
 export const HEIGHT = "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";

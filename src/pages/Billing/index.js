@@ -1,11 +1,15 @@
-import React from 'react'
+import React from 'react';
+import TabPanelComponent from './TabPanelComponent';
 
-function Billing() {
+
+
+function Billing(props) {
     return (
-        <div>
-            <h3>Billing Screen</h3>
-        </div>
-    )
+        <>
+     <TabPanelComponent></TabPanelComponent>
+     
+     </>
+    );
 }
 
-export default Billing
+export default Billing;
