@@ -736,10 +736,10 @@ export default function PatientRegistration() {
           {
             preferred: true,
             address1: formValues["Postal Address"],
-            cityVillage: formValues["Town/City"],
-            stateProvince: formValues["State"],
+            cityVillage: formValues["Town/City"].name,
+            stateProvince: formValues["State"].name,
             postalCode: formValues["Postal Code"],
-            countyDistrict: formValues["District"],
+            countyDistrict: formValues["District"].name,
           },
         ],
         attributes: [
