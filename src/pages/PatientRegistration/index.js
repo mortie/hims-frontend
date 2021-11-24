@@ -63,8 +63,10 @@ export default function PatientRegistration() {
   const [personAttributeTypes, setPersonAttributeTypes] = useState();
   const [visitAttributeTypes, setVisitAttributeTypes] = useState();
   const [registrationSuccessData, setRegistrationSuccessData] = useState(null);
-  const [addressfields, setaddessfields]=useState();
-
+  const [addressfields, setaddessfields]=useState([]);
+  const [districtfields, setdistrictfields]=useState([]);
+  const [cityfields, setcityfields]=useState([]);
+  const [stateisselected, setstateisselected]=useState(false);
   useEffect(() => {
     getAPI(
       `/concept?q="Registration Attribute"&v=custom:(answers:(display,answers:(uuid,display,datatype:(display),synonyms:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType)))))`
@@ -128,8 +130,8 @@ export default function PatientRegistration() {
     const fetchAddressData=  async () => {
      
       let fetchstateprovience=(await getAddress());
-      console.log(fetchstateprovience);
-      setaddessfields(fetchstateprovience);
+      console.log(fetchstateprovience.state_province);
+      setaddessfields([...fetchstateprovience.state_province]);
 
     }
     fetchAddressData();
@@ -247,110 +249,61 @@ export default function PatientRegistration() {
               }
 
               if (datatype.display === "Coded") {
-                if(display === 'State' || display === 'District' || display === 'Town/City')
+                
+                if(display === 'State')
                 {
-                  const getactualadressdata=getSpecifiyFielddata(display,addressfields);
                   return (
-      
                     <React.Fragment key={uuid}>
                       <AutocompleteComponent
                         display={display}
                         labelName={getLabelName(names) || display}
-                        answers={getactualadressdata}
+                        answers={addressfields}
                         formErrors={formErrors}
                         formValues={formValues}
                         autoFocus={index === 0}
                         classes={classes}
-                        onAutocompleteChange={onAutocompleteChange}
+                        onAutocompleteAddressChange={onAutocompleteAddressChange}
                         validateAutocomplete={validateAutocomplete}
-                      />
                       
-                      {formValues[display]?.datatype?.display === "Coded" && (
-                       
-                        <AutocompleteComponent
-                          display={formValues[display].display}
-                          labelName={
-                            getLabelName(formValues[display].names) ||
-                            formValues[display].display
-                          }
-                          answers={formValues[display].answers}
-                          formErrors={formErrors}
-                          formValues={formValues}
-                          autoFocus={true}
-                          classes={classes}
-                          onAutocompleteChange={onAutocompleteChange}
-                          validateAutocomplete={validateAutocomplete}
-                        />
-                      )}
-  
-                      {formValues[display]?.datatype?.display === "Text" && (
-                        <TextFieldComponent
-                          display={formValues[display].display}
-                          labelName={
-                            getLabelName(formValues[display].names) ||
-                            formValues[display].display
-                          }
-                          formValues={formValues}
-                          formErrors={formErrors}
-                          classes={classes}
-                          autoFocus={index === 0}
-                          onTextChange={onTextChange}
-                          validateText={validateText}
-                        />
-                      )}
-  
-                      {formValues[formValues[display]?.display]?.datatype
-                        ?.display === "Coded" && (
-                        <AutocompleteComponent
-                          display={
-                            formValues[formValues[display]?.display]?.display
-                          }
-                          labelName={
-                            getLabelName(
-                              formValues[formValues[display]?.display]?.names
-                            ) || formValues[formValues[display]?.display]?.display
-                          }
-                          answers={
-                            formValues[formValues[display]?.display]?.answers
-                          }
-                          formErrors={formErrors}
-                          formValues={formValues}
-                          autoFocus={true}
-                          classes={classes}
-                          onAutocompleteChange={onAutocompleteChange}
-                          validateAutocomplete={validateAutocomplete}
-                        />
-                      )}
-  
-                      {formValues[
-                        formValues[formValues[display]?.display]?.display
-                      ]?.datatype?.display === "Numeric" && (
-                        <TextFieldComponent
-                          display={
-                            formValues[
-                              formValues[formValues[display]?.display]?.display
-                            ]?.display
-                          }
-                          labelName={
-                            getLabelName(
-                              formValues[
-                                formValues[formValues[display]?.display]?.display
-                              ]?.names
-                            ) ||
-                            formValues[
-                              formValues[formValues[display]?.display]?.display
-                            ]?.display
-                          }
-                          formValues={formValues}
-                          formErrors={formErrors}
-                          classes={classes}
-                          autoFocus={index === 0}
-                          onTextChange={onTextChange}
-                          validateText={validateText}
-                        />
-                      )}
+                      />
+                    
                     </React.Fragment>
                   );
+                }
+                else if(display === 'District')
+                {
+                  return (
+                    <AutocompleteComponent
+                    display={display}
+                    labelName={getLabelName(names) || display}
+                    answers={districtfields}
+                    formErrors={formErrors}
+                    formValues={formValues}
+                    autoFocus={index === 0}
+                    classes={classes}
+                    onAutocompleteDistrictChange={onAutocompleteDistrictChange}
+                    validateAutocomplete={validateAutocomplete}
+                  />
+                  );
+                  
+                }
+                else if(display === 'Town/City')
+                {
+                  return (
+                    <AutocompleteComponent
+                    display={display}
+                    labelName={getLabelName(names) || display}
+                    answers={cityfields}
+                    formErrors={formErrors}
+                    formValues={formValues}
+                    autoFocus={index === 0}
+                    classes={classes}
+                    onAutocompleteChange={onAutocompleteChange}
+                    validateAutocomplete={validateAutocomplete}
+                   
+                  />
+                  );
+                  
                 }
                 else{
                   return (
@@ -503,33 +456,28 @@ export default function PatientRegistration() {
     const shortName = names.filter((name) => name.conceptNameType === "SHORT");
     return shortName.length ? shortName[0].display : null;
   }
-  function getSpecifiyFielddata(field,obj) {
-    if(field === 'State')
-    {
-      return [...obj.state_province];
-    }
-    else if(field === 'District')
-    {
-      let arr=[];
-      obj.state_province.map((elem)=>{
-      elem.county_district.map((items)=>{
-       arr.push(items);
-      });
-      });
-      return arr;
-    }
-    else{
-      let arrvillage=[];
-      obj.state_province.map((elem)=>{
-      elem.county_district.map((items)=>{
-       items.city_village.map((viallage)=>{
-        arrvillage.push(viallage);
-       });
-      });
-      });
-      return arrvillage;
-    }
-  }
+  // function getSpecifiyFielddata(field,obj) {
+  //   if(field === 'State')
+  //   {
+  //     return [...obj.state_province];
+  //   }
+  //   else if(field === 'District')
+  //   {
+     
+  //     return [...obj.state_province];
+  //   }
+  //   else{
+  //     let arrvillage=[];
+  //     obj.state_province.map((elem)=>{
+  //     elem.county_district.map((items)=>{
+  //      items.city_village.map((viallage)=>{
+  //       arrvillage.push(viallage);
+  //      });
+  //     });
+  //     });
+  //     return arrvillage;
+  //   }
+  // }
   function getTimeSlots(type) {
     setSelectedTimeSlot(null);
     const fromDate = new Date();
@@ -602,7 +550,34 @@ export default function PatientRegistration() {
 
     validateAutocomplete(display, newValue);
   }
-
+  function onAutocompleteAddressChange(display, newValue) {
+  
+    console.log(newValue);
+       setFormValues({ ...formValues, [display]: newValue });
+       setstateisselected(true);
+       if(newValue?.county_district)
+       {
+         setdistrictfields(newValue["county_district"]);
+       }
+       else{
+        
+       }
+     
+     validateAutocomplete(display, newValue);
+   }
+   function onAutocompleteDistrictChange(display, newValue) {
+  
+    console.log(newValue);
+       setFormValues({ ...formValues, [display]: newValue });
+       if(newValue?.city_village)
+       {
+         setcityfields(newValue["city_village"]);
+       }
+       else{
+        
+       }
+     validateAutocomplete(display, newValue);
+   }
   function onPhoneChange(value, data, event, formattedValue) {
     const { name } = event.target;
     // const rawValue = value.slice(data.dialCode.length);

@@ -12,7 +12,10 @@ function AutocompleteComponent({
   autoFocus,
   classes,
   onAutocompleteChange,
+  onAutocompleteAddressChange,
   validateAutocomplete,
+  onAutocompleteDistrictChange,
+  
 }) {
   const errors = formErrors[display] ? true : false;
   if(display === 'State')
@@ -25,7 +28,7 @@ function AutocompleteComponent({
           options={answers}
           getOptionLabel={(option) => option.name}
           onChange={(e, newValue) => {
-            onAutocompleteChange(display, newValue);
+            onAutocompleteAddressChange(display, newValue);
           }}
           onBlur={(e) => validateAutocomplete(display, formValues[display])}
           value={formValues[display]}
@@ -43,71 +46,73 @@ function AutocompleteComponent({
           )}
         />
       </GridItem>
+     
     </>
   );
           }
           else if(display === 'District')
           {
-          return (
-            <>
-              <GridItem item xs={12} sm={6} md={4}>
-                <Autocomplete
-                  id={display}
-                  options={answers}
-                  getOptionLabel={(option) => option.name}
-                  onChange={(e, newValue) => {
-                    onAutocompleteChange(display, newValue);
-                  }}
-                  onBlur={(e) => validateAutocomplete(display, formValues[display])}
-                  value={formValues[display]}
-                  getOptionSelected={(option, value) => option.name === value.name}
-                  className={classes.field}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      error={errors}
-                      helperText={formErrors[display]}
-                      label={labelName}
-                      variant="outlined"
-                      autoFocus={autoFocus}
-                    />
-                  )}
-                />
-              </GridItem>
-            </>
-          );
-                  }
-                  else if(display === 'Town/City')
-                  {
-                  return (
-                    <>
-                      <GridItem item xs={12} sm={6} md={4}>
-                        <Autocomplete
-                          id={display}
-                          options={answers}
-                          getOptionLabel={(option) => option.name}
-                          onChange={(e, newValue) => {
-                            onAutocompleteChange(display, newValue);
-                          }}
-                          onBlur={(e) => validateAutocomplete(display, formValues[display])}
-                          value={formValues[display]}
-                          getOptionSelected={(option, value) => option.name === value.name}
-                          className={classes.field}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              error={errors}
-                              helperText={formErrors[display]}
-                              label={labelName}
-                              variant="outlined"
-                              autoFocus={autoFocus}
-                            />
-                          )}
-                        />
-                      </GridItem>
-                    </>
-                  );
-                          }
+            return (
+              <>
+                <GridItem item xs={12} sm={6} md={4}>
+                  <Autocomplete
+                    id={display}
+                    options={answers}
+                    getOptionLabel={(option) => option.name}
+                    onChange={(e, newValue) => {
+                      onAutocompleteDistrictChange(display, newValue);
+                    }}
+                    onBlur={(e) => validateAutocomplete(display, formValues[display])}
+                    value={formValues[display]}
+                    getOptionSelected={(option, value) => option.name === value.name}
+                    className={classes.field}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        error={errors}
+                        helperText={formErrors[display]}
+                        label={labelName}
+                        variant="outlined"
+                        autoFocus={autoFocus}
+                      />
+                    )}
+                  />
+                </GridItem>
+              </>
+            );
+          }
+          else if(display === 'Town/City')
+          {
+            return (
+              <>
+                <GridItem item xs={12} sm={6} md={4}>
+                  <Autocomplete
+                    id={display}
+                    options={answers}
+                    getOptionLabel={(option) => option.name}
+                    onChange={(e, newValue) => {
+                      onAutocompleteChange(display, newValue);
+                    }}
+                    onBlur={(e) => validateAutocomplete(display, formValues[display])}
+                    value={formValues[display]}
+                    getOptionSelected={(option, value) => option.name === value.name}
+                    className={classes.field}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        error={errors}
+                        helperText={formErrors[display]}
+                        label={labelName}
+                        variant="outlined"
+                        autoFocus={autoFocus}
+                      />
+                    )}
+                  />
+                </GridItem>
+              </>
+            );
+          }
+         
           else{
             return (
               <>
