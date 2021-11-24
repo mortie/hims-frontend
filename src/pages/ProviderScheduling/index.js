@@ -147,7 +147,7 @@ export default function ProviderScheduling() {
     Promise.all(requests).then((responses) => {
       const provider = convertResponseData(responses[0].data.results);
       const service = convertResponseData(responses[1].data.results);
-      const appointmentBlockWithTimeSlot = convertAppointmentData(responses[2]);
+      const appointmentBlockWithTimeSlot = convertAppointmentData2(responses[2]);
 
       const resorce = resources;
       resorce.find((a) => a.fieldName === "types").instances = service;
@@ -183,7 +183,18 @@ export default function ProviderScheduling() {
     }));
   }
 
+  function convertAppointmentData2(response) {
+    let res = response.data.results;
+
+    res = res.filter(function(item) {
+      return item.provider !== null
+  })
+    
+    console.log(res);
+    return res.map((item) => getAppointmentDataObject(item));
+  }
   function convertAppointmentData(response) {
+    
     return response.data.results.map((item) => getAppointmentDataObject(item));
   }
 

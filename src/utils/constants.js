@@ -49,7 +49,7 @@ export const ANSWER_YES = "Yes"
 
 export const HOSPITAL_NAME =
   process.env.NODE_ENV === "development"
-    ? "9fcb80cb-a417-4e6d-84dd-09355cee06fb"
+    ? "acd05df0-e499-4613-ab8f-818c5470c79e"
     : "acd05df0-e499-4613-ab8f-818c5470c79e";
 export const HOSPITAL_DISTRICT =
   process.env.NODE_ENV === "development"

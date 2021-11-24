@@ -536,7 +536,7 @@ export default function PatientRegistration() {
     const toDate = new Date(
       fromDate.getFullYear(),
       fromDate.getMonth(),
-      fromDate.getDate(),
+      (fromDate.getDate()),
       23,
       59,
       59
@@ -550,7 +550,12 @@ export default function PatientRegistration() {
       )
         .then((response) => {
           setTimeSlotsLoading(false);
-          setTimeSlots(response.data.results);
+          let res = response.data.results;
+
+            res = res.filter(function(item) {
+              return item.appointmentBlock.provider !== null
+          })
+          setTimeSlots(res);
         })
         .catch((error) => {
           setTimeSlotsLoading(false);
@@ -746,10 +751,6 @@ export default function PatientRegistration() {
           {
             attributeType: HOSPITAL_NAME,
             value: "Deendyal Upadhyay Zonal Hospital",
-          },
-          {
-            attributeType: HOSPITAL_DISTRICT,
-            value: "Shimla",
           },
           {
             attributeType: PERSON_UPDATED,
