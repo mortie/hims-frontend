@@ -128,7 +128,7 @@ export default function PatientRegistration() {
     getAddress();
 
     const fetchAddressData=  async () => {
-     
+
       let fetchstateprovience=(await getAddress());
       console.log(fetchstateprovience.state_province);
       setaddessfields([...fetchstateprovience.state_province]);
@@ -159,7 +159,7 @@ export default function PatientRegistration() {
           />
         ) : (
           <>
-            {stepsWithContent[step - 1].answers.map((element, index) => { 
+            {stepsWithContent[step - 1].answers.map((element, index) => {
               const { uuid, display, answers, datatype, synonyms, names } =
                 element;
 
@@ -249,7 +249,7 @@ export default function PatientRegistration() {
               }
 
               if (datatype.display === "Coded") {
-                
+
                 if(display === 'State')
                 {
                   return (
@@ -264,9 +264,9 @@ export default function PatientRegistration() {
                         classes={classes}
                         onAutocompleteAddressChange={onAutocompleteAddressChange}
                         validateAutocomplete={validateAutocomplete}
-                      
+
                       />
-                    
+
                     </React.Fragment>
                   );
                 }
@@ -285,7 +285,7 @@ export default function PatientRegistration() {
                     validateAutocomplete={validateAutocomplete}
                   />
                   );
-                  
+
                 }
                 else if(display === 'Town/City')
                 {
@@ -300,14 +300,14 @@ export default function PatientRegistration() {
                     classes={classes}
                     onAutocompleteChange={onAutocompleteChange}
                     validateAutocomplete={validateAutocomplete}
-                   
+
                   />
                   );
-                  
+
                 }
                 else{
                   return (
-      
+
                     <React.Fragment key={uuid}>
                       <AutocompleteComponent
                         display={display}
@@ -320,9 +320,9 @@ export default function PatientRegistration() {
                         onAutocompleteChange={onAutocompleteChange}
                         validateAutocomplete={validateAutocomplete}
                       />
-                      
+
                       {formValues[display]?.datatype?.display === "Coded" && (
-                       
+
                         <AutocompleteComponent
                           display={formValues[display].display}
                           labelName={
@@ -338,7 +338,7 @@ export default function PatientRegistration() {
                           validateAutocomplete={validateAutocomplete}
                         />
                       )}
-  
+
                       {formValues[display]?.datatype?.display === "Text" && (
                         <TextFieldComponent
                           display={formValues[display].display}
@@ -354,7 +354,7 @@ export default function PatientRegistration() {
                           validateText={validateText}
                         />
                       )}
-  
+
                       {formValues[formValues[display]?.display]?.datatype
                         ?.display === "Coded" && (
                         <AutocompleteComponent
@@ -377,7 +377,7 @@ export default function PatientRegistration() {
                           validateAutocomplete={validateAutocomplete}
                         />
                       )}
-  
+
                       {formValues[
                         formValues[formValues[display]?.display]?.display
                       ]?.datatype?.display === "Numeric" && (
@@ -463,7 +463,7 @@ export default function PatientRegistration() {
   //   }
   //   else if(field === 'District')
   //   {
-     
+
   //     return [...obj.state_province];
   //   }
   //   else{
@@ -551,7 +551,7 @@ export default function PatientRegistration() {
     validateAutocomplete(display, newValue);
   }
   function onAutocompleteAddressChange(display, newValue) {
-  
+
     console.log(newValue);
        setFormValues({ ...formValues, [display]: newValue });
        setstateisselected(true);
@@ -560,13 +560,13 @@ export default function PatientRegistration() {
          setdistrictfields(newValue["county_district"]);
        }
        else{
-        
+
        }
-     
+
      validateAutocomplete(display, newValue);
    }
    function onAutocompleteDistrictChange(display, newValue) {
-  
+
     console.log(newValue);
        setFormValues({ ...formValues, [display]: newValue });
        if(newValue?.city_village)
@@ -574,7 +574,7 @@ export default function PatientRegistration() {
          setcityfields(newValue["city_village"]);
        }
        else{
-        
+
        }
      validateAutocomplete(display, newValue);
    }
@@ -773,6 +773,7 @@ export default function PatientRegistration() {
               reason: "New Registration",
               status: "Scheduled",
               timeSlot: selectedTimeSlot,
+              visit:visit.visitType,
             })
               .then((appointmentResponse) => {
                 setRegistrationSuccessData({
