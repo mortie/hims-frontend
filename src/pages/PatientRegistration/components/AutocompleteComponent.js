@@ -2,7 +2,7 @@ import React from "react";
 import { TextField } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import { GridItem } from "../../../components";
-
+import {District_Dropdown} from "../../../utils/constants"
 function AutocompleteComponent({
   display,
   labelName,
@@ -18,6 +18,10 @@ function AutocompleteComponent({
   
 }) {
   const errors = formErrors[display] ? true : false;
+  const [value, setValue] = React.useState(answers[0]);
+  const [districtvaluedrop, setdistrictvaluedrop] = React.useState(District_Dropdown==='Shimla'?answers[8]:answers[10]);
+  const [inputValue, setInputValue] = React.useState('');
+  //const [inputValuedstrict, setinputValuedstrict] = React.useState('');
   if(display === 'State')
   {
   return (
@@ -28,12 +32,21 @@ function AutocompleteComponent({
           options={answers}
           getOptionLabel={(option) => option.name}
           onChange={(e, newValue) => {
+            setValue(newValue);
             onAutocompleteAddressChange(display, newValue);
+            //setdistrictvaluedrop("")
+          }}
+         
+          inputValue={inputValue}
+          onInputChange={(event, newInputValue) => {
+            setInputValue(newInputValue);
           }}
           onBlur={(e) => validateAutocomplete(display, formValues[display])}
-          value={formValues[display]}
+          value={value}
           getOptionSelected={(option, value) => option.name === value.name}
           className={classes.field}
+          autoHighlight={true}
+        
           renderInput={(params) => (
             <TextField
               {...params}
@@ -42,6 +55,9 @@ function AutocompleteComponent({
               label={labelName}
               variant="outlined"
               autoFocus={autoFocus}
+              InputProps={{
+                readOnly: true,
+              }}
             />
           )}
         />
@@ -61,9 +77,14 @@ function AutocompleteComponent({
                     getOptionLabel={(option) => option.name}
                     onChange={(e, newValue) => {
                       onAutocompleteDistrictChange(display, newValue);
+                      setdistrictvaluedrop(newValue)
+                    }}
+                    inputValue={inputValue}
+                    onInputChange={(event, newInputValue) => {
+                      setInputValue(newInputValue);
                     }}
                     onBlur={(e) => validateAutocomplete(display, formValues[display])}
-                    value={formValues[display]}
+                    value={districtvaluedrop}
                     getOptionSelected={(option, value) => option.name === value.name}
                     className={classes.field}
                     renderInput={(params) => (

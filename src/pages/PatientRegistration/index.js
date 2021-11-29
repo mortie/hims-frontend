@@ -33,6 +33,7 @@ import {
   MPI_ID,
   PATIENT_UPDATED,
   PERSON_UPDATED,
+  District_Dropdown
 } from "../../utils/constants";
 
 const useStyles = makeStyles(styles);
@@ -45,6 +46,8 @@ const initialSate = {
   "Date of Birth": null,
   "Gender*": null,
   "Phone Number*": null,
+  "State" :"Himachal Pradesh",
+  "District":District_Dropdown
 };
 
 export default function PatientRegistration() {
@@ -132,6 +135,21 @@ export default function PatientRegistration() {
       let fetchstateprovience=(await getAddress());
       console.log(fetchstateprovience.state_province);
       setaddessfields([...fetchstateprovience.state_province]);
+      //setdistrictfields(fetchstateprovience.state_province['county_district']);fetchstateprovience.state_province
+      const newarr=fetchstateprovience.state_province.filter((item)=>{
+        if(item.selected)
+        {
+          setdistrictfields([...item.county_district]);
+        }
+      });
+      fetchstateprovience.state_province.map((item)=>{
+        item.county_district.map((items)=>{
+          if(items.name === District_Dropdown)
+          {
+            setcityfields(items.city_village)
+          }
+        });
+      });
 
     }
     fetchAddressData();
@@ -253,7 +271,7 @@ export default function PatientRegistration() {
                 if(display === 'State')
                 {
                   return (
-                    <React.Fragment key={uuid}>
+                    <React.Fragment>
                       <AutocompleteComponent
                         display={display}
                         labelName={getLabelName(names) || display}
@@ -716,10 +734,10 @@ export default function PatientRegistration() {
           {
             preferred: true,
             address1: formValues["Postal Address"],
-            cityVillage: formValues["Town/City"].name,
-            stateProvince: formValues["State"].name,
+            cityVillage: formValues["Town/City"]===null?"":formValues["Town/City"].name,
+            stateProvince: formValues["State"],
             postalCode: formValues["Postal Code"],
-            countyDistrict: formValues["District"].name,
+            countyDistrict: formValues["District"]===District_Dropdown?District_Dropdown:formValues["District"].name,
           },
         ],
         attributes: [
