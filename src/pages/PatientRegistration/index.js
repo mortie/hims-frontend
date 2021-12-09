@@ -778,8 +778,6 @@ export default function PatientRegistration() {
       attributes: getAttributes(visitAttributeTypes),
     };
 
-    console.log(patient);
-
     postAPI("/patient", patient)
       .then((patientResponse) => {
         visit.patient = patientResponse.data.uuid;

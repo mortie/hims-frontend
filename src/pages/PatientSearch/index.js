@@ -21,6 +21,7 @@ import {
 import { DataGrid } from "@material-ui/data-grid";
 import AddIcon from "@material-ui/icons/Add";
 import { GridContainer, GridItem } from "../../components/Grid";
+import {ADRESSBASE_URL_API} from "../../utils/constants"
 
 import CustomizedMenus from "./ActionButton";
 
@@ -631,7 +632,7 @@ export default function PatientSearch(props) {
             const headers = {
               Authorization: "Basic " + btoa(`${username}:${password}`),
             };
-            const url = `https://ln3.hispindia.org/openmrs/ws/hisp/rest/patient_search?name=${param}`;
+            const url = `${ADRESSBASE_URL_API}/patient_search?name=${param}`;
             axios
               .get(url, { headers: headers })
               .then((response) => {
@@ -777,7 +778,7 @@ export default function PatientSearch(props) {
           const headers = {
             Authorization: "Basic " + btoa(`${username}:${password}`),
           };
-          const url = `https://ln3.hispindia.org/openmrs/ws/hisp/rest/patient_search?name=${param}`;
+          const url = `${ADRESSBASE_URL_API}/patient_search?name=${param}`;
           axios
             .get(url, { headers: headers })
             .then((response) => {

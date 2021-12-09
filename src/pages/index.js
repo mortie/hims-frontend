@@ -10,7 +10,9 @@ import Radiology from "./Radiology";
 import SignIn from "./SignIn";
 import UserProfile from "./UserProfile";
 import ProviderScheduling from "./ProviderScheduling";
-import PatientRegistration from './PatientRegistration'
+import PatientRegistration from './PatientRegistration';
+import OnlinePatients from './OnlinePatients';
+import SystemAdmin from './SystemAdministration';
 
 export {
   Billing,
@@ -25,5 +27,7 @@ export {
   SignIn,
   UserProfile,
   ProviderScheduling,
-  PatientRegistration
+  PatientRegistration,
+  OnlinePatients,
+  SystemAdmin,
 };

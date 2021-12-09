@@ -11,6 +11,8 @@ import {
   UserProfile,
   ProviderScheduling,
   PatientRegistration,
+  OnlinePatients,
+  SystemAdmin
 } from "../pages";
 
 /**
@@ -53,7 +55,7 @@ export const appRoutes = [
     ],
     visibleOnSidebar: true,
     icon: "fa fa-calendar-check",
-    component: PatientSearch,
+    component: OnlinePatients,
     layout: "/app",
   },
   {
@@ -190,6 +192,21 @@ export const appRoutes = [
     visibleOnSidebar: true,
     icon: "fa fa-calendar-alt",
     component: ProviderScheduling,
+    layout: "/app",
+  },
+  {
+    path: "/system-administration",
+    title: "System Administration",
+    roles: [
+      "System Developer",
+      "Organizational: Registration clerk",
+      "Application: Registers Patients",
+      "Application: Schedules appointments",
+      "Application: Sees appointment schedule",
+    ],
+    visibleOnSidebar: true,
+    icon: "fa fa-calendar-alt",
+    component: SystemAdmin,
     layout: "/app",
   },
 ];

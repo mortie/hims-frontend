@@ -68,3 +68,16 @@ export function remapArrayWithField(array,fieldToMapWith){
     array[element[fieldToMapWith]]=element
   });
 }
+export async function statusAppointment(appointmentId,status) {
+  
+  const URL = `/onlineappointment/appointmentstatus?appointment_id=${appointmentId}&status=${status}`;
+  try {
+    const data = await postAPI(URL);
+    return data;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    console.log("finished");
+  }
+}
+
