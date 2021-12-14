@@ -15,8 +15,9 @@ function AutocompleteComponent({
   onAutocompleteAddressChange,
   validateAutocomplete,
   onAutocompleteDistrictChange,
-  
+
 }) {
+
   const errors = formErrors[display] ? true : false;
   const [value, setValue] = React.useState(answers[0]);
   const [districtvaluedrop, setdistrictvaluedrop] = React.useState(District_Dropdown==='Shimla'?answers[8]:answers[10]);
@@ -62,7 +63,7 @@ function AutocompleteComponent({
           )}
         />
       </GridItem>
-     
+
     </>
   );
           }
@@ -133,7 +134,7 @@ function AutocompleteComponent({
               </>
             );
           }
-         
+
           else{
             return (
               <>

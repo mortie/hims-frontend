@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
@@ -9,11 +9,17 @@ import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import EditIcon from '@material-ui/icons/Edit';
 import PrintIcon from '@material-ui/icons/Print';
 
+import PrintAction from "./PrintAction";
+import RevisitAction from "./RevisitAction";
+import axios from "axios";
+import { getAPI, postAPI,getaddressAPI } from "../../services/index";
+
+
 const StyledMenu = withStyles({
   paper: {
     border: '1px solid #d3d4d5',
     cursor:'pointer !important',
-  },
+  }
 })((props) => (
   <Menu
     elevation={0}
@@ -42,21 +48,106 @@ const StyledMenuItem = withStyles((theme) => ({
 }))(MenuItem);
 
 export default function CustomizedMenus(props) {
+
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [searchSuccessData, setSearchSuccessData] = useState(null);
+  const [searchRevisitData, setSearchRevisitData] = useState(null);
+
+  var [isPrintBoxOpen, setIsPrintBoxOpen] = useState(false);
+  var [isRevisitBoxOpen, setIsRevisitBoxOpen] = useState(false);
+
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
+          setIsPrintBoxOpen(false)
+
   };
 
-    const handleClose = () => {
-      
+  const handleClose = () => {
     setAnchorEl(null);
+    setIsPrintBoxOpen(false)
+
   };
 
-    const gotopage = (event) => {
-console.log("BUTTON CLICKED")
 
-    }
+  const onRevisit = () => {
+    setIsRevisitBoxOpen(false)
+
+  var printValues = props.patiendData.row
+  var username = "bhavana";
+  var password = "Admin123";
+  var uuid = printValues.uuid
+
+const headers =
+  {
+    Authorization: "Basic " + btoa(`${username}:${password}`),
+  };
+  const url1 = `https://ln3.hispindia.org/openmrs/ws/rest/v1/lastVisit/patient?patient=${uuid}`;
+  axios
+  .get(url1, { headers: headers })
+    .then((response) => {
+      var visitUuid = response.data.visitUuid;
+      const url2 = `https://ln3.hispindia.org/openmrs/ws/rest/v1/lastVisitAppointmentDeatils/patient?visit=${visitUuid}`;
+
+axios
+  .get(url2, { headers: headers })
+  .then((responseVisit) => {
+      setIsRevisitBoxOpen(true)
+      setSearchRevisitData({
+      ...searchRevisitData,
+      appointmentData: printValues,
+      visitData: responseVisit,
+    });
+      }).catch(function (error) {
+          console.log(error);
+      });
+
+
+      }).catch(function (error) {
+          console.log(error);
+      });
+
+  }
+
+  const onPrint = () => {
+  setIsPrintBoxOpen(false)
+
+  var printValues = props.patiendData.row
+  var username = "bhavana";
+  var password = "Admin123";
+  var uuid = printValues.uuid
+
+const headers =
+  {
+    Authorization: "Basic " + btoa(`${username}:${password}`),
+  };
+  const url1 = `https://ln3.hispindia.org/openmrs/ws/rest/v1/lastVisit/patient?patient=${uuid}`;
+  axios
+  .get(url1, { headers: headers })
+    .then((response) => {
+      var visitUuid = response.data.visitUuid;
+      const url2 = `https://ln3.hispindia.org/openmrs/ws/rest/v1/lastVisitAppointmentDeatils/patient?visit=${visitUuid}`;
+
+axios
+  .get(url2, { headers: headers })
+  .then((responseVisit) => {
+      setIsPrintBoxOpen(true)
+      setSearchSuccessData({
+      ...searchSuccessData,
+      appointmentData: printValues,
+      visitData: responseVisit,
+    });
+      }).catch(function (error) {
+          console.log(error);
+      });
+
+
+      }).catch(function (error) {
+          console.log(error);
+      });
+
+
+}
   return (
     <div>
       <Button
@@ -75,11 +166,11 @@ console.log("BUTTON CLICKED")
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
-        onClick={gotopage}      
+
       >
         <StyledMenuItem>
           <ListItemIcon>
-            <AddCircleOutlineIcon fontSize="small" className="AddCirclebtm" />
+            <AddCircleOutlineIcon fontSize="small" className="AddCirclebtm" onClick={onRevisit} />
           </ListItemIcon>
         </StyledMenuItem>
         <StyledMenuItem>
@@ -87,12 +178,20 @@ console.log("BUTTON CLICKED")
             <EditIcon fontSize="small" />
           </ListItemIcon>
         </StyledMenuItem>
-        <StyledMenuItem>
+        <StyledMenuItem onClick={onPrint}>
           <ListItemIcon>
             <PrintIcon fontSize="small" />
           </ListItemIcon>
         </StyledMenuItem>
       </StyledMenu>
+      {isPrintBoxOpen && searchSuccessData && (
+       <PrintAction data={searchSuccessData} />
+      )}
+      {isRevisitBoxOpen && searchRevisitData && (
+        <RevisitAction data={searchRevisitData} mlc={props.mlc} />
+     )}
+
+
     </div>
   );
 }
