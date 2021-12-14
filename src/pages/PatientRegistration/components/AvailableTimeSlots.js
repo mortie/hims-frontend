@@ -86,9 +86,9 @@ function AvailableTimeSlots({
           );
         })
       ) : (
-        <GridItem>
-          <Typography variant="h6">No Doctors Available</Typography>
-        </GridItem>
+
+          <Typography>No Doctors Available</Typography>
+
       )}
     </GridContainer>
   );

@@ -15,8 +15,9 @@ function AutocompleteComponent({
   onAutocompleteAddressChange,
   validateAutocomplete,
   onAutocompleteDistrictChange,
-  
+
 }) {
+
   const errors = formErrors[display] ? true : false;
   if(display === 'State')
   {
@@ -46,7 +47,7 @@ function AutocompleteComponent({
           )}
         />
       </GridItem>
-     
+
     </>
   );
           }
@@ -112,7 +113,7 @@ function AutocompleteComponent({
               </>
             );
           }
-         
+
           else{
             return (
               <>

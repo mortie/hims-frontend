@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
 import {
@@ -23,6 +23,8 @@ import AddIcon from "@material-ui/icons/Add";
 import { GridContainer, GridItem } from "../../components/Grid";
 
 import CustomizedMenus from "./ActionButton";
+import { getAPI, postAPI,getaddressAPI } from "../../services/index";
+
 
 import axios from "axios";
 import styles from "./styles";
@@ -31,6 +33,7 @@ import "./styles.css";
 const useStyles = makeStyles(styles);
 
 const createData = (
+  uuid,
   identifier,
   name,
   phone,
@@ -41,7 +44,7 @@ const createData = (
   action,
   id
 ) => {
-  return { identifier, name, phone, gender, age, address, lvd, action, id };
+  return { uuid,identifier, name, phone, gender, age, address, lvd, action, id };
 };
 
 export default function PatientSearch(props) {
@@ -79,8 +82,12 @@ export default function PatientSearch(props) {
   var [PhoneErrorMsj, setPhoneErrorMsj] = useState();
   var [NameErrorMsj, setNameErrorMsj] = useState();
   var [IdenErrorMsj, setIdenErrorMsj] = useState();
+  const [appointmentTypes, setAppointmentTypes] = useState([]);
+  const [patientCategoryTypes, setPatientCategoryTypes] = useState([]);
+  const [mlcResp, setMlcResp] = useState([]);
 
   const columns = [
+    { field: "uuid", hide:true },
     { field: "identifier", headerName: "Patiend ID", width: 120 },
     { field: "name", headerName: "Name", width: 200 },
     { field: "phone", headerName: "Phone", width: 115 },
@@ -116,7 +123,7 @@ export default function PatientSearch(props) {
       width: 100,
       renderCell: (params) => (
         <strong>
-          <CustomizedMenus patiendData={params} />
+          <CustomizedMenus patiendData={params} mlc = {mlcResp} />
         </strong>
       ),
     },
@@ -613,7 +620,7 @@ export default function PatientSearch(props) {
         } else {
           let param = firstNameValue;
           var username = "bhavana";
-          var password = "Test1234";
+          var password = "Admin123";
           param = checkData(
             param,
             firstNameValue,
@@ -644,6 +651,8 @@ export default function PatientSearch(props) {
                 for (let i = 0; i < response.data.length; i++) {
                   var addressrarr = [];
                   searchdatanew.push(response.data);
+                  console.log(" SEARCH DATA ", searchdatanew[0][i])
+                  let uuidID = searchdatanew[0][i]["uuid"];
                   let identifierid = searchdatanew[0][i]["identifier"];
                   let nameval = searchdatanew[0][i]["name"].toUpperCase();
                   let genval = searchdatanew[0][i]["gender"];
@@ -674,6 +683,7 @@ export default function PatientSearch(props) {
 
                   storedata.push(
                     createData(
+                      uuidID,
                       identifierid,
                       nameval,
                       phoneNo,
@@ -759,7 +769,7 @@ export default function PatientSearch(props) {
       } else {
         let param = firstNameValue;
         var username = "bhavana";
-        var password = "Test1234";
+        var password = "Admin123";
         param = checkData(
           param,
           firstNameValue,
@@ -792,6 +802,8 @@ export default function PatientSearch(props) {
               for (let i = 0; i < response.data.length; i++) {
                 var addressrarr = [];
                 searchdatanew.push(response.data);
+                console.log(" SEARCH DATA ",searchdatanew[0][i])
+                let uuidID = searchdatanew[0][i]["uuid"];
                 let identifierid = searchdatanew[0][i]["identifier"];
                 let nameval = searchdatanew[0][i]["name"].toUpperCase();
                 let genval = searchdatanew[0][i]["gender"];
@@ -821,6 +833,7 @@ export default function PatientSearch(props) {
 
                 storedata.push(
                   createData(
+                    uuidID,
                     identifierid,
                     nameval,
                     phoneNo,
@@ -928,6 +941,51 @@ export default function PatientSearch(props) {
     setErrors({ phoneData: true, nameData: true, identifierData: true });
     document.getElementById("searchForm").reset();
   };
+
+
+
+    useEffect(() => {
+
+
+    getAPI(
+      `/concept?q="Registration Attribute"&v=custom:(answers:(display,answers:(uuid,display,datatype:(display),synonyms:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType)))))`
+    )
+      .then((response) => {
+
+          var visitinfo = response.data.results[0].answers.map((item1, index) => {
+              if (item1.display == "Visit Info") {
+
+            var abc = item1.answers.map((item2, index) => {
+              if (item2.display == "Medico Legal Case*") {
+                  setMlcResp(item2.answers)
+              }
+            })
+              }
+              else if (item1.display == "Payment Info") {
+                var abc2 = item1.answers.map((item3, index) => {
+              if (item3.display == "Patient Category*") {
+                  setPatientCategoryTypes(item3.answers)
+              }
+            })
+
+              }
+             return item1
+         })
+
+      })
+      .catch((error) => console.log(error));
+
+
+
+
+
+        getAPI("/appointmentscheduling/appointmenttype?v=custom:(uuid,display)")
+            .then((response) => {
+                setAppointmentTypes(response.data.results);
+            })
+            .catch((error) => console.log(error));
+    }, []);
+
 
   return (
     <>

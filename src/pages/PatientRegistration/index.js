@@ -130,7 +130,6 @@ export default function PatientRegistration() {
     const fetchAddressData=  async () => {
 
       let fetchstateprovience=(await getAddress());
-      console.log(fetchstateprovience.state_province);
       setaddessfields([...fetchstateprovience.state_province]);
 
     }
@@ -552,7 +551,7 @@ export default function PatientRegistration() {
   }
   function onAutocompleteAddressChange(display, newValue) {
 
-    console.log(newValue);
+
        setFormValues({ ...formValues, [display]: newValue });
        setstateisselected(true);
        if(newValue?.county_district)
@@ -567,7 +566,6 @@ export default function PatientRegistration() {
    }
    function onAutocompleteDistrictChange(display, newValue) {
 
-    console.log(newValue);
        setFormValues({ ...formValues, [display]: newValue });
        if(newValue?.city_village)
        {
@@ -760,22 +758,26 @@ export default function PatientRegistration() {
       attributes: getAttributes(visitAttributeTypes),
     };
 
-    console.log(patient);
 
     postAPI("/patient", patient)
       .then((patientResponse) => {
+            console.log("Patient Values :",patientResponse);
+
         visit.patient = patientResponse.data.uuid;
         postAPI("/visit", visit)
           .then((visitResponse) => {
+                    console.log(" Visit Data :",visitResponse)
+
             postAPI("/appointmentscheduling/appointment", {
               appointmentType: formValues["Department*"].uuid,
               patient: patientResponse.data.uuid,
               reason: "New Registration",
               status: "Scheduled",
               timeSlot: selectedTimeSlot,
-              visit:visit.visitType,
+              visit:visitResponse.data.uuid,
             })
               .then((appointmentResponse) => {
+
                 setRegistrationSuccessData({
                   appointmentData: appointmentResponse.data,
                   visitData: visitResponse.data,
