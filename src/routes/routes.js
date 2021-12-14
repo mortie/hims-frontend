@@ -205,7 +205,7 @@ export const appRoutes = [
       "Application: Sees appointment schedule",
     ],
     visibleOnSidebar: true,
-    icon: "fa fa-calendar-alt",
+    icon: "fa fa-user",
     component: SystemAdmin,
     layout: "/app",
   },

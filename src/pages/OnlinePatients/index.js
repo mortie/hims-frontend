@@ -26,7 +26,25 @@ import "./styles.css";
 
 const useStyles = makeStyles(styles);
 
+const CustomLoadingOverlay = () => {
+  return (
+    <GridOverlay>
+      <div style={{ position: "absolute", top: 0, width: "100%" }}>
+        <LinearProgress />
+      </div>
+    </GridOverlay>
+  );
+};
 
+const CustomNoRowsOverlay = () => {
+  return (
+    <GridOverlay>
+      <Alert severity="info">
+        <strong>No records found.</strong>
+      </Alert>
+    </GridOverlay>
+  );
+};
   
 
 function searchOnKey(){
@@ -94,7 +112,7 @@ export default function InfiniteLoadingGrid() {
       width: 120,
       renderCell: (cellValues) => {  
         if(cellValues.row.appointmentStatus != "BOOKED"){
-          return "VISIED";
+          return "ARRIVED";
         }else{
              return <Button
         variant="contained"
@@ -109,60 +127,8 @@ export default function InfiniteLoadingGrid() {
     },
   }
   ];
-  const CustomLoadingOverlay = () => {
-  return (
-    <GridOverlay>
-      <div style={{ position: "absolute", top: 0, width: "100%" }}>
-        <LinearProgress />
-      </div>
-    </GridOverlay>
-  );
-};
+ 
 
-const CustomNoRowsOverlay = () => {
-  return (
-    <GridOverlay>
-      <Alert severity="info">
-        <strong>No records found.</strong>
-      </Alert>
-    </GridOverlay>
-  );
-};
-
-  function getPatient(id){
-    const url = "/patient/"+id+"?v=custom:(uuid,display)";
-      const patient = getAPI(url).then((response) => {
-       
-        var data = response.data
-        return data;
-      }); 
-      console.log(patient)
-      const results = JSON.stringify(patient);
-   return results;
-  }
-  //return patient
-  const getAttributes = (attributeTypes) => {
-    return attributeTypes
-      .map((element) => {
-        return (
-          element
-        );
-      })
-      .filter((element) => element && element);
-  };
-  const patientVisit = (patientId) =>{
-    getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
-    .then((response) => {
-      setVisits(response.data);
-      for(var i=0;i<=visits.length-1;i++){
-        console.log(visits[i]);
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-    
-  }
   
   const handleClick = (event, data) => {
 
@@ -204,8 +170,7 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
       console.log(error);
     });
     
-    event.target.innerText = "Visited";
-    event.target.style.color = "green"    
+    event.target.text = "Arrived";    
     return ;
   };
 
@@ -237,17 +202,16 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
             rows.push(rObj);
           }
           
-        
+          setLoading(false);
         setsearchData(rows);
-        setLoading(false);
-        return searchData;
       })
       .catch((error) => {
        
         console.log(error);
       });
    
-  }, []);
+      
+  },[]);
 
   return (
     <>
@@ -382,9 +346,9 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
       </Paper>
       <Paper style={{ marginTop: "2vh" }}>
       <DataGrid
-          rows={searchData}
-          columns={columns}            
           loading={loading}
+          rows={searchData}
+          columns={columns} 
           disableColumnMenu
           autoHeight
           rowHeight={40}
