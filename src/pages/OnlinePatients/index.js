@@ -47,28 +47,35 @@ const CustomNoRowsOverlay = () => {
 };
   
 
-function searchOnKey(){
-    
-}
+
 
 
 export default function InfiniteLoadingGrid() {
-  var [searchData, setsearchData] = useState([]);
+  
   const classes = useStyles();
   const [loading, setLoading] = React.useState(false);
   const [btnValue, setBtnValue]= React.useState('Check In');
   let [appointData, setAppointData]= React.useState([]);
+  let [filterappointData, setFilterAppointData]= React.useState([]);
   const [visitAttributeTypes, setVisitAttributeTypes] = useState();
   const [visits, setVisits] = useState([]);
+  var [searchDetails, setsearchDetails] = useState({
+    phone: "",
+    name: "",
+    age: "",
+    gender: "",
+  });
   
-  const fromDate = new Date();
+  const date = new Date();
+  const fromDate = new Date(
+    date.getFullYear(),
+      date.getMonth(),
+      (date.getDate()+2)
+  );
     const toDate = new Date(
-      fromDate.getFullYear(),
-      fromDate.getMonth(),
-      (fromDate.getDate()+2),
-      23,
-      59,
-      59
+      date.getFullYear(),
+      date.getMonth(),
+      (date.getDate()+5)
     );
     
   const columns = [
@@ -76,7 +83,7 @@ export default function InfiniteLoadingGrid() {
     { field: 'hospitalId', hide: true },
     { field: 'appointmentId', hide: true },
     { field: 'appointmentStatus', hide: true },
-    { field: "id", headerName: "No.", width: 120 },
+    { field: "id", headerName: "No.", width: 90 },
     { field: "name", headerName: "Name", width: 120 },
     { field: "phone", headerName: "Phone", width: 120 },
     {
@@ -111,8 +118,12 @@ export default function InfiniteLoadingGrid() {
       type: "string",
       width: 120,
       renderCell: (cellValues) => {  
-        if(cellValues.row.appointmentStatus != "BOOKED"){
-          return "ARRIVED";
+        if(cellValues.row.appointmentStatus !== "BOOKED"){
+          return <Button
+        variant="contained"
+      >
+       Arrived
+      </Button>
         }else{
              return <Button
         variant="contained"
@@ -128,10 +139,42 @@ export default function InfiniteLoadingGrid() {
   }
   ];
  
+function keyUpFun(e){
 
+  searchDetails[e.target.id] = e.target.value;
+}
+
+function resetOnKey(e){
   
+  setAppointData(filterappointData);
+  document.getElementById("searchForm").reset();
+}
+  function searchOnKey(e){
+   if(searchDetails["name"] !== ""){
+    appointData = appointData.filter( function (appointment) {
+      return appointment.name === searchDetails["name"];
+    })
+    setAppointData(appointData)
+   }
+   if(searchDetails["phone"] !== ""){
+    appointData = appointData.filter( function (appointment) {
+      return appointment.phone === "91"+searchDetails["phone"];
+    })
+    setAppointData(appointData)
+   }
+   if(searchDetails["age"] !== ""){
+    appointData = appointData.filter( function (appointment) {
+      return appointment.age === searchDetails["age"];
+    })
+    setAppointData(appointData)
+   }
+   else{
+    setAppointData(filterappointData);
+   }
+  
+  }
   const handleClick = (event, data) => {
-
+   
     let visitattributes = [
       {uuid: "724ce4fd-4908-4562-831e-c33d7a469539", display: "Patient Category*: Paid category*"},
       {uuid: "d70434d4-5f55-4e82-9903-41de9454049c", display: "Paid category*: General Category*"},
@@ -162,6 +205,8 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
           postAPI("/visit", visit)
             .then((visitResponse) => {
               console.log(visitResponse);
+              event.target.style.pointerEvents = "none";
+              event.target.innerHTML = "Arrived";
           })
       })
       
@@ -169,69 +214,69 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
     .catch((error) => {
       console.log(error);
     });
-    
-    event.target.text = "Arrived";    
+       
     return ;
   };
-
-  
-  React.useEffect(() => {
-   setLoading(true);
-    getAPI(
-      `/onlineappointment/onlineAppointments?&frdate=${fromDate.toISOString()}&todate=${toDate.toISOString()}&v=default`
-    )
-      .then((response) => {
-        var res = response.data;
-        
-        let rows = [];
-          for (let i = 0; i < res.appointments.length; i++) { 
-            let rObj = {}
-            rObj["id"] = (i+1);
-            rObj["uuid"] = res.appointments[i].patient_id;
-            rObj["appointmentId"] = res.appointments[i].appointment_id;
-            rObj["appointmentStatus"] = res.appointments[i].appointment_status;
-            rObj["hospitalId"] = res.appointments[i].hospital_appointment_id;
-            rObj["name"] = res.appointments[i].patient_name;
-            rObj["phone"] = res.appointments[i].patient_mobile;
-            rObj["gender"] = res.appointments[i].patient_gender;
-            rObj["age"] = res.appointments[i].patient_age;
-            rObj["district"]= res.appointments[i].district_name;
-            rObj["hospital"]= res.appointments[i].hospital_name;
-            rObj["appointmentTime"] = new Date(res.appointments[i].appointment_date).toLocaleTimeString();
-            
-            rows.push(rObj);
-          }
-          
-          setLoading(false);
-        setsearchData(rows);
-      })
-      .catch((error) => {
-       
-        console.log(error);
-      });
+  const createAppointmentList = (results) => {
+    const patientList = results.map((result,index) => {
    
+      return {
+        id: index+1,        
+        uuid: result.patient_id,
+        appointmentId:result.appointment_id,
+        appointmentStatus: result.appointment_status,
+        hospitalId:result.hospital_appointment_id,
+        name:result.patient_name,
+        phone: result.patient_mobile,
+        gender:result.patient_gender,
+        age:result.patient_age,
+        district:result.district_name,
+        hospital:result.hospital_name,
+        appointmentTime: new Date(result.appointment_date).toLocaleTimeString(),
+      };
+    });
+  
+    return patientList;
+  };
+ 
+  React.useEffect(() => {
+   setLoading(true); 
+   
+   getAPI(
+    `/onlineappointment/onlineAppointments?&frdate=${fromDate.toISOString()}&todate=${toDate.toISOString()}`
+      )
+    .then((response) => {
       
-  },[]);
+      const appointList = createAppointmentList(response.data.appointments);
+        setFilterAppointData(appointList);
+        setAppointData(appointList);
+        setLoading(false);
+      
+    })
+    .catch((error) => {
+     
+      console.log(error);
+    });
+   
+  },[false]);
 
   return (
     <>
     <Paper className={classes.paper}>
-        <form noValidate id="searchForm">
+        <form noValidate id="searchForm" >
           <GridContainer>
             <GridItem item xs={12} sm={6} md={3}>
-              <TextField
-                
-                name="firstName"
+              <TextField                
+                name={searchDetails["name"]}
                 variant="outlined"
                 margin="dense"
                 required
                 fullWidth
                 type="text"
-                id="firstName"
+                id="name"
                 label="Name"
-                autoFocus
-                onKeyUp={(e) => searchOnKey(e, "firstName", "press")}
                 className={classes.field}
+                onKeyUp={(e) => keyUpFun(e, "clicked")}
               />
             </GridItem>
             <GridItem item xs={12} sm={6} md={3}>
@@ -244,10 +289,10 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
                 label="Phone"
                 name="phone"
                 autoComplete="phone"
-                onKeyUp={(e) => searchOnKey(e, "phone", "press")}
                 value={classes.phone}
                 type="number"
                 className={classes.field}
+                onKeyUp={(e) => keyUpFun(e, "clicked")}
                 onInput={(e) => {
                   e.target.value = Math.max(0, parseInt(e.target.value))
                     .toString()
@@ -255,51 +300,30 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
                 }}
               />
             </GridItem>
-            <GridItem item xs={12} sm={6} md={3}>
-              <TextField
-               
-                variant="outlined"
-                fullWidth
-                margin="dense"
-                required
-                id="identifier"
-                label="Identifier"
-                name="identifier"
-                autoComplete="lname"
-                onKeyUp={(e) => searchOnKey(e, "identifier", "press")}
-                value={classes.identifier}
-                className={classes.field}
-              />
-            </GridItem>
+            
            
             <GridItem item xs={12} sm={6} md={3}>
               <GridContainer>
                 <GridItem item xs={12} sm={6} md={6}>
                   <TextField
-                    id="standard-number"
+                    id="age"
+                    name= "age"
                     variant="outlined"
                     fullWidth
                     margin="dense"
                     label="Age"
                     type="number"
+                    onKeyUp={(e) => keyUpFun(e, "clicked")}
                     className={classes.field}
-                    onKeyUp={(e) => searchOnKey(e, "age", "press")}
                   />
                 </GridItem>               
               </GridContainer>
             </GridItem>
             <GridItem item xs={12} sm={6} md={3}>
               <FormControl component="fieldset">
-                <FormLabel
-                  component="legend"
-                  style={{ marginBottom: "0px", fontSize: "12px" }}
-                >
-                  Gender
-                </FormLabel>
-                <RadioGroup
-                  aria-label="gender"
+                
+                <RadioGroup                  
                   value=""
-                  onChange={(e) => searchOnKey(e, "gender", "press")}
                   row
                 >
                   <FormControlLabel
@@ -312,11 +336,6 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
                     control={<Radio style={{ padding: "2px" }} />}
                     label="Male"
                   />
-                  <FormControlLabel
-                    value="O"
-                    control={<Radio style={{ padding: "2px" }} />}
-                    label="Other"
-                  />
                 </RadioGroup>
               </FormControl>
             </GridItem>
@@ -324,14 +343,14 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
               <Button
                 variant="contained"
                 color="primary"
-                //onClick={(e) => searchOnKey(e, { searchDetails }, "clicked")}
                 className={clsx(classes.button, classes.field)}
+                onClick={(e) => searchOnKey(e, "clicked")}
               >
                 Search
               </Button>
               <Button
                 variant="contained"
-                //onClick={(e) => resetOnKey(e, { searchDetails }, "clicked")}
+                onClick={(e) => resetOnKey(e, { searchDetails }, "clicked")}
                 className={classes.field}
               >
                 Reset
@@ -347,7 +366,7 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
       <Paper style={{ marginTop: "2vh" }}>
       <DataGrid
           loading={loading}
-          rows={searchData}
+          rows={appointData}
           columns={columns} 
           disableColumnMenu
           autoHeight
