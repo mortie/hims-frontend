@@ -70,12 +70,12 @@ export default function InfiniteLoadingGrid() {
   const fromDate = new Date(
     date.getFullYear(),
       date.getMonth(),
-      (date.getDate()+2)
+      (date.getDate()+1)
   );
     const toDate = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      (date.getDate()+5)
+      fromDate.getFullYear(),
+      fromDate.getMonth(),
+      (fromDate.getDate()+2)
     );
     
   const columns = [
@@ -174,7 +174,7 @@ function resetOnKey(e){
   
   }
   const handleClick = (event, data) => {
-   
+   if(event.target.innerHTML !== "Arrived"){
     let visitattributes = [
       {uuid: "724ce4fd-4908-4562-831e-c33d7a469539", display: "Patient Category*: Paid category*"},
       {uuid: "d70434d4-5f55-4e82-9903-41de9454049c", display: "Paid category*: General Category*"},
@@ -205,7 +205,7 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
           postAPI("/visit", visit)
             .then((visitResponse) => {
               console.log(visitResponse);
-              event.target.style.pointerEvents = "none";
+              //event.target.style.pointerEvents = "none";
               event.target.innerHTML = "Arrived";
           })
       })
@@ -214,7 +214,7 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
     .catch((error) => {
       console.log(error);
     });
-       
+  } 
     return ;
   };
   const createAppointmentList = (results) => {

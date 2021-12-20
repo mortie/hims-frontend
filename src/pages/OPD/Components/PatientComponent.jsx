@@ -3,8 +3,11 @@ import { useContext, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useEffect } from 'react';
 import { connect } from 'react-redux'
-import { loadPatientAndConcepts, savePatientDiagnosys } from '../../../actions/patientAction'
+import { loadPatientAndConcepts, savePatientDiagnosys,savePatientOrder } from '../../../actions/patientAction'
 import PropTypes from 'prop-types';
+
+import { useHistory } from "react-router-dom";
+import { PatientListContext } from '../Contexts/PatientListContext';
 import { PatientContext } from '../Contexts/PatientContext';
 import TransferList from './TransferListComponent';
 import renderOutcomeOptions from './OutcomeOptions';
@@ -59,7 +62,8 @@ function Patient({
     procedure,
     vitals,
     allConcepts,
-    savePatientDiagnosys
+    savePatientDiagnosys,
+    savePatientOrder
 }) {
 
     console.log("Melaeke investigation prop is ", investigation)
@@ -71,6 +75,7 @@ function Patient({
     const [procedureObject, setProcedureObject] = useState([])
     const [investigationObject, setInvestigationObject] = useState([])
     
+    const history = useHistory();
     const [selectedInvestigation, setSelectedInvestigation] = useState([])
     const [extraDiagnosis, setExtraDiagnosis] = useState([])
     const [extraSymptoms, setExtraSymptoms] = useState([])
@@ -95,7 +100,6 @@ function Patient({
             }
         })
     }
-
     const getSelectedValues = (theArray) => {
         return theArray.filter(obj => {
             return obj.selected;
@@ -103,6 +107,13 @@ function Patient({
     }
 
     const handleSaveClick = () => {
+        console.log(selectedVisit)
+        let orderpayload = {
+            patient: selectedVisit.id,
+            investigations: getSelectedValues(investigationObject),
+            procedures: getSelectedValues(procedureObject),
+        }
+        console.log(orderpayload)
         let payload = {
             selectedDiagnosis: getSelectedValues(diagnosisObject),
             selectedSymptoms: getSelectedValues(symptomsObject),
@@ -112,6 +123,9 @@ function Patient({
             visitOutcomeDetails: visitOutcomeDetails
         }
         savePatientDiagnosys(payload)
+        savePatientOrder(orderpayload);
+        
+    window.location.reload();
     }
 
     const handleVitalDialogClose = () => {
@@ -501,7 +515,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
     loadPatientAndConcepts,
-    savePatientDiagnosys
+    savePatientDiagnosys,
+    savePatientOrder
 }
 
 

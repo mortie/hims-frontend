@@ -22,6 +22,9 @@ import {
     PatientHistory
 } from './PatientHistory'
 
+import {
+    OrderGeneration
+} from './OrderGeneration'
 
 
 export {
@@ -30,5 +33,6 @@ export {
     Concept,
     Patient,
     Encounter,
-    PatientHistory
+    PatientHistory,
+    OrderGeneration
 };

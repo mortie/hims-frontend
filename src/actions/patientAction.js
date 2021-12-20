@@ -13,6 +13,7 @@ import {
     Encounter,
     Patient,
     PatientHistory,
+    OrderGeneration,
     VitalSigns
 } from '../services/data/'
 import { ANSWER_YES, CONCEPT_OPD_VISIT_OUTCOME_UUID, VISIT_OUTCOME_ADMIT, VISIT_OUTCOME_DIED, VISIT_OUTCOME_FOLLOW_UP } from "../utils/constants";
@@ -64,7 +65,7 @@ export const loadPatientAndConcepts = (patientId) => async (dispatch, getState) 
 
     let patientDetail = await Patient.getPatientWithId(patientId);
 
-    console.log("patient detail is ", patientDetail, encounterTypes)
+    //console.log("patient detail is ", patientDetail, encounterTypes)
 
     dispatch({
         type: PATIENT_LOADED,
@@ -94,7 +95,26 @@ const addAnswer = (arrayToAddTo, selectedConcepts) => {
         }
     })
 }
+export const savePatientOrder = (details) => async (dispatch) =>{
 
+    const investigationList = details.investigations.map((result) => {
+        return result.uuid;
+    })
+    const procedureList = details.procedures.map((result) => {
+        return result.uuid;
+    })
+
+    let payload = {
+        patient: details.patient,
+        investigations: investigationList,
+        procedures: procedureList,
+    }
+
+    let response = await OrderGeneration.saveOrder(payload);
+
+    console.log("response after saving orders is ", response)
+
+}
 export const savePatientDiagnosys = (details) => async (dispatch, getState) => {
 
 
