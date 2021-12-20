@@ -142,7 +142,21 @@ function AutocompleteComponent({
                   <Autocomplete
                     id={display}
                     options={answers}
-                    getOptionLabel={(option) => option.display}
+                    getOptionLabel={(option) => 
+                      {
+                        if(option.display ==="MLC Yes*" || option.display ==="Referred-Yes")
+                        {
+                          return "Yes";
+                        }
+                        else if(option.display === "MLC No" || option.display ==="Referred-No")
+                        {
+                          return "No";
+                        }
+                        else{
+                          return option.display;
+                        }
+                      }
+                    }
                     onChange={(e, newValue) => {
                       onAutocompleteChange(display, newValue);
                     }}

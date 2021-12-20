@@ -33,7 +33,8 @@ import {
   MPI_ID,
   PATIENT_UPDATED,
   PERSON_UPDATED,
-  District_Dropdown
+  District_Dropdown,
+  BASE_URL
 } from "../../utils/constants";
 
 const useStyles = makeStyles(styles);
@@ -152,8 +153,18 @@ export default function PatientRegistration() {
 
     }
     fetchAddressData();
-
-
+  //  const getshortnameData= async () => {
+  //   const url = "/conceptDetails/concept?concept=f2230777-cb6e-40f9-a249-ce262ed4a62c";
+  //   try{
+  //     let responsedata = (await getAPI(url)).data;
+  //     console.log(responsedata.shortName);
+  //   }
+  //   catch(error)
+  //   {
+  //     return null;
+  //   }
+  //  }
+  //  getshortnameData();
   }, []);
 
   function getStepContent(step) {
@@ -622,17 +633,40 @@ export default function PatientRegistration() {
 
   function validateText(e) {
     const { name, value } = e.target;
+    console.log(e.target);
     if (name.slice(-1) === "*") {
       if (!value || value === "") {
         setFormErrors({ ...formErrors, [name]: "This field is required" });
-      } else {
+      }
+      else {
         const errors = formErrors;
         delete errors[name];
         setFormErrors(errors);
       }
+      if(name === "First Name*" || name === "Last Name*" || name === "Relative Name*")
+      {
+        validateName(name,value);
+      }
+      if(name === "Aadhar*")
+      {
+        validateAadhar(name,value);
+      }
     }
   }
-
+  function validateName(name,value)
+  {
+   const regexname = /^[a-zA-Z\s]*$/;
+     if (!regexname.test(value)) {
+        setFormErrors({ ...formErrors, [name]: "Only alphabets are allowed" });
+      }
+  }
+  function validateAadhar(name,value)
+  {
+  
+     if (value.length  > 12 || value.length < 12) {
+        setFormErrors({ ...formErrors, [name]: "Only 12 digits are allowed" });
+      }
+  }
   function validateEmail(e) {
     const { name, value } = e.target;
     const regex = /^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]+$/;
