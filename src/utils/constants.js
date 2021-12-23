@@ -2,6 +2,10 @@ export const USER_TOKEN = "authenticatedUser";
 export const REMEMBER_ME = "REMEMBER_ME";
 export const JSESSIONID = "JSESSIONID";
 export const SESSION_TIME_OUT = 1 / 48;
+export const MPI_URL =
+  process.env.NODE_ENV === "development"
+    ? "https://ln3.hispindia.org/openmrs_mpi/ws/rest/v1"
+    : "https://ln3.hispindia.org/openmrs_mpi/ws/rest/v1";
 export const BASE_URL =
   process.env.NODE_ENV === "development"
     ? "https://ln3.hispindia.org/openmrs/ws/rest/v1"
@@ -58,4 +62,5 @@ export const HOSPITAL_DISTRICT =
 export const PERSON_UPDATED = "75f95cc0-aff4-4025-9f69-27029d186e95";
 export const PATIENT_UPDATED = "7317240c-13c9-4dc0-9c8c-7916d568fc47";
 export const MPI_ID = "4ea2ceb4-2edf-454f-af76-ef7e8d777901";
-export const District_Dropdown="Shimla";
+export const District_Dropdown= "Shimla";
+export const REGISTRATION_HOSPITAL_NAME = "Deendyal Upadhyay Zonal Hospital";

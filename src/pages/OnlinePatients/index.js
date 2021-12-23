@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { GridOverlay, DataGrid } from "@material-ui/data-grid";
-import { getAPI } from "../../services/index";
+import { getAPI,getOnlineAPI } from "../../services/index";
 import {  postAPI,statusAppointment } from "../../services/index";
 import { Alert } from "@material-ui/lab";
 import clsx from "clsx";
+import {District_Dropdown} from "../../utils/constants"
 import {
   Button,
   TextField,
@@ -75,7 +76,7 @@ export default function InfiniteLoadingGrid() {
     const toDate = new Date(
       fromDate.getFullYear(),
       fromDate.getMonth(),
-      (fromDate.getDate()+2)
+      (fromDate.getDate()+1)
     );
     
   const columns = [
@@ -188,7 +189,7 @@ function resetOnKey(e){
     };
 
     
-getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
+    getOnlineAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
     .then((response) => {
       let visits = response.data.visits;
       let firstVisitId = visits[visits.length-1].uuid;
@@ -242,11 +243,17 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
   React.useEffect(() => {
    setLoading(true); 
    
-   getAPI(
+   getOnlineAPI(
     `/onlineappointment/onlineAppointments?&frdate=${fromDate.toISOString()}&todate=${toDate.toISOString()}`
       )
     .then((response) => {
-      
+      console.log(response.data.appointments)
+      response.data.appointments = response.data.appointments.filter( function (appointment) {
+        return appointment.appointment_status === "BOOKED";
+      })
+      response.data.appointments = response.data.appointments.filter( function (appointment) {
+        return appointment.district_name === District_Dropdown;
+      })
       const appointList = createAppointmentList(response.data.appointments);
         setFilterAppointData(appointList);
         setAppointData(appointList);
@@ -320,24 +327,7 @@ getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
               </GridContainer>
             </GridItem>
             <GridItem item xs={12} sm={6} md={3}>
-              <FormControl component="fieldset">
-                
-                <RadioGroup                  
-                  value=""
-                  row
-                >
-                  <FormControlLabel
-                    value="F"
-                    control={<Radio style={{ paddingRight: "2px" }} />}
-                    label="Female"
-                  />
-                  <FormControlLabel
-                    value="M"
-                    control={<Radio style={{ padding: "2px" }} />}
-                    label="Male"
-                  />
-                </RadioGroup>
-              </FormControl>
+             
             </GridItem>
             <GridItem item xs={12} sm={6} md={3}>
               <Button

@@ -28,13 +28,12 @@ import styles from "./styles";
 import AutocompleteComponent from "./components/AutocompleteComponent";
 import TextFieldComponent from "./components/TextFieldComponent";
 import {
-  HOSPITAL_DISTRICT,
+  REGISTRATION_HOSPITAL_NAME,
   HOSPITAL_NAME,
   MPI_ID,
   PATIENT_UPDATED,
   PERSON_UPDATED,
   District_Dropdown,
-  BASE_URL
 } from "../../utils/constants";
 
 const useStyles = makeStyles(styles);
@@ -775,7 +774,7 @@ export default function PatientRegistration() {
         attributes: [
           {
             attributeType: HOSPITAL_NAME,
-            value: "Deendyal Upadhyay Zonal Hospital",
+            value: REGISTRATION_HOSPITAL_NAME,
           },
           {
             attributeType: PERSON_UPDATED,

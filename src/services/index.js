@@ -1,8 +1,17 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { updateSession } from "../utils/authentication";
-import { JSESSIONID, BASE_URL,ADRESSBASE_URL_API} from "../utils/constants";
+import { JSESSIONID, BASE_URL,ADRESSBASE_URL_API,MPI_URL} from "../utils/constants";
 
+export function getOnlineAPI(endpoint, authorization = Cookies.get(JSESSIONID)) {
+  updateSession();
+  const config = {
+    headers: {
+      Authorization: authorization,
+    },
+  };
+  return axios.get(MPI_URL + endpoint, config);
+}
 export function getAPI(endpoint, authorization = Cookies.get(JSESSIONID)) {
   updateSession();
   const config = {
