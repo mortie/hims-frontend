@@ -75,12 +75,9 @@ function Labtest(props) {
     setOpen(false);
   };
   const saveValues = (e) => {
-    
-    
     e.preventDefault();
     const data = new FormData(e.target);
     console.log(formData);
-    let conMap = [];
     let concepts = {};
     for(var i=0;i<=formData.length-1;i++){
       var ename = formData[i].uuid;
@@ -99,7 +96,6 @@ function Labtest(props) {
     .then((response) => {
       var res = response;
         console.log(res);
-        
     })
     }
     handleClose();
@@ -111,14 +107,19 @@ function Labtest(props) {
 )
   .then((response) => {
     var res = response.data.results[0].answers;
-      //console.log(res);
-      setformData(res);
-      
+      setformData(res);      
   })
-  .catch((error) => {
-   
-    console.log(error);
-  });
+  .catch((error) => {console.log(error);  });
+
+  getAPI(
+    `/services/billable`
+  )
+    .then((response) => {
+      var res = response.data;
+        setFormValues(res);      
+    })
+    .catch((error) => {console.log(error);  });
+
   handleClickOpen();
 }, []);
     return (
@@ -139,8 +140,10 @@ function Labtest(props) {
                 fullWidth
                 label={item.display}
                 name={item.uuid}
+                defaultValue ={formValues[item.uuid]?formValues[item.uuid]:""}
                 className={classes.field}
             />
+
 
             </GridItem>
         )}
