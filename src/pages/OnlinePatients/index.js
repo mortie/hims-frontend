@@ -8,18 +8,14 @@ import {District_Dropdown} from "../../utils/constants"
 import {
   Button,
   TextField,
-  FormControl,
-  FormControlLabel,
   LinearProgress,
-  Radio,
-  RadioGroup,
   CircularProgress,
-  InputLabel,
   makeStyles,
-  Paper,
+  Paper, 
   Select,
-  FormLabel,
   MenuItem,
+  InputLabel,
+  FormControl
 } from "@material-ui/core/";
 import { GridContainer, GridItem } from "../../components/Grid";
 import styles from "./styles";
@@ -60,6 +56,7 @@ export default function InfiniteLoadingGrid() {
   let [filterappointData, setFilterAppointData]= React.useState([]);
   const [visitAttributeTypes, setVisitAttributeTypes] = useState();
   const [visits, setVisits] = useState([]);
+  const [gender, setGender] = React.useState('');
   var [searchDetails, setsearchDetails] = useState({
     phone: "",
     name: "",
@@ -121,7 +118,7 @@ export default function InfiniteLoadingGrid() {
       renderCell: (cellValues) => {  
         if(cellValues.row.appointmentStatus !== "BOOKED"){
           return <Button
-        variant="contained"
+        variant="contained" disabled
       >
        Arrived
       </Button>
@@ -172,8 +169,28 @@ function resetOnKey(e){
    else{
     setAppointData(filterappointData);
    }
-  
   }
+ const getAppointmentData = () => {
+  getOnlineAPI(
+    `/onlineappointment/onlineAppointments?&frdate=${fromDate.toISOString()}&todate=${toDate.toISOString()}`
+      )
+    .then((response) => {
+      console.log(response.data.appointments)
+     
+      response.data.appointments = response.data.appointments.filter( function (appointment) {
+        return appointment.district_name === District_Dropdown;
+      })
+      const appointList = createAppointmentList(response.data.appointments);
+        setFilterAppointData(appointList);
+        setAppointData(appointList);
+        setLoading(false);
+    })
+    .catch((error) => {
+     
+      console.log(error);
+    });
+ }
+
   const handleClick = (event, data) => {
    if(event.target.innerHTML !== "Arrived"){
     let visitattributes = [
@@ -189,32 +206,35 @@ function resetOnKey(e){
     };
 
     
-    getOnlineAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
+    getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
     .then((response) => {
       let visits = response.data.visits;
+      console.log(visits);
       let firstVisitId = visits[visits.length-1].uuid;
       getAPI("/visit/"+firstVisitId)
         .then((resp) => {
-          console.log(resp.data.attributes);
+          //console.log(resp.data.attributes);
           let attributes =[];
           attributes = resp.data.attributes.length > 0? resp.data.attributes : visitattributes;
           console.log(attributes);
          visit.attributes = attributes;
           visit.patient = data.row.uuid;
-          visit.location = resp.data.location.uuid
-          statusAppointment( data.row.appointmentId,"CONFIRM");
+          visit.location = resp.data.location.uuid;          
           postAPI("/visit", visit)
             .then((visitResponse) => {
               console.log(visitResponse);
-              //event.target.style.pointerEvents = "none";
-              event.target.innerHTML = "Arrived";
+              statusAppointment( data.row.appointmentId,"CONFIRM");
+              getAppointmentData();
           })
+          
       })
       
     })
     .catch((error) => {
       console.log(error);
     });
+    
+    
   } 
     return ;
   };
@@ -242,29 +262,7 @@ function resetOnKey(e){
  
   React.useEffect(() => {
    setLoading(true); 
-   
-   getOnlineAPI(
-    `/onlineappointment/onlineAppointments?&frdate=${fromDate.toISOString()}&todate=${toDate.toISOString()}`
-      )
-    .then((response) => {
-      console.log(response.data.appointments)
-      response.data.appointments = response.data.appointments.filter( function (appointment) {
-        return appointment.appointment_status === "BOOKED";
-      })
-      response.data.appointments = response.data.appointments.filter( function (appointment) {
-        return appointment.district_name === District_Dropdown;
-      })
-      const appointList = createAppointmentList(response.data.appointments);
-        setFilterAppointData(appointList);
-        setAppointData(appointList);
-        setLoading(false);
-      
-    })
-    .catch((error) => {
-     
-      console.log(error);
-    });
-   
+   getAppointmentData();
   },[false]);
 
   return (
@@ -327,7 +325,25 @@ function resetOnKey(e){
               </GridContainer>
             </GridItem>
             <GridItem item xs={12} sm={6} md={3}>
-             
+            <GridContainer>
+                <GridItem item xs={12} sm={6} md={6}>
+                <FormControl >
+                  <InputLabel id="select-gender">Gender</InputLabel>
+                  <Select
+                          labelId="select-gender"
+                          variant="outlined"
+                          fullWidth
+                          nativ
+                          margin="dense"
+                          className={classes.field}
+                          onKeyUp={(e) => keyUpFun(e, "clicked")}
+                          >
+                            <MenuItem value="M">Male</MenuItem>
+                            <MenuItem value="F">Female</MenuItem>
+                          </Select>
+                          </FormControl>
+                     </GridItem>
+                     </GridContainer>     
             </GridItem>
             <GridItem item xs={12} sm={6} md={3}>
               <Button
@@ -362,7 +378,7 @@ function resetOnKey(e){
           autoHeight
           rowHeight={40}
           headerHeight={40}
-          pageSize={10}
+          pageSize={40}
           components={{
             LoadingOverlay: CustomLoadingOverlay,
             NoRowsOverlay: CustomNoRowsOverlay,

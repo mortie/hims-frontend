@@ -41,7 +41,19 @@ export function getImageAPI(endpoint, authorization = Cookies.get(JSESSIONID)) {
   };
   return axios.get(BASE_URL + endpoint, config);
 }
-
+export function postCentralAPI(
+  endpoint,
+  data,
+  authorization = Cookies.get(JSESSIONID)
+) {
+  updateSession();
+  const config = {
+    headers: {
+      Authorization: authorization,
+    },
+  };
+  return axios.post(MPI_URL + endpoint, data, config);
+}
 export function postAPI(
   endpoint,
   data,
@@ -81,7 +93,7 @@ export async function statusAppointment(appointmentId,status) {
   
   const URL = `/onlineappointment/appointmentstatus?appointment_id=${appointmentId}&status=${status}`;
   try {
-    const data = await postAPI(URL);
+    const data = await postCentralAPI(URL);
     return data;
   } catch (error) {
     console.log(error);
