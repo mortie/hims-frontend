@@ -12,7 +12,8 @@ import PrintIcon from '@material-ui/icons/Print';
 import PrintAction from "./PrintAction";
 import RevisitAction from "./RevisitAction";
 import axios from "axios";
-import { getAPI, postAPI,getaddressAPI } from "../../services/index";
+import { getAPI, postAPI, getaddressAPI } from "../../services/index";
+import { useHistory } from "react-router-dom";
 
 
 const StyledMenu = withStyles({
@@ -55,6 +56,7 @@ export default function CustomizedMenus(props) {
 
   var [isPrintBoxOpen, setIsPrintBoxOpen] = useState(false);
   var [isRevisitBoxOpen, setIsRevisitBoxOpen] = useState(false);
+  let history = useHistory();
 
 
   const handleClick = (event) => {
@@ -69,6 +71,10 @@ export default function CustomizedMenus(props) {
 
   };
 
+  const onEdit = () => {
+    let path = `/app/edit-patient/` + props.patiendData.row.identifier;
+    history.push(path);
+}
 
   const onRevisit = () => {
     setIsRevisitBoxOpen(false)
@@ -175,7 +181,7 @@ axios
         </StyledMenuItem>
         <StyledMenuItem>
           <ListItemIcon>
-            <EditIcon fontSize="small" />
+            <EditIcon fontSize="small"  onClick={onEdit}/>
           </ListItemIcon>
         </StyledMenuItem>
         <StyledMenuItem onClick={onPrint}>
