@@ -12,7 +12,8 @@ import {
   ProviderScheduling,
   PatientRegistration,
   OnlinePatients,
-  SystemAdmin
+  SystemAdmin,
+  PatientEdit,
 } from "../pages";
 
 /**
@@ -71,6 +72,21 @@ export const appRoutes = [
     visibleOnSidebar: false,
     icon: "fa fa-user-plus",
     component: PatientRegistration,
+    layout: "/app",
+  },
+  {
+    path: "/edit-patient/:id",
+    title: "Edit Patient",
+    roles: [
+      "System Developer",
+      "Organizational: Registration clerk",
+      "Application: Registers Patients",
+      "Application: Schedules appointments",
+      "Application: Sees appointment schedule",
+    ],
+    visibleOnSidebar: false,
+    icon: "fa fa-user-plus",
+    component: PatientEdit,
     layout: "/app",
   },
   {
