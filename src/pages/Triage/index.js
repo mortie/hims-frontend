@@ -230,7 +230,7 @@ export default function Triage() {
         console.log(error);
       });
 
-    let patient_history_url = `/concept?q=Patient History&v=custom:(answers:(display,answers:(uuid,display,datatype:(display),synonyms:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display)))))`;
+    let patient_history_url = `/concept?q="Patient History"&v=custom:(answers:(display,answers:(uuid,display,datatype:(display),synonyms:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType)))))`;
     getAPI(patient_history_url)
       .then((response) => {
         setHistoryfields(response.data.results[0].answers);

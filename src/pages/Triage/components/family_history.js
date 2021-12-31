@@ -97,7 +97,7 @@ export default function FamilyHistory(props) {
               <FormControlLabel
                 value={smoker.display}
                 control={<Radio id={smoker.uuid} onChange={handleChange} />}
-                label={smoker.display}
+                label={smoker.display.split("-").at("-1") == "Yes" ? "Yes" : "No"}
                 className="yesClass"
                 id={smoker.uuid}
               />

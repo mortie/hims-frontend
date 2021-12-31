@@ -29,6 +29,7 @@ export default function MedicationHistory(props) {
   var dataType = "Coded"
   var medication_level_1 = data.answers;
   var uuid = data.uuid;
+  var names = data.names;
   var MEDICATION = "Medication-Yes"
   var NO_MEDICATION = "Medication-No"
   var [showMedication, setShowMedication] = useState(false);
@@ -41,12 +42,13 @@ export default function MedicationHistory(props) {
   var [allmedicationuuid, setAllmedicationuuid] = useState([]);
 
   medication_level_1.forEach(function (item, index) {
-      if (item.display == MEDICATION) {
+    if (item.display == MEDICATION) {
         if (medicationDetails.length == 0) {
           setMedicationUuid(item.uuid)
           setMedicationDetails(item.answers)
         }
-      }
+    }
+
   });
 
   const handleChange = (event,cVal) => {
@@ -97,7 +99,7 @@ export default function MedicationHistory(props) {
               <FormControlLabel
                 value={smoker.display}
                 control={<Radio id={smoker.uuid} onChange={handleChange} />}
-                label={smoker.display}
+                label={smoker.display.split("-").at("-1") == "Yes" ? "Yes" : "No"}
                 className="yesClass"
                 id={smoker.uuid}
               />

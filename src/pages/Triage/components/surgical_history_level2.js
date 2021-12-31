@@ -8,7 +8,6 @@ import DateType from './dateType'
 export default function Surgical_Level2_History(props) {
     var data = props.answer;
     var dataType = data.datatype.display
-    console.log( " data level 2 ",data)
 
     var [successcheck, setSuccesscheck] = useState(false);
     const handleChange = (event,cVal) => {

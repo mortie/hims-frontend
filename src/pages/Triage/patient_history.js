@@ -126,8 +126,8 @@ const ControlledAccordions = (props) => {
           return (
       <MedicationHistory
         question={items}
-              onChange={handleChange}
-              onDelete={deleteChange}
+        onChange={handleChange}
+        onDelete={deleteChange}
       />
     )
   };

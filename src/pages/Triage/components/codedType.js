@@ -53,7 +53,7 @@ export default function CodedType(props) {
             <FormControlLabel
               value={smoker.display}
               control={<Radio id={smoker.uuid} onChange={handleChange} />}
-              label={smoker.display}
+              label={smoker.display.split("-").at("-1") == "Yes" || "No" ? smoker.display.replace(/(.*)-/,"") : smoker.display.substr(0, smoker.display.indexOf('-'))}
               className="yesClass"
               key={smoker.uuid}
             />
