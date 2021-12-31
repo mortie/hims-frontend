@@ -4,10 +4,10 @@ import TabPanelComponent from './TabPanelComponent';
 
 
 function Billing(props) {
+    
     return (
-        <>
-     {/* <TabPanelComponent></TabPanelComponent> */}
-     
+    <>
+     <TabPanelComponent></TabPanelComponent>
      </>
     );
 }

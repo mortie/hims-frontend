@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import {
   TextField,
   makeStyles,
@@ -11,16 +11,25 @@ import {
   DialogContent,
   Typography,
   useMediaQuery,
-  DialogContentText
+  DialogContentText,
+  LinearProgress
 } from '@material-ui/core/';
-import { DataGrid } from "@material-ui/data-grid";
+import { DataGrid ,  GridOverlay } from "@material-ui/data-grid";
 import styles from "./styles";
+import { Alert, Autocomplete } from "@material-ui/lab";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import moment from "moment";
+import MomentUtils from "@date-io/moment";
+import { getAPI, postAPI,getPatientSearch } from "../../../services";
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
 const useStyles = makeStyles(styles);
 function createData(name, calories, fat, carbs, protein) {
   return { name, calories, fat, carbs, protein };
@@ -34,32 +43,99 @@ const rows3 = [
   createData('Gingerbread', 356, 16.0, 49, 3.9),
 ];
 
- const dateval=new Date().toLocaleDateString("fr-CA");
-
-export default function OpdQue() {
+  export default function OpdQue() {
      const classes = useStyles();
-     const [patientname,setPatientname]=useState("");
+     //const [patientname,setPatientname]=useState("");
      const [datasubmitted,setDataSubmitted]=useState(false);
      const [currentRow,setCurrentRow]=useState(null);
      const [showDialog,setshowDialog]=useState(false);
-     const [orderdate,setorderdate]=useState(new Date().toLocaleDateString("en-IN"));
+     const [selectedDate, setSelectedDate] = React.useState(new Date());
+     const [actualorderdate,setActualOrderdate]= React.useState(moment().format('DD-MM-YYYY'));
+     const [formerrors,setformErrors]=React.useState({});
+     const [loading, setLoading] = useState(false);
+     const [filteredPatientList, setFilteredPatientList] = useState([]);
+    const [patientnameorid,setPatientnameorid]=React.useState("");
+    useEffect(() => {
+      setLoading(true);
+      const url =
+        "/procedureinvestigationorder/patient";
+      getAPI(url).then((response) => {
+         const patientList = response.data.testOrderDetails;
+        patientList.map((item)=>{
+          const patientId="1bb427fe-0a0a-4a1a-a145-38656e232845";
+        })
+        setLoading(false);
+        console.log(response.data.testOrderDetails);
+      });
+    }, []);
+    const CustomLoadingOverlay = () => {
+      return (
+        <GridOverlay>
+          <div style={{ position: "absolute", top: 0, width: "100%" }}>
+          <LinearProgress />
+          </div>
+        </GridOverlay>
+      );
+    };
+    const CustomNoRowsOverlay = () => {
+      return (
+        <GridOverlay>
+          <Alert severity="info">
+            <strong>No records found.</strong>
+          </Alert>
+        </GridOverlay>
+      );
+    };
+     const handleChange=(e)=>{
+       const {name,value}=e.target;
+       console.log(value);
+      //   setFormValues({...formValues,[name]:value});
+      if(!value)
+      {
+        setformErrors({"patientname":"Name or Id is required"});
+      }
+      else{
+        const errors = formerrors;
+        delete errors[name];
+        setformErrors(errors);
+      }
+       setPatientnameorid(e.target.value);
+     }
+    
+    
+    const handleDateChange = (date) => {
+      setActualOrderdate(moment(date["_d"]).format('DD-MM-YYYY'));
+        setSelectedDate(date);
+    };
   
-     const changeEventHandlerPatientName=(e)=>{
-      setPatientname(e.target.value);
-     }
-     const changeEventHandlerOrderDate=(e)=>{
-       console.log(e.target.value);
-      setorderdate(new Date(e.target.value).toLocaleDateString("en-IN"));
-     }
      const submitHandler=(e)=>{
       e.preventDefault();
       setDataSubmitted(true);
       const getpatientinfo={
-        patientDetails :patientname,
-        bookingDate:orderdate
+        patientNameorId:patientnameorid,
+        orderDate:actualorderdate
       }
-      setPatientname("");
-      console.log(getpatientinfo);
+      const getPatientSearchdata= async ()=>{
+        const url="/patient_search?name="+getpatientinfo.patientNameorId;
+        try{
+        const data= await getPatientSearch(url);
+        return data;
+        }
+        catch(err)
+        {
+          return null;
+        }
+      }
+      const getPatientdata=getPatientSearchdata();
+      console.log(getPatientdata);   
+      getPatientdata.map(async (item)=>{
+          const url="/procedureinvestigationorder/patient";
+          const passuid=await getAPI(url);
+          if(passuid)
+          {
+
+          }
+      })
      }
      const columns = [
       { field: "id", headerName: "S.No" },
@@ -119,35 +195,38 @@ export default function OpdQue() {
       <form noValidate id="searchForm" onSubmit={submitHandler}>
       <div style={{ width: '100%',display: 'flex' ,flexWrap: 'wrap',justifyContent :'space-between',alignItems:'center'}}>
       <Box flexGrow={0.4}>
-        <TextField 
-        id="firstnameopdque" 
-        name="lpn"
-        label="Name/Patient-Id" 
+       <TextField 
+        id="patientname" 
+        name="patientname"
+        label="Name" 
         variant="outlined"
         className={classes.field}
-        onChange={changeEventHandlerPatientName}
-        value={patientname}
+        onChange={handleChange}
+        value={patientnameorid}
+        error={formerrors["patientname"] ? true :false}
+        helperText={formerrors["patientname"]}
         fullWidth
         autoFocus
         />
       </Box>
        <Box  flexGrow={0.4}>
-        <TextField
-            variant="outlined"
-            label="Date"
-            type="date"
-            margin="dense"
-            name="lvd"
-            id="lvd"
-            defaultValue={dateval}
-            onChange={changeEventHandlerOrderDate}
-            maxDate={new Date()}
-            InputLabelProps={{
-            shrink: true,
-            }}
-            className={classes.field}
+        <MuiPickersUtilsProvider utils={MomentUtils}>
+          <KeyboardDatePicker
             fullWidth
-        />
+            name="orderdate"
+            style={{ marginTop: 8 }}
+            disableFuture
+            allowKeyboardControl
+            autoOk
+            inputVariant="outlined"
+            format="DD-MM-yyyy"
+            label="Date"
+            views={["year", "month", "date"]}
+            onChange={handleDateChange}
+            value={selectedDate}
+            className={classes.field}
+          />
+        </MuiPickersUtilsProvider>
        </Box>
       <Box>
         <Button
@@ -155,15 +234,19 @@ export default function OpdQue() {
             color="primary"
             className={classes.field}
             type="submit"
+            disabled={
+              Object.keys(formerrors).length > 0 || patientnameorid===""
+            }
           >
         Get Patient
         </Button>
       </Box>
       </div>
       </form>
-    {datasubmitted && 
-    <DataGrid
+
+    {/* <DataGrid
       rows={rows}
+      loading={loading}
       disableColumnMenu
       columns={columns}
       autoHeight
@@ -172,15 +255,15 @@ export default function OpdQue() {
       pageSize={10}
       onCellClick={handleOpen}
       
-     />
-        }
+     /> */}
+        
         {currentRow && ( 
-        <Dialog open={showDialog}  onClose={handleModalClose}  maxWidth="lg" fullWidth >
+        <Dialog open={showDialog}  onClose={handleModalClose}  maxWidth="lg" fullWidth  >
           <DialogTitle>List Of Orders</DialogTitle>
           <DialogContent dividers>
             <DialogContentText>
             <Typography variant="body1" gutterBottom>
-            <Typography variant="h5"> Date : {orderdate} </Typography>
+            {/* <Typography variant="h5"> Date : {orderdate} </Typography> */}
             </Typography>
             <Typography variant="body1" gutterBottom>
             <Typography variant="h5">PatientId: {currentRow.patientid}</Typography>
@@ -204,11 +287,15 @@ export default function OpdQue() {
                 <DataGrid
                   rows={rows1}
                   columns={columns1}
-                  pageSize={5}
                   autoHeight
                   rowHeight={40}
                   headerHeight={40}
                   className={classes.table}
+                  pageSize={10}
+                  components={{
+                    LoadingOverlay: CustomLoadingOverlay,
+                    NoRowsOverlay: CustomNoRowsOverlay,
+                  }}
                  
                 />
             {/* <TableContainer component={Paper}>

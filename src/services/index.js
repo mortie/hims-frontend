@@ -32,6 +32,16 @@ export function getaddressAPI(endpoint, authorization = Cookies.get(JSESSIONID))
   return axios.get(ADRESSBASE_URL_API + endpoint, config);
 }
 
+export function getPatientSearch(endpoint, authorization = Cookies.get(JSESSIONID)) {
+  updateSession();
+  const config = {
+    headers: {
+      Authorization: authorization,
+    },
+  };
+  return axios.get(ADRESSBASE_URL_API + endpoint, config);
+}
+
 export function getImageAPI(endpoint, authorization = Cookies.get(JSESSIONID)) {
   const config = {
     responseType: "blob",

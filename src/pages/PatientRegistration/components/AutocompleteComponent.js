@@ -154,6 +154,7 @@ function AutocompleteComponent({
                          return option.display;
                        }
                       }
+                     //option.display
                     }
                     onChange={(e, newValue) => {
                       onAutocompleteChange(display, newValue);

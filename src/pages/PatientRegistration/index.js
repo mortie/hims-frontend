@@ -338,7 +338,7 @@ export default function PatientRegistration() {
                     <React.Fragment key={uuid}>
                       <AutocompleteComponent
                         display={display}
-                        labelName={getLabelName(names) || display}
+                        labelName={display}
                         answers={answers}
                         formErrors={formErrors}
                         formValues={formValues}
@@ -353,7 +353,7 @@ export default function PatientRegistration() {
                         <AutocompleteComponent
                           display={formValues[display].display}
                           labelName={
-                            getLabelName(formValues[display].names) ||
+                         
                             formValues[display].display
                           }
                           answers={formValues[display].answers}
@@ -370,7 +370,7 @@ export default function PatientRegistration() {
                         <TextFieldComponent
                           display={formValues[display].display}
                           labelName={
-                            getLabelName(formValues[display].names) ||
+                          
                             formValues[display].display
                           }
                           formValues={formValues}
@@ -389,9 +389,7 @@ export default function PatientRegistration() {
                             formValues[formValues[display]?.display]?.display
                           }
                           labelName={
-                            getLabelName(
-                              formValues[formValues[display]?.display]?.names
-                            ) || formValues[formValues[display]?.display]?.display
+                            formValues[formValues[display]?.display]?.display
                           }
                           answers={
                             formValues[formValues[display]?.display]?.answers
@@ -415,11 +413,7 @@ export default function PatientRegistration() {
                             ]?.display
                           }
                           labelName={
-                            getLabelName(
-                              formValues[
-                                formValues[formValues[display]?.display]?.display
-                              ]?.names
-                            ) ||
+                          
                             formValues[
                               formValues[formValues[display]?.display]?.display
                             ]?.display
