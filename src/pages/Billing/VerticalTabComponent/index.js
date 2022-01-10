@@ -44,9 +44,8 @@ function TabPanel(props) {
     return (
       <div className={classes.root}>
          <GridContainer>
-          < GridItem xs={12} sm={6} md={3}>
+          < GridItem xs={12} sm={6} md={12}>
         <Tabs
-          orientation="vertical"
           variant="scrollable"
           value={value}
           onChange={handleChange}
@@ -61,10 +60,9 @@ function TabPanel(props) {
           <Tab label="Search Patient System" />
         </Tabs>
         </GridItem>
-        < GridItem xs={12} sm={6} md={9}>
+        < GridItem xs={12} sm={6} md={12}>
         <TabPanel value={value} index={0}  className={classes.panelfirst}>
-        <Typography variant="h6">OPD Queue</Typography>
-       <OpdQue></OpdQue>
+          <OpdQue></OpdQue>
         </TabPanel>
         <TabPanel value={value} index={1}>
         <Typography variant="h6">IPD Queue</Typography>

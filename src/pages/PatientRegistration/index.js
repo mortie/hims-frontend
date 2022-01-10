@@ -338,7 +338,7 @@ export default function PatientRegistration() {
                     <React.Fragment key={uuid}>
                       <AutocompleteComponent
                         display={display}
-                        labelName={display}
+                        labelName={getLabelName(names) || display}
                         answers={answers}
                         formErrors={formErrors}
                         formValues={formValues}
@@ -353,7 +353,7 @@ export default function PatientRegistration() {
                         <AutocompleteComponent
                           display={formValues[display].display}
                           labelName={
-                         
+                            getLabelName(formValues[display].names) ||
                             formValues[display].display
                           }
                           answers={formValues[display].answers}
@@ -369,8 +369,9 @@ export default function PatientRegistration() {
                       {formValues[display]?.datatype?.display === "Text" && (
                         <TextFieldComponent
                           display={formValues[display].display}
+                         
                           labelName={
-                          
+                            getLabelName(formValues[display].names) ||
                             formValues[display].display
                           }
                           formValues={formValues}
@@ -388,8 +389,11 @@ export default function PatientRegistration() {
                           display={
                             formValues[formValues[display]?.display]?.display
                           }
+                          
                           labelName={
-                            formValues[formValues[display]?.display]?.display
+                            getLabelName(
+                              formValues[formValues[display]?.display]?.names
+                            ) || formValues[formValues[display]?.display]?.display
                           }
                           answers={
                             formValues[formValues[display]?.display]?.answers
@@ -412,8 +416,18 @@ export default function PatientRegistration() {
                               formValues[formValues[display]?.display]?.display
                             ]?.display
                           }
-                          labelName={
+                          // labelName={
                           
+                          //   formValues[
+                          //     formValues[formValues[display]?.display]?.display
+                          //   ]?.display
+                          // }
+                          labelName={
+                            getLabelName(
+                              formValues[
+                                formValues[formValues[display]?.display]?.display
+                              ]?.names
+                            ) ||
                             formValues[
                               formValues[formValues[display]?.display]?.display
                             ]?.display
@@ -474,8 +488,26 @@ export default function PatientRegistration() {
   }
 
   function getLabelName(names) {
-    const shortName = names.filter((name) => name.conceptNameType === "SHORT");
-    return shortName.length ? shortName[0].display : null;
+    const shortName = names.filter((name) => name.conceptNameType === "FULLY_SPECIFIED");
+    //return shortName.length ? shortName[0].display : null;
+    if(shortName.length)
+    {
+      if(shortName[0].display === 'CHC'
+         || shortName[0].display === 'PHC' 
+         || shortName[0].display ==='Sub Centre'
+         || shortName[0].display ==='SDH'
+         || shortName[0].display ==='Private Institutions')
+      {
+        return "Referral Type";
+      }
+      else
+      {
+        return shortName[0].display;
+      }
+    }
+    else{
+      return null;
+    }
   }
   // function getSpecifiyFielddata(field,obj) {
   //   if(field === 'State')

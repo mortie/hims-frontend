@@ -26,7 +26,13 @@ import {
     OrderGeneration
 } from './OrderGeneration'
 
+import {
+ PatientSearchData 
+} from './PatientSearchData'
 
+import {
+    TestOrderDetails
+} from './TestOrderDetails'
 export {
     Location,
     Visit,
@@ -34,5 +40,7 @@ export {
     Patient,
     Encounter,
     PatientHistory,
-    OrderGeneration
+    OrderGeneration,
+    PatientSearchData,
+    TestOrderDetails 
 };

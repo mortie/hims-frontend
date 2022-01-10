@@ -26,6 +26,7 @@ import TableRow from '@material-ui/core/TableRow';
 import moment from "moment";
 import MomentUtils from "@date-io/moment";
 import { getAPI, postAPI,getPatientSearch } from "../../../services";
+import {PatientSearchData,TestOrderDetails} from "../../../services/data"
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -52,22 +53,12 @@ const rows3 = [
      const [selectedDate, setSelectedDate] = React.useState(new Date());
      const [actualorderdate,setActualOrderdate]= React.useState(moment().format('DD-MM-YYYY'));
      const [formerrors,setformErrors]=React.useState({});
-     const [loading, setLoading] = useState(false);
+     const [loading, setLoading] = useState(true);
+
      const [filteredPatientList, setFilteredPatientList] = useState([]);
     const [patientnameorid,setPatientnameorid]=React.useState("");
-    useEffect(() => {
-      setLoading(true);
-      const url =
-        "/procedureinvestigationorder/patient";
-      getAPI(url).then((response) => {
-         const patientList = response.data.testOrderDetails;
-        patientList.map((item)=>{
-          const patientId="1bb427fe-0a0a-4a1a-a145-38656e232845";
-        })
-        setLoading(false);
-        console.log(response.data.testOrderDetails);
-      });
-    }, []);
+    const [orderrowdetails, setOrderRowDetails] = useState([]);
+    const [countrow,setCountRow]=useState(0);
     const CustomLoadingOverlay = () => {
       return (
         <GridOverlay>
@@ -90,15 +81,19 @@ const rows3 = [
        const {name,value}=e.target;
        console.log(value);
       //   setFormValues({...formValues,[name]:value});
-      if(!value)
-      {
-        setformErrors({"patientname":"Name or Id is required"});
-      }
-      else{
-        const errors = formerrors;
-        delete errors[name];
-        setformErrors(errors);
-      }
+      // if(!value)
+      // {
+      //   setformErrors({"patientname":"Name or Id is required"});
+      // }
+      // if(value.length < 1)
+      // {
+      //   setformErrors({"patientname":"Name or Id is required"});
+      // }
+      // else{
+      //   const errors = formerrors;
+      //   delete errors[name];
+      //   setformErrors(errors);
+      // }
        setPatientnameorid(e.target.value);
      }
     
@@ -107,66 +102,106 @@ const rows3 = [
       setActualOrderdate(moment(date["_d"]).format('DD-MM-YYYY'));
         setSelectedDate(date);
     };
-  
-     const submitHandler=(e)=>{
+     
+     const submitHandler= async (e)=>{
       e.preventDefault();
       setDataSubmitted(true);
-      const getpatientinfo={
+      const orderinfo={
         patientNameorId:patientnameorid,
         orderDate:actualorderdate
       }
-      const getPatientSearchdata= async ()=>{
-        const url="/patient_search?name="+getpatientinfo.patientNameorId;
-        try{
-        const data= await getPatientSearch(url);
-        return data;
-        }
-        catch(err)
-        {
-          return null;
-        }
-      }
-      const getPatientdata=getPatientSearchdata();
-      console.log(getPatientdata);   
-      getPatientdata.map(async (item)=>{
-          const url="/procedureinvestigationorder/patient";
-          const passuid=await getAPI(url);
-          if(passuid)
+     if(orderinfo.patientNameorId !=='' && orderinfo.orderDate !=='')
+     {
+      const getPatientSearchResultData= await PatientSearchData.PatientSearchDataFunc(orderinfo.patientNameorId);
+      console.log(getPatientSearchResultData);
+      if(getPatientSearchResultData !== null)
+      {
+        const hetdata=getPatientSearchResultData.map(async (item,index)=>{
+          const getTestOrderDetails= await TestOrderDetails.TestOrderDetailsDataFunc(item.uuid,orderinfo.orderDate);
+          if(getTestOrderDetails !== null)
           {
-
+           
+             if(getTestOrderDetails["testOrderDetails"].length >0)
+             {
+              console.log(getTestOrderDetails);
+              setLoading(false);
+             setFilteredPatientList((prev)=>[...prev,{
+                  id:item.identifier,
+                  name:item.name,
+                  age:item.age,
+                  gender:item.gender,
+                  date:orderinfo.orderDate,
+                  uuid:item.uuid
+             }]);
+            
+            //  getTestOrderDetails.testOrderDetails.map((itembill)=>{
+            //   if(itembill["billableServiceDetails"].length > 0)
+            //   {
+                
+            //     itembill.billableServiceDetails.map((itemsorder,index)=>{
+            //       setOrderRowDetails((orderrowdetails=[])=>[...orderrowdetails,{
+            //         "id":index+1,
+            //         "orderId":itemsorder.opdOrderId,
+            //         "date":orderinfo.orderDate,
+            //         "sentFrom":"OPD"
+            //        }]);
+            //     })
+            //   }
+            //  })
+           
+             }
+             else{
+              setLoading(false);
+              setFilteredPatientList([]);
+             }
           }
-      })
+          else{
+            console.log("error")
+          }
+        });
+      }
+      else{
+        setLoading(false);
+        setFilteredPatientList([]);
+      }
+     }
+     else{
+      const getDateOrders= await TestOrderDetails.TestOnlySelectDateFunc(orderinfo.orderDate);
+      console.log(getDateOrders);
+      
+     }
      }
      const columns = [
-      { field: "id", headerName: "S.No" },
-      { field: "patientid", headerName: "Patiend ID",flex:1 },
-      { field: "name", headerName: "Name",flex:1},
+      { field: "id", headerName: "Patiend ID",width: 125 },
+      { field: "name", headerName: "Name",width: 220 },
       {
         field: "gender",
         headerName: "Gender",
-        flex:1
-        
+        width: 160
       },
       {
         field: "age",
         headerName: "Age",
-        type: "number"
-       
-      }
+        type: "number",
+        width: 160
+      },
+      {
+        field: "date",
+        headerName: "Date",
+        hide: true 
+      },
+      { field: "uuid", headerName: "uuid"}
     ];
-    const rows = [
-      {id:"1",patientid: "101", name : "subham",gender: 'M',  age: 18},
-      {id:"2",patientid: "201",  name : "Subham",gender: 'F', age: 20},
-      {id:"3",patientid: "301",  name : "Subham",gender: 'F', age: 20}
     
-    ];
     const rows1 = [
       {id: "1", orderId : "11146", date:"2021-11-11", sentFrom:"OPD"} 
     
     ];
     const columns1 = [
-      { field: "id", headerName: "Sl.No."},
-      { field: "orderId", headerName: "Order Id",flex:1},
+      { field: "id", headerName: "Sl.No.",flex:1},
+      { 
+        field: "orderId", 
+        headerName: "Order Id",flex:1},
       {
         field: "date",
         headerName: "Date",
@@ -180,18 +215,40 @@ const rows3 = [
       
       
     ];
-    const handleOpen=(event)=>{
+    const handleOpen=async(event)=>{
       setshowDialog(true);
       setCurrentRow(event.row);
-      //setDataSubmitted(false);
+      console.log(event.row);
+      const getTestOrderDetails= await TestOrderDetails.TestOrderDetailsDataFunc(event.row.uuid,actualorderdate);
+      console.log(getTestOrderDetails);
+      getTestOrderDetails.testOrderDetails.map((itembill)=>{
+        if(itembill["billableServiceDetails"].length > 0)
+        {
+          itembill.billableServiceDetails.map((itemsorder,index)=>{
+            setOrderRowDetails((prev)=>[...prev,{
+              id:index+1,
+              orderId:itemsorder.opdOrderId,
+              date:actualorderdate,
+              sentFrom:"OPD"
+             }]);
+          })
+        }
+       })
     }
     const handleModalClose = () => {
       setshowDialog(false);
     };
-  
+  // const getRow=async (currentRow)=>{
+  //   const getTestOrderDetails= await TestOrderDetails.TestOrderDetailsDataFunc(currentRow.uuid,actualorderdate);
+  //   console.log(getTestOrderDetails);
+  //   return orderrowdetails;
+  // }
     
     return (
       <>
+      {!currentRow && 
+      <div>
+      <Typography variant="h6">OPD Queue</Typography>
       <form noValidate id="searchForm" onSubmit={submitHandler}>
       <div style={{ width: '100%',display: 'flex' ,flexWrap: 'wrap',justifyContent :'space-between',alignItems:'center'}}>
       <Box flexGrow={0.4}>
@@ -207,6 +264,9 @@ const rows3 = [
         helperText={formerrors["patientname"]}
         fullWidth
         autoFocus
+        // InputProps={{
+        //   readOnly: datasubmitted,
+        // }}
         />
       </Box>
        <Box  flexGrow={0.4}>
@@ -225,6 +285,7 @@ const rows3 = [
             onChange={handleDateChange}
             value={selectedDate}
             className={classes.field}
+            
           />
         </MuiPickersUtilsProvider>
        </Box>
@@ -234,18 +295,18 @@ const rows3 = [
             color="primary"
             className={classes.field}
             type="submit"
-            disabled={
-              Object.keys(formerrors).length > 0 || patientnameorid===""
-            }
+         
           >
         Get Patient
         </Button>
       </Box>
       </div>
       </form>
-
-    {/* <DataGrid
-      rows={rows}
+      </div>
+  }
+    {datasubmitted && !currentRow &&
+    <DataGrid
+      rows={filteredPatientList}
       loading={loading}
       disableColumnMenu
       columns={columns}
@@ -254,38 +315,23 @@ const rows3 = [
       headerHeight={40}
       pageSize={10}
       onCellClick={handleOpen}
-      
-     /> */}
-        
+      components={{
+        LoadingOverlay: CustomLoadingOverlay,
+        NoRowsOverlay: CustomNoRowsOverlay,
+      }}
+     />
+    }
         {currentRow && ( 
-        <Dialog open={showDialog}  onClose={handleModalClose}  maxWidth="lg" fullWidth  >
-          <DialogTitle>List Of Orders</DialogTitle>
-          <DialogContent dividers>
-            <DialogContentText>
-            <Typography variant="body1" gutterBottom>
-            {/* <Typography variant="h5"> Date : {orderdate} </Typography> */}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-            <Typography variant="h5">PatientId: {currentRow.patientid}</Typography>
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-            <Typography variant="h5">Name: {currentRow.name}</Typography>
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-            <Typography variant="h5">Gender: {currentRow.gender}</Typography>
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-            <Typography variant="h5">Age: {currentRow.age}</Typography>
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-            <Typography variant="h5">Payment Category: Paying</Typography>
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-            <Typography variant="h5">File No.</Typography>
-            </Typography>
-        
+          <div>
+          <Typography variant="h4">List Of Orders</Typography>
+           <Typography variant="body1"> Date : {currentRow.date} </Typography>
+              <Typography variant="body1">PatientId: {currentRow.id}</Typography>
+              <Typography variant="body1">Name: {currentRow.name}</Typography>
+              <Typography variant="body1">Gender: {currentRow.gender}</Typography>
+              <Typography variant="body1">Age: {currentRow.age}</Typography>
+              <Typography variant="body1" style={{marginBottom:"1rem"}}>Patient Category: Paying</Typography>
                 <DataGrid
-                  rows={rows1}
+                  rows={orderrowdetails}
                   columns={columns1}
                   autoHeight
                   rowHeight={40}
@@ -296,38 +342,54 @@ const rows3 = [
                     LoadingOverlay: CustomLoadingOverlay,
                     NoRowsOverlay: CustomNoRowsOverlay,
                   }}
+                        
+                    />
+              </div>
+        // <Dialog open={showDialog}  onClose={handleModalClose}  maxWidth="lg" fullWidth  >
+        //   <DialogTitle>List Of Orders</DialogTitle>
+        //   <DialogContent dividers>
+        //     <DialogContentText>
+        //     <Typography variant="body1" gutterBottom>
+        //     <Typography variant="h5"> Date : {currentRow.date} </Typography>
+        //     </Typography>
+        //     <Typography variant="body1" gutterBottom>
+        //     <Typography variant="h5">PatientId: {currentRow.id}</Typography>
+        //     </Typography>
+        //     <Typography variant="body1" gutterBottom>
+        //     <Typography variant="h5">Name: {currentRow.name}</Typography>
+        //     </Typography>
+        //     <Typography variant="body1" gutterBottom>
+        //     <Typography variant="h5">Gender: {currentRow.gender}</Typography>
+        //     </Typography>
+        //     <Typography variant="body1" gutterBottom>
+        //     <Typography variant="h5">Age: {currentRow.age}</Typography>
+        //     </Typography>
+        //     <Typography variant="body1" gutterBottom>
+        //     <Typography variant="h5">Patient Category: Paying</Typography>
+        //     </Typography>
+        //     <Typography variant="body1" gutterBottom>
+        //     <Typography variant="h5">File No.</Typography>
+        //     </Typography>
+        
+        //         <DataGrid
+        //           rows={rows1}
+        //           columns={columns1}
+        //           autoHeight
+        //           rowHeight={40}
+        //           headerHeight={40}
+        //           className={classes.table}
+        //           pageSize={10}
+        //           components={{
+        //             LoadingOverlay: CustomLoadingOverlay,
+        //             NoRowsOverlay: CustomNoRowsOverlay,
+        //           }}
                  
-                />
-            {/* <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-            <TableCell align="right">Protein&nbsp;(g)</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.name}>
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell align="right">{rows3.calories}</TableCell>
-              <TableCell align="right">{rows3.fat}</TableCell>
-              <TableCell align="right">{rows3.carbs}</TableCell>
-              <TableCell align="right">{rows3.protein}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer> */}
-            </DialogContentText>
-          </DialogContent>
-          {/* <DialogActions></DialogActions> */}
-        </Dialog>)}
+        //         />
+        //     </DialogContentText>
+        //   </DialogContent>
+        // </Dialog>
+        
+        )}
        
     </>
     );
