@@ -13,6 +13,7 @@ import ProviderScheduling from "./ProviderScheduling";
 import PatientRegistration from './PatientRegistration';
 import OnlinePatients from './OnlinePatients';
 import SystemAdmin from './SystemAdministration';
+import PatientEdit from './PatientEdit';
 
 export {
   Billing,
@@ -30,4 +31,5 @@ export {
   PatientRegistration,
   OnlinePatients,
   SystemAdmin,
+  PatientEdit,
 };

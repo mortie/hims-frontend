@@ -144,18 +144,18 @@ function AutocompleteComponent({
                     options={answers}
                     getOptionLabel={(option) => 
                       {
-                      
-                       const shortName= option.names.filter((name)=>name.conceptNameType === "SHORT");
-                       if(shortName.length > 0)
-                       {
-                         return shortName[0].display;
-                       }
-                       else{
-                         return option.display;
-                       }
-                      //return option.display
+                        if(option.display ==="MLC Yes*" || option.display ==="Referred-Yes")
+                        {
+                          return "Yes";
+                        }
+                        else if(option.display === "MLC No" || option.display ==="Referred-No")
+                        {
+                          return "No";
+                        }
+                        else{
+                          return option.display;
+                        }
                       }
-                    
                     }
                     onChange={(e, newValue) => {
                       onAutocompleteChange(display, newValue);

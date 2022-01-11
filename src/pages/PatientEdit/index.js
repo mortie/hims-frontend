@@ -10,7 +10,7 @@ import PrintPatientRegistration from "./components/PrintPatientRegistration";
 import AvailableTimeSlots from "./components/AvailableTimeSlots";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
-
+import moment from "moment";
 
 import {
   Paper,
@@ -28,13 +28,16 @@ import styles from "./styles";
 import AutocompleteComponent from "./components/AutocompleteComponent";
 import TextFieldComponent from "./components/TextFieldComponent";
 import {
-  REGISTRATION_HOSPITAL_NAME,
+  HOSPITAL_DISTRICT,
   HOSPITAL_NAME,
   MPI_ID,
   PATIENT_UPDATED,
   PERSON_UPDATED,
   District_Dropdown,
+  BASE_URL
 } from "../../utils/constants";
+import { useSnackbar } from "notistack";
+
 
 const useStyles = makeStyles(styles);
 
@@ -50,7 +53,7 @@ const initialSate = {
   "District":District_Dropdown
 };
 
-export default function PatientRegistration() {
+export default function PatientEdit(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
@@ -69,7 +72,66 @@ export default function PatientRegistration() {
   const [addressfields, setaddessfields]=useState([]);
   const [districtfields, setdistrictfields]=useState([]);
   const [cityfields, setcityfields]=useState([]);
-  const [stateisselected, setstateisselected]=useState(false);
+  const [stateisselected, setstateisselected] = useState(false);
+  const [patiendID, setPatientID] = useState(props.match.params.id);
+  let [pUuid, setPUuid] = useState("");
+  let [registeredDetails, setRegisteredDetails] = useState([]);
+  let [nationalID, setNationnalID] = useState([]);
+  let [bloodG, setBloodG] = useState([]);
+  let [occpList, setOccpList] = useState([]);
+  let [mrsList, setMrsList] = useState([]);
+  let [nation, setNation] = useState([])
+  let [rela, setRela] = useState([]);
+  const [value, setValue] = useState();
+    const { enqueueSnackbar } = useSnackbar();
+
+
+  const [error, setError] = useState(false);
+
+
+    const onAgeEdit = (name,value) => {
+
+    const regex = /^[0-9]+(y|Y|m|M|w|W|d|D)$/;
+
+    if (value === "") {
+      setError(false);
+      return;
+    }
+
+    if (!regex.test(value)) {
+      setError(true);
+      return;
+    }
+
+    setError(false);
+
+    const age = value.slice(0, -1);
+    const lastCharacter = value[value.length - 1];
+    let dob = moment().format("DD/MM/yyyy");
+
+    switch (lastCharacter.toLowerCase()) {
+      case "y":
+        dob = moment().subtract(age, "years");
+        break;
+      case "m":
+        dob = moment().subtract(age, "months");
+        break;
+      case "w":
+        dob = moment().subtract(age, "weeks");
+        break;
+      case "d":
+        dob = moment().subtract(age, "days");
+        break;
+      default:
+        break;
+    }
+
+    formValues["Age*"] = value
+    formValues["Date of Birth"] = new Date(dob)
+
+  };
+
+
   useEffect(() => {
     getAPI(
       `/concept?q="Registration Attribute"&v=custom:(answers:(display,answers:(uuid,display,datatype:(display),synonyms:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType)))))`
@@ -79,17 +141,83 @@ export default function PatientRegistration() {
           (stepWithContent) =>
             stepWithContent.answers.length >= 1 && stepWithContent
         );
+        var idToRemoveList = ["Visit Info","Payment Info"]
+
+        var finalLabels = stapsWithContent.filter((item) => !idToRemoveList.includes(item.display));
         setsteps([
           "Demographics",
-          ...stapsWithContent.map((step) => step.display),
+          ...finalLabels.map((step) => step.display),
         ]);
-        setStepsWithContent(stapsWithContent);
+        setStepsWithContent(finalLabels);
+        var grouplist = []
+        var nationalIDlist = []
+        var occList = [];
+        var mrList = [];
+        var natList = [];
+        var relList = [];
+response.data.results.forEach(function(respData) {
+respData.answers.map((result) => {
+            result.answers.map((element) => {
+              const { uuid, display, answers, datatype, synonyms, names } =
+                element;
+              if (display == "National ID*") {
+                answers.map((nation) => {
+                  nationalIDlist.push(nation)
+                })
+                setNationnalID(nationalIDlist)
+              }
+              else if (display == "Blood Group") {
+                answers.map((group) => {
+                  grouplist.push(group)
+                })
+                setBloodG(grouplist)
+              }
+              else if (display == "Occupation") {
+                answers.map((occ) => {
+                  occList.push(occ)
+                })
+                setOccpList(occList)
+              }
+              else if (display == "Marital Status") {
+                answers.map((mr) => {
+                  mrList.push(mr)
+                })
+                setMrsList(mrList)
+              }
+              else if (display == "Nationality") {
+                answers.map((nat) => {
+                  natList.push(nat)
+                })
+                setNation(natList)
+              }
+              else if (display == "Relationship") {
+                answers.map((rela) => {
+                  relList.push(rela)
+                })
+              }
+            }
+
+  )
+                  setRela(relList)
+
+
+})
+  console.log(" >>>",rela)
+
+})
+
       })
       .catch((error) => console.log(error));
 
     getAPI("/idgen/nextIdentifier?source=1")
       .then((response) => {
-        setIdentifier(response.data.results[0].identifierValue);
+        if (patiendID) {
+    setIdentifier(patiendID)
+}
+else {
+   setIdentifier(response.data.results[0].identifierValue);
+}
+
       })
       .catch((error) => console.log(error));
 
@@ -164,7 +292,138 @@ export default function PatientRegistration() {
   //   }
   //  }
   //  getshortnameData();
+
+    getaddressAPI("/patient_search?name="+patiendID)
+      .then((response) => {
+        console.log(" Registered Data>>> ", response.data[0])
+
+        var pResponse = response.data[0];
+        setPUuid(pResponse.uuid)
+        var nameR = pResponse.name;
+        var firstN = "";
+        var middleN = "";
+        var lastN = "";
+        var nameL = nameR.split(" ")
+        if (nameR) {
+            firstN = nameL[0]
+          if (nameL.length == 3) {
+            middleN = nameL[1]
+            lastN = nameL[2]
+          }
+          else if (nameL.length == 2) {
+            lastN = nameL[1]
+          }
+          else {
+            lastN = nameL[-1]
+          }
+        }
+        formValues["First Name*"] = firstN
+        formValues["Middle Name"] = middleN
+        formValues["Last Name*"] = lastN
+        var ageV = pResponse.age + "y"
+        onAgeEdit("Age*",ageV)
+
+        if (response.data[0].gender == "M") {
+          formValues["Gender*"] = { name: "Male", value: pResponse.gender }
+        }
+        else if (response.data[0].gender == "F") {
+          formValues["Gender*"] = { name: "Female", value: pResponse.gender }
+        }
+        else {
+          formValues["Gender*"] = { name: "Others", value: pResponse.gender }
+        }
+        formValues["Phone Number*"] = pResponse.person_attributes["Phone Number*"]
+        formValues["Relative Name*"] = pResponse.person_attributes["Relative Name*"]
+        formValues["Next of Kin Phone Number*"] = pResponse.person_attributes["Next of Kin Phone Number*"]
+
+
+        formValues["Town/City"] = { name: pResponse.address["City Village"] }
+        formValues["Postal Address"] = pResponse.address["Address1"]
+        formValues["Postal Code"] = pResponse.address["Postal Code"]
+        formValues["State"] = pResponse.address["State Province"]
+
+        setRegisteredDetails(response.data.results);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+
+
   }, []);
+
+  useEffect(() => {
+
+        setValue({});
+
+    getaddressAPI("/patient_search?name="+patiendID)
+      .then((response) => {
+        console.log(" Registered Data>>> ", response.data[0])
+
+        var pResponse = response.data[0];
+        setPUuid(pResponse.uuid)
+
+        console.log(" Blood G ",bloodG,nationalID,mrsList,rela)
+          if (pResponse.person_attributes["Blood Group"]) {
+            bloodG.map((gr) => {
+              if (gr.display == pResponse.person_attributes["Blood Group"]) {
+                formValues["Blood Group"] = gr
+              }
+            })
+          }
+          if (pResponse.person_attributes["Aadhar*"]) {
+            nationalID.map((nt) => {
+              if (nt.display == "Aadhar*") {
+                formValues["National ID*"] = nt
+                formValues["Aadhar*"] = pResponse.person_attributes["Aadhar*"]
+              }
+            })
+          }
+          if (pResponse.person_attributes["Occupation"]) {
+            occpList.map((oc) => {
+              if (oc.display == pResponse.person_attributes["Occupation"]) {
+                formValues["Occupation"] = oc
+              }
+            })
+          }
+          if (pResponse.person_attributes["Marital Status"]) {
+            mrsList.map((mrs) => {
+              if (mrs.display == pResponse.person_attributes["Marital Status"]) {
+                formValues["Marital Status"] = mrs
+              }
+            })
+          }
+          if (pResponse.person_attributes["Nationality"]) {
+            nation.map((nt) => {
+              if (nt.display == pResponse.person_attributes["Nationality"]) {
+                formValues["Nationality"] = nt
+              }
+            })
+        }
+        if (pResponse.person_attributes["Relationship"]) {
+            rela.map((relas) => {
+              if (relas.display == pResponse.person_attributes["Relationship"]) {
+                formValues["Relationship"] = relas
+              }
+            })
+          }
+
+
+
+
+        setRegisteredDetails(response.data.results);
+                setValue({});
+
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+
+
+  }, [activeStep]);
+
+
 
   function getStepContent(step) {
     return (
@@ -369,7 +628,6 @@ export default function PatientRegistration() {
                       {formValues[display]?.datatype?.display === "Text" && (
                         <TextFieldComponent
                           display={formValues[display].display}
-                         
                           labelName={
                             getLabelName(formValues[display].names) ||
                             formValues[display].display
@@ -389,7 +647,6 @@ export default function PatientRegistration() {
                           display={
                             formValues[formValues[display]?.display]?.display
                           }
-                          
                           labelName={
                             getLabelName(
                               formValues[formValues[display]?.display]?.names
@@ -416,12 +673,6 @@ export default function PatientRegistration() {
                               formValues[formValues[display]?.display]?.display
                             ]?.display
                           }
-                          // labelName={
-                          
-                          //   formValues[
-                          //     formValues[formValues[display]?.display]?.display
-                          //   ]?.display
-                          // }
                           labelName={
                             getLabelName(
                               formValues[
@@ -446,41 +697,7 @@ export default function PatientRegistration() {
               }
               return null;
             })}
-            {isLastStep() ? (
-              <GridItem item xs={12} sm={6} md={4}>
-                <Autocomplete
-                  id="Department*"
-                  options={appointmentTypes}
-                  getOptionLabel={(option) => option.display}
-                  onChange={(e, newValue) => {
-                    onAutocompleteChange("Department*", newValue);
-                    getTimeSlots(newValue);
-                  }}
-                  onBlur={(e) =>
-                    validateAutocomplete(
-                      "Department*",
-                      formValues["Department*"]
-                    )
-                  }
-                  value={formValues["Department*"]}
-                  getOptionSelected={(option, value) =>
-                    option.uuid === value.uuid
-                  }
-                  defaultValue={formValues["Department*"]}
-                  className={classes.field}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      name="Department*"
-                      label="Department*"
-                      variant="outlined"
-                      error={formErrors["Department*"] ? true : false}
-                      helperText={formErrors["Department*"]}
-                    />
-                  )}
-                />
-              </GridItem>
-            ) : null}
+
           </>
         )}
       </GridContainer>
@@ -488,26 +705,8 @@ export default function PatientRegistration() {
   }
 
   function getLabelName(names) {
-    const shortName = names.filter((name) => name.conceptNameType === "FULLY_SPECIFIED");
-    //return shortName.length ? shortName[0].display : null;
-    if(shortName.length)
-    {
-      if(shortName[0].display === 'CHC'
-         || shortName[0].display === 'PHC' 
-         || shortName[0].display ==='Sub Centre'
-         || shortName[0].display ==='SDH'
-         || shortName[0].display ==='Private Institutions')
-      {
-        return "Referral Type";
-      }
-      else
-      {
-        return shortName[0].display;
-      }
-    }
-    else{
-      return null;
-    }
+    const shortName = names.filter((name) => name.conceptNameType === "SHORT");
+    return shortName.length ? shortName[0].display : null;
   }
   // function getSpecifiyFielddata(field,obj) {
   //   if(field === 'State')
@@ -572,7 +771,6 @@ export default function PatientRegistration() {
       [name]: value,
     });
     validateText(e);
-
   }
 
   function onEmailChange(e) {
@@ -587,13 +785,14 @@ export default function PatientRegistration() {
 
   function onAutocompleteChange(display, newValue) {
     if (newValue?.datatype?.display === "Coded") {
-
+      console.log(" Auto compelteee : ", newValue, display);
       setFormValues({
         ...formValues,
         [newValue.display]: null,
         [display]: newValue,
       });
     } else if (newValue?.datatype?.display === "Text") {
+            console.log(" Auto compelteee  Test: ", newValue, display);
 
       setFormValues({
         ...formValues,
@@ -601,6 +800,7 @@ export default function PatientRegistration() {
         [display]: newValue,
       });
     } else {
+            console.log(" Auto compelteee ELSE : ", newValue, display);
 
       setFormValues({ ...formValues, [display]: newValue });
     }
@@ -662,6 +862,7 @@ export default function PatientRegistration() {
 
   function validateText(e) {
     const { name, value } = e.target;
+
     if (name.slice(-1) === "*") {
       if (!value || value === "") {
         setFormErrors({ ...formErrors, [name]: "This field is required" });
@@ -803,7 +1004,7 @@ export default function PatientRegistration() {
         attributes: [
           {
             attributeType: HOSPITAL_NAME,
-            value: REGISTRATION_HOSPITAL_NAME,
+            value: "Deendyal Upadhyay Zonal Hospital",
           },
           {
             attributeType: PERSON_UPDATED,
@@ -828,42 +1029,50 @@ export default function PatientRegistration() {
       ],
     };
 
-    let location = timeSlots.filter(
-      (element) => selectedTimeSlot === element.uuid
-    );
+    // let location = timeSlots.filter(
+    //   (element) => selectedTimeSlot === element.uuid
+    // );
 
-    let visit = {
-      visitType: "7b0f5697-27e3-40c4-8bae-f4049abfb4ed",
-      location: location[0].appointmentBlock.location.uuid,
-      attributes: getAttributes(visitAttributeTypes),
-    };
-    postAPI("/patient", patient)
+    // let visit = {
+    //   visitType: "7b0f5697-27e3-40c4-8bae-f4049abfb4ed",
+    //   location: location[0].appointmentBlock.location.uuid,
+    //   attributes: getAttributes(visitAttributeTypes),
+    // };
+
+    postAPI("/patient/"+pUuid, patient)
       .then((patientResponse) => {
-        visit.patient = patientResponse.data.uuid;
-        postAPI("/visit", visit)
-          .then((visitResponse) => {
-            postAPI("/appointmentscheduling/appointment", {
-              appointmentType: formValues["Department*"].uuid,
-              patient: patientResponse.data.uuid,
-              reason: "New Registration",
-              status: "Scheduled",
-              timeSlot: selectedTimeSlot,
-              visit:visitResponse.data.uuid,
-            })
-              .then((appointmentResponse) => {
+        console.log("Patient Values :", patientResponse);
+        var successmsj = "success"
+        enqueueSnackbar("Patient Data Edited Successfully.", {successmsj});
 
-                setRegistrationSuccessData({
-                  appointmentData: appointmentResponse.data,
-                  visitData: visitResponse.data,
-                });
-              })
-              .catch((appointmentRequestError) => {
-                console.log(appointmentRequestError);
-              });
-          })
-          .catch((visitRequestError) => {
-            console.log(visitRequestError);
-          });
+
+        // visit.patient = patientResponse.data.uuid;
+        // postAPI("/visit", visit)
+        //   .then((visitResponse) => {
+        //             console.log(" Visit Data :",visitResponse)
+
+        //     postAPI("/appointmentscheduling/appointment", {
+        //       appointmentType: formValues["Department*"].uuid,
+        //       patient: patientResponse.data.uuid,
+        //       reason: "New Registration",
+        //       status: "Scheduled",
+        //       timeSlot: selectedTimeSlot,
+        //       visit:visitResponse.data.uuid,
+        //     })
+        //       .then((appointmentResponse) => {
+
+        //         setRegistrationSuccessData({
+        //           appointmentData: appointmentResponse.data,
+        //           visitData: visitResponse.data,
+        //         });
+        //       })
+        //       .catch((appointmentRequestError) => {
+        //         console.log(appointmentRequestError);
+        //       });
+        //   })
+        //   .catch((visitRequestError) => {
+        //     console.log(visitRequestError);
+        //   });
       })
       .catch((patientRequestError) => console.log(patientRequestError));
   };
@@ -977,7 +1186,7 @@ export default function PatientRegistration() {
                   {isLastStep() ? (
                     <Button
                       disabled={
-                        Object.keys(formErrors).length > 0 || !selectedTimeSlot
+                        Object.keys(formErrors).length > 0
                       }
                       variant="contained"
                       color="primary"
