@@ -1,9 +1,9 @@
 import React from 'react'
-
+import ConceptDashboard from "./conceptDashboard"
 function ConceptMgmt() {
     return (
         <div>
-            <h3>Concept Management</h3>
+            <ConceptDashboard/>
         </div>
     )
 }

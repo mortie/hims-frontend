@@ -11,6 +11,7 @@ import { SnackbarProvider } from "notistack";
 import { makeStyles, CssBaseline, Container } from "@material-ui/core";
 import { logout, hasAccess, isLogin } from "../../utils";
 import { appRoutes as routes } from "../../routes";
+import { billingRoutes as billroutes } from "../../routes";
 import { AppBar, SideBar, Footer } from "../../components";
 import styles from "./styles";
 import { deleteAPI } from "../../services";
@@ -46,7 +47,7 @@ function App({ getAllLocationsAction, ...rest }) {
   const handleLogout = () => {
     deleteAPI("/loginaudit").then((response) => logout(history));
   };
-
+  
   const switchRoutes = (
     <Switch>
       {routes.map((prop, key) => {
@@ -61,6 +62,16 @@ function App({ getAllLocationsAction, ...rest }) {
           );
         }
         return null;
+      })}
+        {billroutes.map((prop, key) => {       
+          return (
+            <Route
+              path={prop.layout + prop.path}
+              component={prop.component}
+              key={key}
+              exact
+            />
+          );
       })}
       <Redirect from="/" to="/app/home" />
     </Switch>

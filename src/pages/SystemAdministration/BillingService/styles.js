@@ -1,7 +1,22 @@
-const patientSearchStyles = (theme) => ({
+const BillingServiceStyles = (theme) => ({
   paper: {
     marginTop: theme.spacing(2),
     // padding: theme.spacing(2),
+  },
+  header:{
+    backgroundColor: "#3EABC1",
+    color: "#FFFFFF",
+    fontSize:18
+  },
+  root: {
+    width: '100%',
+  },
+  nested: {
+    paddingLeft: theme.spacing(4),
+  },
+  subcontent:{
+    
+    marginLeft: theme.spacing(6),
   },
   field: {
     marginTop: theme.spacing(1),
@@ -13,5 +28,8 @@ const patientSearchStyles = (theme) => ({
   containerTable: {
     maxHeight: 440,
   },
+  checkbox:{
+    marginTop: 20
+  }
 });
-export default patientSearchStyles;
+export default BillingServiceStyles;

@@ -1,81 +1,54 @@
-import React, { useState , useEffect} from 'react';
-import { getAPI } from "../../../services/index";
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Collapse from '@material-ui/core/Collapse';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import Subconcept from './subconcept'
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import { Link } from "react-router-dom";
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import BillableService from './components/BillableService/';
+import { billingRoutes } from "../../../routes/billingroutes";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
-    maxWidth: 360,
-    backgroundColor: theme.palette.background.paper,
+    marginTop: 10,
   },
-  nested: {
-    paddingLeft: theme.spacing(4),
+  
+  title: {
+    backgroundColor: "#3EABC1",
+    color: "#FFFFFF",
   },
 }));
-
 function BillingMgmt() {
-  const [data, setData] = React.useState([]);
     const classes = useStyles();
-  const [open, setOpen] = React.useState(null);
-
-  const handleClick = (name) => {
-    if(open === name){
-      setOpen(null);
-    }
-    else{
-      setOpen(name);
-    }
-  };
-  
-  useEffect(() => {
-    let url1 =
-    "/concept?q=services order&v=custom:(answers:(uuid,display,datatype:(display),answers:(uuid,display),description:(display)))";
-  getAPI(url1)
-    .then((response) => {
-     
-      if(!data.includes(response.data.results[0].answers)){
-        setData(response.data.results[0].answers);
-      }
-      
-    })
-    .catch((error) => console.log(error));
-
-   }, []);
+    const handleClick = (event) => {
+        event.preventDefault();
+        return(<BillableService/>)
+    };
     return (
-        <List
-      component="nav"
-      aria-labelledby="nested-list-subheader"
-      subheader={
-        <ListSubheader component="div" id="nested-list-subheader">
-          Billing Concept
-        </ListSubheader>
-      }
-      className={classes.root}
-    >
-       {data.map((item) =>
-        <>
-            <ListItem button onClick={() => handleClick(item.display)}>
-              <ListItemText primary={item.display} />
-        {open === item.display ? <ExpandLess /> : <ExpandMore />}
-      </ListItem>
-      
-          <Collapse in={open === item.display} timeout="auto" unmountOnExit>
-            <Subconcept name={item.display}/>
-          </Collapse>
-      
-      </>
-      )}
-      
-    </List>
-    )
+      <Card className={classes.root}>
+        <CardHeader        
+          title="Billing Management"
+          className={classes.title}
+        />
+        <CardContent>
+        
+        {billingRoutes.map((prop, key) => {
+          return (
+            <Typography key={key}> 
+                <Button                    
+                    component={Link}
+                    to={prop.layout + prop.path}                 
+                  >
+                    {prop.title}
+                  </Button>
+             </Typography>
+          )
+        })
+          }</CardContent>
+      </Card>
+    );
 }
 
 export default BillingMgmt

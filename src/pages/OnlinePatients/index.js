@@ -55,7 +55,7 @@ export default function InfiniteLoadingGrid() {
   let [appointData, setAppointData]= React.useState([]);
   let [filterappointData, setFilterAppointData]= React.useState([]);
   const [visitAttributeTypes, setVisitAttributeTypes] = useState();
-  const [visits, setVisits] = useState([]);
+  const [visitId, setVisitId] = useState('');
   const [gender, setGender] = React.useState('');
   var [searchDetails, setsearchDetails] = useState({
     phone: "",
@@ -193,29 +193,41 @@ function resetOnKey(e){
 
   const handleClick = (event, data) => {
    if(event.target.innerHTML !== "Arrived"){
-    let visitattributes = [
-      {uuid: "724ce4fd-4908-4562-831e-c33d7a469539", display: "Patient Category*: Paid category*"},
-      {uuid: "d70434d4-5f55-4e82-9903-41de9454049c", display: "Paid category*: General Category*"},
-      {uuid: "026578f3-750d-4910-889f-c0c1190d1ce3", display: "Cash: 785.0"},
-      {uuid: "c52cec47-b03f-4795-9465-a26ad00fdc81", display: "Medico Legal Case*: MLC No"}
-    ];
+   
     const patientId = data.row.uuid;
 
     let visit = {
       visitType: "7b0f5697-27e3-40c4-8bae-f4049abfb4ed",
     };
-
+    
+    const getVisitAttrs = (data) =>{
+      console.log(data);
+      if(data.length === 1){
+        setVisitId(data[0].uuid);
+      }else{
+        data.map((result) => {
+          console.log(result);
+          getAPI("/visit/"+result.uuid)
+          .then((resp) => {
+            if(resp.data.attributes.length > 0)
+            {
+              console.log(result.uuid);
+              setVisitId(result.uuid);
+            }
+          })
+        })
+      }
+    return visitId;
+    };
     
     getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
     .then((response) => {
       let visits = response.data.visits;
-      console.log(visits);
-      let firstVisitId = visits[visits.length-1].uuid;
-      getAPI("/visit/"+firstVisitId)
-        .then((resp) => {
-          //console.log(resp.data.attributes);
+      getVisitAttrs(visits);
+      getAPI("/visit/"+visitId)
+        .then((resp) => {          
           let attributes =[];
-          attributes = resp.data.attributes.length > 0? resp.data.attributes : visitattributes;
+          attributes = resp.data.attributes;
           console.log(attributes);
          visit.attributes = attributes;
           visit.patient = data.row.uuid;
