@@ -187,6 +187,7 @@ export default function Triage() {
   const [previousVitalsLoading, setPreviousVitalsLoading] = useState(false);
   const [providerUuid, setProviderUuid] = useState(null);
   const [vitalSaved, setVitalSaved] = useState(false);
+  const [hisSaved, setHisSaved] = useState(false);
   const [location, setLocation] = useState(null);
   const [searchKey, setSearchKey] = useState("");
   const [loading, setLoading] = useState(true);
@@ -397,6 +398,7 @@ export default function Triage() {
       .then((response) => {
         enqueueSnackbar("Patient History saved successfully.");
         setOpen(false);
+        setVitalSaved(true);
       })
       .catch((error) => {
         console.log(error);
@@ -510,10 +512,10 @@ export default function Triage() {
                       ))}
                     </Select>
                     <FormHelperText>
-                      {previousVitalsLoading
-                        ? "loading..."
-                        : getPreviousVitalValue(uuid)}
+                      {display.includes("Blood Pressure") &&
+                        getPreviousVitalValue(uuid)}
                     </FormHelperText>
+
                   </FormControl>
                 </Tooltip>
               </GridItem>
@@ -545,13 +547,13 @@ export default function Triage() {
                     autoFocus={!index}
                     disabled={display === "BMI"}
                     error={errors[uuid]}
-                    helperText={
-                      errors[uuid]
-                        ? errors[uuid]
-                        : previousVitalsLoading
-                        ? "loading..."
-                        : getPreviousVitalValue(uuid)
-                    }
+                    // helperText={
+                    //   errors[uuid]
+                    //     ? errors[uuid]
+                    //     : previousVitalsLoading
+                    //     ? "loading..."
+                    //     : getPreviousVitalValue(uuid)
+                    // }
                   />
                 </Tooltip>
               </GridItem>
@@ -588,11 +590,11 @@ export default function Triage() {
                       }
                       autoFocus={!index}
                       onChange={handleDateChange}
-                      helperText={
-                        previousVitalsLoading
-                          ? "loading..."
-                          : getPreviousVitalValue(uuid)
-                      }
+                      // helperText={
+                      //   previousVitalsLoading
+                      //     ? "loading..."
+                      //     : getPreviousVitalValue(uuid)
+                      // }
                     />
                   </MuiPickersUtilsProvider>
                 </Tooltip>
