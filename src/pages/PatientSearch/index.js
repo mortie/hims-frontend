@@ -24,12 +24,12 @@ import { GridContainer, GridItem } from "../../components/Grid";
 import {ADRESSBASE_URL_API} from "../../utils/constants"
 
 import CustomizedMenus from "./ActionButton";
-import { getAPI, postAPI,getaddressAPI } from "../../services/index";
-
+import { getAPI, postAPI, getaddressAPI } from "../../services/index";
 
 import axios from "axios";
 import styles from "./styles";
 import "./styles.css";
+import { PRE_NUM } from './constants';
 
 const useStyles = makeStyles(styles);
 
@@ -427,6 +427,7 @@ export default function PatientSearch(props) {
       } else {
         param = phoneVal;
       }
+      param = PRE_NUM + param
     }
     if (firstNameVal && phoneVal) {
       if (phoneVal && ageVal) {
@@ -438,6 +439,7 @@ export default function PatientSearch(props) {
       } else {
         param = phoneVal;
       }
+      param = PRE_NUM + param
     }
     if (identifierVal) {
       if (identifierVal && ageVal) {
@@ -600,7 +602,7 @@ export default function PatientSearch(props) {
           filters["name"] = [firstName.toUpperCase()];
         }
         if (phone) {
-          filters["phone"] = [phone];
+          filters["phone"] = [PRE_NUM + phone];
         }
         if (identifier) {
           filters["identifier"] = [identifier];
@@ -723,7 +725,7 @@ export default function PatientSearch(props) {
                       filters["name"] = [firstNameValue];
                     }
                     if (phoneValue) {
-                      filters["phone"] = [phoneValue];
+                      filters["phone"] = [PRE_NUM + phoneValue];
                     }
                     if (lvdValue) {
                       filters["lvd"] = [lvdValue];
@@ -873,7 +875,7 @@ export default function PatientSearch(props) {
                     filters["name"] = [firstNameValue];
                   }
                   if (phoneValue) {
-                    filters["phone"] = [phoneValue];
+                    filters["phone"] = [PRE_NUM+phoneValue];
                   }
                   if (lvdValue) {
                     filters["lvd"] = [lvdValue];

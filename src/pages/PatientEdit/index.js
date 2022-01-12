@@ -333,8 +333,13 @@ else {
           formValues["Gender*"] = { name: "Others", value: pResponse.gender }
         }
         formValues["Phone Number*"] = pResponse.person_attributes["Phone Number*"]
-        formValues["Relative Name*"] = pResponse.person_attributes["Relative Name*"]
-        formValues["Next of Kin Phone Number*"] = pResponse.person_attributes["Next of Kin Phone Number*"]
+        if (pResponse.person_attributes["Next of Kin Phone Number*"]) {
+          formValues["Next of Kin Phone Number*"] = pResponse.person_attributes["Next of Kin Phone Number*"]
+        }
+        if (pResponse.person_attributes["Relative Name*"]) {
+          formValues["Relative Name*"] = pResponse.person_attributes["Relative Name*"]
+
+        }
 
 
         formValues["Town/City"] = { name: pResponse.address["City Village"] }
