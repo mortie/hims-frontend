@@ -518,16 +518,15 @@ const getAge = (birthdate) => {
               <TableCell >
                 <Typography>&nbsp;&nbsp;&nbsp;{ doctorName }</Typography>
               </TableCell>
-              {/* <TableCell >
+              </TableRow>
+              <TableRow>
+              <TableCell colSpan={2}>
                 <Typography>REPORTING TIME</Typography>
               </TableCell>
-              <TableCell>
-                <Typography>{`${moment(startDate).format(
-                  "hh:mm a"
-                )} to ${moment(endDate).format("hh:mm a")}`}</Typography>
-                            <Typography>{ reportingTime }</Typography>
-              </TableCell> */}
-          </TableRow>
+              <TableCell >
+                <Typography>&nbsp;&nbsp;&nbsp;{ reportingTime }</Typography>
+            </TableCell>
+            </TableRow>
         </TableBody>
 
         </Table>
