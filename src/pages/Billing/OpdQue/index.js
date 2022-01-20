@@ -37,6 +37,8 @@ import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
 import { useHistory } from "react-router-dom";
+import ListtoOrder from "../ListtoOrder"
+
 const useStyles = makeStyles(styles);
 function createData(name, calories, fat, carbs, protein) {
   return { name, calories, fat, carbs, protein };
@@ -55,6 +57,8 @@ export default function OpdQue() {
   //const [patientname,setPatientname]=useState("");
   const [datasubmitted, setDataSubmitted] = useState(false);
   const [currentRow, setCurrentRow] = useState(null);
+  const [patientData, setPatientData] = useState([]);
+  const [showListToOrder, setShowListToOrder] = useState(false);
   const [showDialog, setshowDialog] = useState(false);
   const [selectedDate, setSelectedDate] = React.useState(new Date());
   const [actualorderdate, setActualOrderdate] = React.useState(
@@ -241,9 +245,8 @@ export default function OpdQue() {
   ];
   const handleOpen = (event) => {
     console.log(event.row);
-    history.push(
-      `/app/billing/listtoorder/${event.row.id}/${event.row.orderdate}`
-    );
+    setShowListToOrder(true);
+    setPatientData(event.row);
     // setshowDialog(true);
     // setCurrentRow(event.row);
     // console.log(event.row);
@@ -277,7 +280,10 @@ export default function OpdQue() {
   //   return orderrowdetails;
   // }
 
-  return (
+  if(showListToOrder)
+  {return (<ListtoOrder patientData = {patientData}/>)}
+  else{
+    return( 
     <>
       <BillingNavbar></BillingNavbar>
       <VerticalTabComponent></VerticalTabComponent>
@@ -440,5 +446,5 @@ export default function OpdQue() {
         // </Dialog>
       )}
     </>
-  );
+  )}
 }

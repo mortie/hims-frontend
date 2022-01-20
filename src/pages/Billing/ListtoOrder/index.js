@@ -8,20 +8,22 @@ import { useParams } from "react-router-dom";
 import styles from "./styles";
 import { TestOrderDetails } from "../../../services/data";
 const useStyles = makeStyles(styles);
-function ListtoOrder() {
+
+function ListtoOrder(props) {
   const classes = useStyles();
+  const patientData = props.patientData;
   const { id, param2 } = useParams();
   useEffect(() => {
-    //console.log(moment().format("DD-MM-YYYY"));
-    async function fetchData() {
+    console.log(patientData);
+    /*async function fetchData() {
       const request = await TestOrderDetails.TestOrderDetailsDataFunc(
         id,
         param2
       );
       console.log(request);
     }
-    fetchData();
-  }, [id, param2]);
+    fetchData();*/
+  }, []);
   return (
     <>
       <BillingNavbar></BillingNavbar>
