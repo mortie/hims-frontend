@@ -15,6 +15,9 @@ import {
   SystemAdmin,
   PatientEdit,
 } from "../pages";
+import BillingTabHomeComponent from "../pages/Billing/BillingTabHomeComponent";
+import ListtoOrder from "../pages/Billing/ListtoOrder";
+import OpdQue from "../pages/Billing/OpdQue";
 
 /**
  * list of available routes for the entire application.
@@ -154,7 +157,7 @@ export const appRoutes = [
     layout: "/app",
   },
   {
-    path: "/billing",
+    path: "/billing/home",
     title: "Billing",
     roles: [
       "System Developer",
@@ -163,7 +166,33 @@ export const appRoutes = [
     ],
     visibleOnSidebar: true,
     icon: "fa fa-receipt",
-    component: Billing,
+    component: BillingTabHomeComponent,
+    layout: "/app",
+  },
+  {
+    path: "/billing/outpatientbillingqueue",
+    title: "",
+    roles: [
+      "System Developer",
+      "Application: Billing Administrator",
+      "Application: Billing Clerk",
+    ],
+    visibleOnSidebar: false,
+    icon: "fa fa-receipt",
+    component: OpdQue,
+    layout: "/app",
+  },
+  {
+    path: "/billing/listtoorder/:id/:param2",
+    title: "",
+    roles: [
+      "System Developer",
+      "Application: Billing Administrator",
+      "Application: Billing Clerk",
+    ],
+    visibleOnSidebar: false,
+    icon: "fa fa-receipt",
+    component: ListtoOrder,
     layout: "/app",
   },
   {

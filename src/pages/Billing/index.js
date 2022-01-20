@@ -3,23 +3,28 @@ import BillingNavbar from './BillingNavbar';
 import BillingTabHomeComponent from './BillingTabHomeComponent';
 import OpdQue from './OpdQue';
 import TabPanelComponent from './TabPanelComponent';
-import {BrowserRouter, Link, Switch, Route} from 'react-router-dom';
+import {BrowserRouter as Router, Link, Switch, Route} from 'react-router-dom';
 
 
 function Billing(props) {
     
     return (
     <>
-     <TabPanelComponent></TabPanelComponent>
-      {/* <BrowserRouter>
+      {/* <TabPanelComponent></TabPanelComponent>  */}
+      {/* <Router>
       <BillingNavbar>
       <switch>
-      <Route path="/app/billing/home" component={BillingTabHomeComponent}></Route>
-      <Route path="/departments" component={OpdQue}></Route>
-      </BillingNavbar>
+        <Route path="/app/billing/home" exact component={BillingTabHomeComponent}></Route>
+        <Route path="/app/billing/billingnew" component={OpdQue} exact></Route>
       </switch>
-      </BrowserRouter>
-     */}
+      </BillingNavbar>
+
+      </Router> */}
+    
+      <BillingNavbar>
+      </BillingNavbar>
+ 
+      {/* <BillingTabHomeComponent></BillingTabHomeComponent> */}
      </> 
     );
 }

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styles from './styles';
 import OpdQue from '../OpdQue';
+import {Link,Route} from 'react-router-dom';
 const useStyles = makeStyles(styles);
 
 function TabPanel(props) {
@@ -43,9 +44,37 @@ function TabPanel(props) {
     };
     return (
       <div className={classes.root}>
-         <GridContainer>
-          < GridItem xs={12} sm={6} md={12}>
-        <Tabs
+          <Route
+          path="/"
+          render={(history) => (
+            <AppBar position='relative'>
+              <Tabs
+                value={
+                  history.location.pathname !== "/"
+                    ? history.location.pathname
+                    : false
+                }
+                variant="scrollable"
+                className={classes.tabs}
+              >
+                {console.log(history.location.pathname)}
+               
+                <Tab
+                  value="/app/billing/outpatientbillingqueue"
+                  label="OPD  Queue"
+                  component={Link}
+                  to="/app/billing/outpatientbillingqueue"
+                />
+                  <Tab label="IPD Queue"  />
+                  <Tab label="Billing Ambulance"  />
+                  <Tab label="Billing Tender"  />
+                  <Tab label="Billing Miscellaneous Service"  />
+                  <Tab label="Search Patient System" />
+              </Tabs>
+            </AppBar>
+          )}
+          />
+        {/* <Tabs
           variant="scrollable"
           value={value}
           onChange={handleChange}
@@ -58,9 +87,9 @@ function TabPanel(props) {
           <Tab label="Billing Tender"  />
           <Tab label="Billing Miscellaneous Service"  />
           <Tab label="Search Patient System" />
-        </Tabs>
-        </GridItem>
-        < GridItem xs={12} sm={6} md={12}>
+        </Tabs> */}
+   
+        {/* < GridItem xs={12} sm={6} md={12}>
         <TabPanel value={value} index={0}  className={classes.panelfirst}>
           <OpdQue></OpdQue>
         </TabPanel>
@@ -80,8 +109,8 @@ function TabPanel(props) {
         <TabPanel value={value} index={5}>
         <Typography variant="h6">Search Patient System</Typography>
         </TabPanel>
-        </GridItem>
-        </GridContainer>
+        </GridItem> */}
+      
       </div>
     );
    

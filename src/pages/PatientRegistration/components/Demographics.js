@@ -42,6 +42,7 @@ function Demographics(props) {
   const handleDateChange = (date, value) => {
     let age = undefined;
     if (date?._isValid) {
+      console.log(date);
       age = calculateAge(date);
     }
 

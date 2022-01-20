@@ -3,11 +3,14 @@ import { GridContainer, GridItem } from "../../../components/Grid";
 import { makeStyles, Icon,Typography } from "@material-ui/core";
 import { Card, CardHeader, CardIcon, CardFooter } from "../../../components/Card";
 import styles from "../../Home/styles";
+import BillingNavbar from '../BillingNavbar';
 const useStyles = makeStyles(styles);
 function BillingTabHomeComponent() {
   const classes = useStyles();
     return (
         <div>
+             <BillingNavbar>
+      </BillingNavbar>
               <GridContainer>
               <GridItem item xs={12} sm={6} md={3}>
               <Card>

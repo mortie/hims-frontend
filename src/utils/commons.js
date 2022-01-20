@@ -1,11 +1,12 @@
 import moment from "moment";
 
 /**
- * 
- * @param {Date} birthdate 
+ *
+ * @param {Date} birthdate
  * @returns the age in 1y, 1m, 1w or 1d
  */
 export const calculateAge = (birthdate) => {
+  //console.log(birthdate);
   let difference = moment.duration(moment().diff(birthdate));
 
   if (difference.years() >= 1) {

@@ -30,7 +30,15 @@ const opdStyles = (theme) => ({
     },
     table: {
       minWidth: 650,
-    }
+    },
+    title: {
+      backgroundColor: "#3EABC1",
+      color: "#FFFFFF",
+      padding: `6px 9px`,
+     
+
+    },
+    
    
   });
   
