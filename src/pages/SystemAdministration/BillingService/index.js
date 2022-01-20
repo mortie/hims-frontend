@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import BillableService from './components/BillableService/';
 import { billingRoutes } from "../../../routes/billingroutes";
 
 const useStyles = makeStyles((theme) => ({
@@ -22,10 +21,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 function BillingMgmt() {
     const classes = useStyles();
-    const handleClick = (event) => {
-        event.preventDefault();
-        return(<BillableService/>)
-    };
+    
     return (
       <Card className={classes.root}>
         <CardHeader        

@@ -75,7 +75,7 @@ function BillableService() {
 
   useEffect(() => {
     let url1 =
-    "/concept?q=services ordered&v=custom:(answers:(display,answers:(uuid,display,datatype:(display),synonyms:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display)))))";
+    "/concept?q=services ordered&v=custom:(answers:(uuid,display,answers:(uuid,display,datatype:(display),synonyms:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display)))))";
   getAPI(url1)
     .then((response) => {
      
@@ -113,20 +113,20 @@ function BillableService() {
       </Tabs>
       {category.map((item,index) =>
                 <TabPanel value={value} index={index}>
-                  {item.answers.map((item,key) =>
+                  {item.answers.map((answer,key) =>
                         <Grid key={key}>
-                        <ListItem button onClick={() => handleClick(item.display)}>
-                        {open === item.display ? <ExpandLess /> : <ExpandMore />}
+                        <ListItem button onClick={() => handleClick(answer.display)}>
+                        {open === answer.display ? <ExpandLess /> : <ExpandMore />}
                         <Checkbox 
-                        id={item.uuid}
+                        id={answer.uuid}
                         onChange={handleChecked}
                         size="small"
                         inputProps={{ 'aria-label': 'checkbox with small size' }} />
-                         <ListItemText primary={item.display} />
+                         <ListItemText primary={answer.display} />
                       </ListItem>
                       
-                          <Collapse in={open === item.display} timeout="auto" unmountOnExit>
-                            <Subconcept name={item.display} checkedValue={checked} locationType={item.display}/>
+                          <Collapse in={open === answer.display} timeout="auto" unmountOnExit>
+                            <Subconcept name={answer.display} checkedValue={checked} locationType={item.uuid}/>
                           </Collapse>
                     
                       </Grid>

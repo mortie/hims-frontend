@@ -38,10 +38,13 @@ function Labtest(props) {
     e.preventDefault();
     let concepts = {};
     
-      var ename = e.target.id;      
-      concepts["conUuid"] = ename ;
+    var ename = e.target.id;
+    console.log("checked "+checkedVal["checked_"+ename]);
+            
+      concepts["serviceConUuid"] = ename ;
+      concepts["priceCategoryConUuid"] = locationType ;
       concepts["price"] = e.target.value ;
-      concepts["enable"] = "true" ;
+      concepts["enable"] = checkedVal["checked_"+ename] ;
       console.log(e.target.value);
       let billservice = {
         "servicesDetails":[
@@ -84,7 +87,14 @@ function Labtest(props) {
   )
     .then((response) => {
       var res = response.data;
-        setFormValues(res);      
+      console.log(locationType)
+      console.log(res[locationType])
+        if(res[locationType])
+        {
+          const resVal = res[locationType];
+          setFormValues(resVal);
+        }
+        console.log(formValues)
     })
     .catch((error) => {console.log(error);  });
 

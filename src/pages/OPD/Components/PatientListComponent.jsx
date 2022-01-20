@@ -46,6 +46,7 @@ function PatientList({ getAllVisitsAction, loadingVisits, visits }) {
     const columns = [
         { field: "visit", hide: true },
         { field: "uuid", hide: true },
+        { field: "locationId", hide: true },
         { field: "patientId", headerName: "PatientID", width: 125 },
         { field: "name", headerName: "Name", width: 200 },
         { field: "gender", headerName: "Gender" },

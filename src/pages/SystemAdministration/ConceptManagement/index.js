@@ -1,11 +1,50 @@
-import React from 'react'
-import ConceptDashboard from "./conceptDashboard"
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import { Link } from "react-router-dom";
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import { conceptRoutes } from "../../../routes/conceptroutes";
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '100%',
+    marginTop: 10,
+  },
+  
+  title: {
+    backgroundColor: "#3EABC1",
+    color: "#FFFFFF",
+  },
+}));
 function ConceptMgmt() {
+    const classes = useStyles();
+    
     return (
-        <div>
-            <ConceptDashboard/>
-        </div>
-    )
+      <Card className={classes.root}>
+        <CardHeader        
+          title="Billing Management"
+          className={classes.title}
+        />
+        <CardContent>
+        
+        {conceptRoutes.map((prop, key) => {
+          return (
+            <Typography key={key}> 
+                <Button                    
+                    component={Link}
+                    to={prop.layout + prop.path}                 
+                  >
+                    {prop.title}
+                  </Button>
+             </Typography>
+          )
+        })
+          }</CardContent>
+      </Card>
+    );
 }
 
 export default ConceptMgmt
