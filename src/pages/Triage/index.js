@@ -50,9 +50,6 @@ import './index.css';
 const useStyles = makeStyles(opdStyles);
 
 const initialState = {
-  [HEIGHT]: "",
-  [WEIGHT]: "",
-  [BMI]: "",
   [SYSTOLIC]: "",
   [DIASTOLIC]: "",
 };
