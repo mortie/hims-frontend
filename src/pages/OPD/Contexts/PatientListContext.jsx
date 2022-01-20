@@ -34,9 +34,17 @@ const PatientListContextProvider = (props) => {
                 patientId: visit.patient.identifiers[0].identifier,
                 name: visit.patient.person.display,
                 gender: visit.patient.person.gender,
+                locationId:visit.location.uuid,
                 location: visit.location.display,
                 age: calculateAge(visit.patient.person.birthdate),
-                time: moment(visit.startDatetime).format("hh:mm A")
+                time: moment(visit.startDatetime).format("DD-MM-YYYY hh:mm A")
+            }
+        })
+        list = list.filter((visit) => {
+            var visitDate = moment(visit.time).format("DD-MM-YYYY")
+            var date = moment(new Date()).format("DD-MM-YYYY")
+            if (visitDate === date) {
+                return visit
             }
         })
         setPatientList(list)

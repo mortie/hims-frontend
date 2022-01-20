@@ -75,7 +75,7 @@ const CustomNoRowsOverlay = () => {
 };
 
 const createPatientList = (results) => {
-  const patientList = results.map((result) => {
+  let patientList = results.map((result) => {
     const { uuid, display, person } = result.patient;
     const encounters = result.encounters.filter(
       (encounter) => encounter.encounterType.display === "Vitals"
@@ -108,7 +108,7 @@ const createPatientList = (results) => {
       id: display.split("-")[0],
       name: display.split("-")[1].trim(),
       gender: person.gender,
-      visitTime: moment(result.startDatetime).format("hh:mm A"),
+      visitTime: moment(result.startDatetime).format("DD-MM-YYYY hh:mm A"),
       location: result.location.display,
       age: calculateAge(person.birthdate),
       triage: (
@@ -131,7 +131,13 @@ const createPatientList = (results) => {
       ),
     };
   });
-
+  patientList = patientList.filter((visit) => {
+    var visitDate = moment(visit.visitTime).format("DD-MM-YYYY")
+    var date = moment(new Date()).format("DD-MM-YYYY")
+    if (visitDate === date) {
+        return visit
+    }
+})
   return patientList;
 };
 
@@ -149,7 +155,7 @@ const col = [
   { field: "age", headerName: "Age", width: 125 },
 
   { field: "location", headerName: "Location", width: 150 },
-  { field: "visitTime", headerName: "Time" },
+  { field: "visitTime", headerName: "Date Time", width: 150 },
   {
     field: "triage",
     headerName: "Triage",
@@ -278,7 +284,6 @@ export default function Triage() {
               patient.id.toLowerCase().includes(key)
           )
         : filteredList;
-
     return filteredList;
   };
 

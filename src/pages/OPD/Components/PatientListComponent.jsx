@@ -49,10 +49,10 @@ function PatientList({ getAllVisitsAction, loadingVisits, visits }) {
         { field: "locationId", hide: true },
         { field: "patientId", headerName: "PatientID", width: 125 },
         { field: "name", headerName: "Name", width: 200 },
-        { field: "gender", headerName: "Gender" },
-        { field: 'age', hederName: "age" },
-        { field: 'location', hederName: "Location" },
-        { field: 'time', hederName: "Time" }
+        { field: "gender", headerName: "Gender" , width: 150},
+        { field: 'age', hederName: "Age", width: 100 },
+        { field: 'location', hederName: "Location", width: 150 },
+        { field: 'time', hederName: "Date Time" , width: 150 }
     ]
 
 
