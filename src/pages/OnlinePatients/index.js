@@ -52,7 +52,7 @@ export default function InfiniteLoadingGrid() {
   const classes = useStyles();
   const [loading, setLoading] = React.useState(false);
   const [btnValue, setBtnValue]= React.useState('Check In');
-  let [appointData, setAppointData]= React.useState([]);
+  let [appointData, setAppointData]= useState([]);
   let [filterappointData, setFilterAppointData]= React.useState([]);
   const [visitAttributeTypes, setVisitAttributeTypes] = useState();
   const [visitId, setVisitId] = useState('');
@@ -77,7 +77,7 @@ export default function InfiniteLoadingGrid() {
     );
     
   const columns = [
-    { field: 'uuid',headerName: 'Uid', hide: true },
+    { field: 'uuid', hide: true },
     { field: 'hospitalId', hide: true },
     { field: 'appointmentId', hide: true },
     { field: 'appointmentStatus', hide: true },
@@ -144,40 +144,44 @@ function keyUpFun(e){
 
 function resetOnKey(e){
   
-  setAppointData(filterappointData);
+  setAppointData(appointData);
   document.getElementById("searchForm").reset();
 }
   function searchOnKey(e){
    if(searchDetails["name"] !== ""){
-    appointData = appointData.filter( function (appointment) {
+    filterappointData = filterappointData.filter( function (appointment) {
       return appointment.name === searchDetails["name"];
     })
-    setAppointData(appointData)
+    setFilterAppointData(appointData)
    }
    if(searchDetails["phone"] !== ""){
-    appointData = appointData.filter( function (appointment) {
+    filterappointData = filterappointData.filter( function (appointment) {
       return appointment.phone === "91"+searchDetails["phone"];
     })
-    setAppointData(appointData)
+    setFilterAppointData(filterappointData)
    }
    if(searchDetails["age"] !== ""){
-    appointData = appointData.filter( function (appointment) {
+    filterappointData = filterappointData.filter( function (appointment) {
       return appointment.age === searchDetails["age"];
     })
-    setAppointData(appointData)
+    setFilterAppointData(filterappointData)
+   }
+   if(searchDetails["gender"] !== ""){
+    filterappointData = filterappointData.filter( function (appointment) {
+      return appointment.gender === searchDetails["gender"];
+    })
+    setFilterAppointData(filterappointData)
    }
    else{
-    setAppointData(filterappointData);
+    setFilterAppointData(filterappointData);
    }
   }
- const getAppointmentData = () => {
-  getOnlineAPI(
+ const getAppointmentData = async() => {
+  await getOnlineAPI(
     `/onlineappointment/onlineAppointments?&frdate=${fromDate.toISOString()}&todate=${toDate.toISOString()}`
       )
     .then((response) => {
-      console.log(response.data.appointments)
-     
-      response.data.appointments = response.data.appointments.filter( function (appointment) {
+     response.data.appointments = response.data.appointments.filter( function (appointment) {
         return appointment.district_name === District_Dropdown;
       })
       const appointList = createAppointmentList(response.data.appointments);
@@ -185,10 +189,6 @@ function resetOnKey(e){
         setAppointData(appointList);
         setLoading(false);
     })
-    .catch((error) => {
-     
-      console.log(error);
-    });
  }
 
   const handleClick = (event, data) => {
@@ -200,18 +200,18 @@ function resetOnKey(e){
       visitType: "7b0f5697-27e3-40c4-8bae-f4049abfb4ed",
     };
     
-    const getVisitAttrs = (data) =>{
+    const getVisitAttrs = async(data) =>{
       console.log(data);
       if(data.length === 1){
         setVisitId(data[0].uuid);
       }else{
-        data.map((result) => {
+        await data.map((result) => {
           console.log(result);
-          getAPI("/visit/"+result.uuid)
+           getAPI("/visit/"+result.uuid)
           .then((resp) => {
             if(resp.data.attributes.length > 0)
             {
-              console.log(result.uuid);
+              console.log(resp.data);
               setVisitId(result.uuid);
             }
           })
@@ -252,7 +252,6 @@ function resetOnKey(e){
   };
   const createAppointmentList = (results) => {
     const patientList = results.map((result,index) => {
-   
       return {
         id: index+1,        
         uuid: result.patient_id,
@@ -275,7 +274,7 @@ function resetOnKey(e){
   React.useEffect(() => {
    setLoading(true); 
    getAppointmentData();
-  },[false]);
+  },[]);
 
   return (
     <>
@@ -306,7 +305,6 @@ function resetOnKey(e){
                 label="Phone"
                 name="phone"
                 autoComplete="phone"
-                value={classes.phone}
                 type="number"
                 className={classes.field}
                 onKeyUp={(e) => keyUpFun(e, "clicked")}
@@ -318,10 +316,7 @@ function resetOnKey(e){
               />
             </GridItem>
             
-           
-            <GridItem item xs={12} sm={6} md={3}>
-              <GridContainer>
-                <GridItem item xs={12} sm={6} md={6}>
+                <GridItem item xs={12} sm={6} md={3}>
                   <TextField
                     id="age"
                     name= "age"
@@ -334,29 +329,24 @@ function resetOnKey(e){
                     className={classes.field}
                   />
                 </GridItem>               
-              </GridContainer>
-            </GridItem>
+              
             <GridItem item xs={12} sm={6} md={3}>
-            <GridContainer>
-                <GridItem item xs={12} sm={6} md={6}>
-                <FormControl >
+            
+                <FormControl fullWidth variant="outlined" >
                   <InputLabel id="select-gender">Gender</InputLabel>
                   <Select
                           labelId="select-gender"
                           variant="outlined"
                           fullWidth
-                          nativ
                           margin="dense"
                           className={classes.field}
-                          onKeyUp={(e) => keyUpFun(e, "clicked")}
+                          onChange={(e) => keyUpFun(e, "clicked")}
                           >
                             <MenuItem value="M">Male</MenuItem>
                             <MenuItem value="F">Female</MenuItem>
                           </Select>
                           </FormControl>
                      </GridItem>
-                     </GridContainer>     
-            </GridItem>
             <GridItem item xs={12} sm={6} md={3}>
               <Button
                 variant="contained"
@@ -380,23 +370,22 @@ function resetOnKey(e){
           <CircularProgress size={24} className={classes.buttonProgress} />
         )}
 
-      </Paper>
-      <Paper style={{ marginTop: "2vh" }}>
+      
       <DataGrid
           loading={loading}
-          rows={appointData}
+          rows={filterappointData}
           columns={columns} 
           disableColumnMenu
           autoHeight
           rowHeight={40}
           headerHeight={40}
-          pageSize={40}
+          pageSize={10}
           components={{
             LoadingOverlay: CustomLoadingOverlay,
             NoRowsOverlay: CustomNoRowsOverlay,
           }}
       />
-      </Paper>
+     </Paper>
     </>
   );
 }

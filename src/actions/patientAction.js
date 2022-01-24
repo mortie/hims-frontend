@@ -106,6 +106,7 @@ export const savePatientOrder = (details) => async (dispatch) =>{
 
     let payload = {
         patient: details.patient,
+        location: details.location,
         investigations: investigationList,
         procedures: procedureList,
     }

@@ -17,10 +17,13 @@ export class Concept {
 
         concepts.forEach(concept => {
             concepts[concept.uuid] = concept
+            
             if (!this.conceptsByClass[concept.conceptClass.display]) {
                 this.conceptsByClass[concept.conceptClass.display] = []
+                
             }
             this.conceptsByClass[concept.conceptClass.display].push(concept)
+            
 
         })
         this.allConcepts = concepts
@@ -35,7 +38,9 @@ export class Concept {
             await this.initConceptClasses();
         }
         //Copy the array so that it won't be changed by other components
+        //console.log(this.conceptsByClass[conceptClassName])
         return [...this.conceptsByClass[conceptClassName]]
+        
     }
 
     static getConceptElementById = async (conceptUUID) => {

@@ -41,9 +41,9 @@ const PatientListContextProvider = (props) => {
             }
         })
         list = list.filter((visit) => {
-            var visitDate = moment(visit.time).format("DD-MM-YYYY")
+            var visitDate = visit.time.split(" ")
             var date = moment(new Date()).format("DD-MM-YYYY")
-            if (visitDate === date) {
+            if (visitDate[0] === date) {
                 return visit
             }
         })

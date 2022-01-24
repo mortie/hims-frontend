@@ -13,6 +13,8 @@ import TransferList from './TransferListComponent';
 import renderOutcomeOptions from './OutcomeOptions';
 import { CONCEPT_DIAGNOSIS, CONCEPT_INVESTIGATION, CONCEPT_PROCEDURE, CONCEPT_SYMPTOPM, ENCOUNTER_TYPE_VITALS } from '../../../utils/constants';
 import VisitOutcomeComponent from './VisitOutcomeComponent';
+import { getAPI } from '../../../services';
+import {HOSPITAL_NAME} from '../../../utils/constants'
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -107,9 +109,10 @@ function Patient({
     }
 
     const handleSaveClick = () => {
-        console.log(selectedVisit)
+        
         let orderpayload = {
             patient: selectedVisit.id,
+            location: "6351fcf4-e311-4a19-90f9-35667d99a8af",
             investigations: getSelectedValues(investigationObject),
             procedures: getSelectedValues(procedureObject),
         }
@@ -124,8 +127,6 @@ function Patient({
         }
         savePatientDiagnosys(payload)
         savePatientOrder(orderpayload);
-        
-    window.location.reload();
     }
 
     const handleVitalDialogClose = () => {

@@ -132,9 +132,10 @@ const createPatientList = (results) => {
     };
   });
   patientList = patientList.filter((visit) => {
-    var visitDate = moment(visit.visitTime).format("DD-MM-YYYY")
+    var visitDate = visit.visitTime.split(" ")
     var date = moment(new Date()).format("DD-MM-YYYY")
-    if (visitDate === date) {
+    console.log(visit.visitTime)
+    if (visitDate[0] === date) {
         return visit
     }
 })
