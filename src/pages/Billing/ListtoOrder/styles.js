@@ -2,6 +2,7 @@ const opdStyles = (theme) => ({
   root: {
     width: "100%",
     marginTop: 20,
+    marginBottom: 10,
   },
   paper: {
     marginTop: theme.spacing(2),
@@ -36,6 +37,12 @@ const opdStyles = (theme) => ({
     backgroundColor: "#3EABC1",
     color: "#FFFFFF",
     padding: `6px 9px`,
+  },
+  margin: {
+    margin: theme.spacing(1),
+  },
+  custompaddingcell: {
+    padding: 3,
   },
 });
 
