@@ -305,7 +305,7 @@ export default function Triage() {
       const systolic = vitalValues[SYSTOLIC];
       const diastolic = vitalValues[DIASTOLIC];
       if (systolic && diastolic) {
-        systolic < diastolic
+        parseInt(systolic) < parseInt(diastolic)
           ? setErrors({
               ...errors,
               [SYSTOLIC]: "Systolic cannot be less than diastolic.",
@@ -550,13 +550,7 @@ export default function Triage() {
                     autoFocus={!index}
                     disabled={display === "BMI"}
                     error={errors[uuid]}
-                    // helperText={
-                    //   errors[uuid]
-                    //     ? errors[uuid]
-                    //     : previousVitalsLoading
-                    //     ? "loading..."
-                    //     : getPreviousVitalValue(uuid)
-                    // }
+                    helperText={errors[uuid]}
                   />
                 </Tooltip>
               </GridItem>

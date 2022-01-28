@@ -86,6 +86,8 @@ export default function PatientSearch(props) {
   const [appointmentTypes, setAppointmentTypes] = useState([]);
   const [patientCategoryTypes, setPatientCategoryTypes] = useState([]);
   const [mlcResp, setMlcResp] = useState([]);
+  const [formErrors, setFormErrors] = useState({});
+
 
   const columns = [
     { field: "uuid", hide:true },
@@ -456,11 +458,23 @@ export default function PatientSearch(props) {
     return param;
   }
 
+  function validateName(name,value)
+  {
+   const regexname = /^[a-zA-Z\s]*$/;
+     if (!regexname.test(value)) {
+        setFormErrors({ ...formErrors, [name]: "Only alphabets are allowed" });
+    }
+     else {
+      setFormErrors({ ...formErrors, [name]: "" });
+    }
+  }
+
   const searchOnKey = (event, name, eventName) => {
     var searchValue = event.target.value;
 
     if (name == "firstName") {
       setfirstName(searchValue);
+      validateName(name, searchValue)
     }
     if (name == "phone") {
       setphone(searchValue);
@@ -1011,16 +1025,18 @@ export default function PatientSearch(props) {
             <GridItem item xs={12} sm={6} md={3}>
               <TextField
                 error={
-                  !errors.phoneData &&
+                  (!errors.phoneData &&
                   !errors.nameData &&
-                  !errors.identifierData
+                    !errors.identifierData)
+                  || (formErrors["firstName"] ? true : false)
                 }
                 helperText={
                   (!errors.phoneData &&
                     !errors.nameData &&
                     !errors.identifierData &&
                     NameErrorMsj) ||
-                  (errors.nameData && NameErrorMsj)
+                  (errors.nameData && NameErrorMsj) ||
+                  (formErrors["firstName"])
                 }
                 name="firstName"
                 variant="outlined"

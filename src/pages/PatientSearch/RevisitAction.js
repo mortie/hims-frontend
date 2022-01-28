@@ -45,7 +45,14 @@ export default function RevisitAction({ data,mlc }) {
   const history = useHistory();
   const ref = useRef();
   const { appointmentData, visitData } = data;
-  const { registrationDate, departmentName,reportingPlace,doctorName,reportingTime } = visitData.data;
+  const { registrationDate,
+    departmentName,
+    reportingPlace,
+    doctorName,
+    reportingTime,
+    patientCategory,
+    patientSubCategory1,
+    patientSubCategory2 } = visitData.data;
   const [appointmentTypes, setAppointmentTypes] = useState([]);
   const [mlcTypes, setMlcTypes] = useState([]);
   const [mlcYesTypes, setmlcYesTypes] = useState([]);
@@ -429,6 +436,10 @@ const getAge = (birthdate) => {
             onAutocompleteChange={onAutocompleteChange}
             validateAutocomplete={validateAutocomplete}
             onChange={handleRevisitChange}
+            patientC={patientCategory}
+            patientC1={patientSubCategory1}
+            patientC2 = {patientSubCategory2}
+
           />
 
           <DepartmentRevisit
