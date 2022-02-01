@@ -11,6 +11,7 @@ const PatientListContextProvider = (props) => {
     const [patientsList, setPatientList] = useState([])
 
     const filterPatientList = ({ visits, location, searchText }) => {
+        console.log(visits);
         if (!visits) {
             return;
         }
@@ -28,6 +29,7 @@ const PatientListContextProvider = (props) => {
             }
             return true;
         }).map((visit) => {
+            
             return {
                 visit: visit.uuid,
                 id: visit.patient.uuid,

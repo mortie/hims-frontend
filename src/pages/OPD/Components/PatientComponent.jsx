@@ -1,11 +1,11 @@
-import { AppBar, Box, Button, Chip, FormControlLabel, Grid, Radio, RadioGroup, Tab, Tabs, TextareaAutosize, TextField, Typography, Dialog, DialogTitle, DialogContent, InputLabel, Tooltip, DialogActions } from '@material-ui/core';
+import { AppBar, Box, Button, Chip, FormControlLabel, Grid, Radio, RadioGroup, Tab, Tabs, TextareaAutosize, TextField, Typography, Dialog, DialogTitle, DialogContent, InputLabel, Tooltip, DialogActions,Paper } from '@material-ui/core';
 import { useContext, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useEffect } from 'react';
 import { connect } from 'react-redux'
 import { loadPatientAndConcepts, savePatientDiagnosys,savePatientOrder } from '../../../actions/patientAction'
 import PropTypes from 'prop-types';
-
+import { useSnackbar } from "notistack";
 import { useHistory } from "react-router-dom";
 import { PatientListContext } from '../Contexts/PatientListContext';
 import { PatientContext } from '../Contexts/PatientContext';
@@ -15,6 +15,7 @@ import { CONCEPT_DIAGNOSIS, CONCEPT_INVESTIGATION, CONCEPT_PROCEDURE, CONCEPT_SY
 import VisitOutcomeComponent from './VisitOutcomeComponent';
 import { getAPI } from '../../../services';
 import {HOSPITAL_NAME} from '../../../utils/constants'
+import { GridContainer,GridItem } from '../../../components';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -45,8 +46,12 @@ TabPanel.propTypes = {
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
-        backgroundColor: theme.palette.background.default,
+        backgroundColor: '#EBECEC',
     },
+    title: {
+        backgroundColor: "#3EABC1",
+        color: "#FFFFFF",
+      },
     inputField: {
         width: 400,
         alignContent: 'left'
@@ -56,6 +61,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Patient({
     loadPatientAndConcepts,
+    patientData,
     patientObject,
     loadingPatient,
     symptom,
@@ -71,6 +77,7 @@ function Patient({
     console.log("Melaeke investigation prop is ", investigation)
     const classes = useStyles();
     const [value, setValue] = useState(0);
+    const { enqueueSnackbar } = useSnackbar();
     const [showVitalDialog, setShowVitalDialog] = useState(false);
     const [symptomsObject, setSymptomsObject] = useState([])
     const [diagnosisObject, setDiagnosisObject] = useState([])
@@ -109,24 +116,28 @@ function Patient({
     }
 
     const handleSaveClick = () => {
+
+        console.log(selectedVisit);
         
         let orderpayload = {
             patient: selectedVisit.id,
-            location: "6351fcf4-e311-4a19-90f9-35667d99a8af",
+            location: selectedVisit.locationId,
             investigations: getSelectedValues(investigationObject),
             procedures: getSelectedValues(procedureObject),
         }
-        console.log(orderpayload)
+        console.log(orderpayload);
+        savePatientOrder(orderpayload);
         let payload = {
             selectedDiagnosis: getSelectedValues(diagnosisObject),
             selectedSymptoms: getSelectedValues(symptomsObject),
             selectedInvestigation: getSelectedValues(investigationObject),
             selectedProcedures: getSelectedValues(procedureObject),
             visit: selectedVisit,
-            visitOutcomeDetails: visitOutcomeDetails
+            visitOutcomeDetails: visitOutcomeDetails,
         }
-        savePatientDiagnosys(payload)
-        savePatientOrder(orderpayload);
+        savePatientDiagnosys(payload);
+        enqueueSnackbar("OPD Order has successfully generated");
+        window.location.reload(false);
     }
 
     const handleVitalDialogClose = () => {
@@ -366,21 +377,37 @@ function Patient({
          */
         <div className={classes.root}>
             {!loadingPatient && patientObject ?
-                <>
-                    <Grid container spacing={3}>
-                        <Grid item xs={6}>
-                            <h2>{patientObject.person.display}</h2>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <h2>{patientObject.person.gender === "M" ? "Male" : "Female"}</h2>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <h2>{patientObject.identifiers[0].identifier}</h2>
-                        </Grid>
-                    </Grid>
+                <Paper>
+                <Paper className={classes.root}>
+                    <GridContainer >
+                        <GridItem item xs container direction="column">
+                            <Typography variant="subtitle1" spacing={2}>
+                                <b>Name:</b> {patientObject.person.display}
+                            </Typography>
+                        
+                        </GridItem>
+                        <GridItem item xs container direction="column">
+                        <Typography variant="subtitle1" spacing={2}>
+                            <b>Gender:</b> {patientObject.person.gender === "M" ? "Male" : "Female"}
+                         </Typography>
+                        </GridItem>
+                        </GridContainer>
+                        <GridContainer>
+                        <GridItem item xs container direction="column">
+                        <Typography variant="subtitle1" spacing={2}>
+                            <b>Identifier:</b> {patientObject.identifiers[0].identifier}
+                         </Typography>
+                        </GridItem>
+                        <GridItem item xs container direction="column">
+                        <Typography variant="subtitle1" spacing={2}>
+                            <b>Location:</b> {selectedVisit.location}
+                         </Typography>
+                        </GridItem>
+                    </GridContainer>
+                    </Paper>
                     <br />
-                    <AppBar position="static">
-                        <Tabs value={value} variant="fullWidth" onChange={handleChange} aria-label="Tabs">
+                    <AppBar position="static" >
+                        <Tabs className={classes.title} value={value} variant="fullWidth" onChange={handleChange} aria-label="Tabs">
                             <Tab label="Clinical notes" />
                             <Tab label="Dashboard" />
                         </Tabs>
@@ -434,10 +461,11 @@ function Patient({
 
                         </Dialog>
                         <Button
-                            onClick={handleVitalDialogOpen}
+                            onClick={handleVitalDialogOpen} variant="contained"
                         >
                             Vitals
                         </Button>
+                        <br/><br/>
                         <TransferList label="Symptoms"
                             options={symptomsObject}
                             handleExtraSelect={handleExtraSelect}
@@ -471,10 +499,10 @@ function Patient({
                         ></TransferList>
                         <br />
                         <hr />
-                        <h4>
+                       <br/>
                             Oter Instructions:
-                        </h4>
-                        <TextareaAutosize aria-label="minimum height" width={400} minRows={2} />
+                        <br/>
+                        <TextareaAutosize aria-label="minimum height" width={800} minRows={2} />
 
                         <br/>
 
@@ -482,7 +510,7 @@ function Patient({
                         
 
                         <Button
-                            onClick={handleSaveClick}
+                            onClick={handleSaveClick} variant="contained"
                         >
                             Save
                         </Button>
@@ -490,7 +518,7 @@ function Patient({
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         Dashboard
-                    </TabPanel></>
+                    </TabPanel></Paper>
                 :
                 <>
                     Loading patient
@@ -502,7 +530,9 @@ function Patient({
 
 
 const mapStateToProps = state => {
+    console.log(state)
     return {
+        patientData: state.location,
         patientObject: state.patient.patient,
         loadingPatient: state.patient.loadingPatient,
         symptom: state.concepts.symptom,

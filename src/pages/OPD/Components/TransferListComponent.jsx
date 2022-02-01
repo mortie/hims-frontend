@@ -8,24 +8,33 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
-import { Popover, TextField } from '@material-ui/core';
+import { Popover, TextField, InputBase } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 const useStyles = makeStyles((theme) => ({
     root: {
         margin: 'auto',
+        backgroundColor: '#EBECEC',
+        width: '100%',
     },
     paper: {
-        height: 230,
+        height: 200,
         overflow: 'auto',
+        width: '100%',
     },
     button: {
         margin: theme.spacing(0.5, 0),
+        background: 'linear-gradient(45deg, #3EABC1 40%, #75D0DC 90%)',
+        border: 0,
+        borderRadius: 3,
+        boxShadow: '0 3px 5px 2px rgba(89, 185, 199, .3)',
+        color: 'white',
+        height: 30,
     },
     popover: {
-        width: 800,
         overflow: 'auto'
-    }
+    },
+   
 }));
 
 const LEFT = "LEFT"
@@ -69,7 +78,7 @@ export default function TransferList({ options, handleSelect, handleUnselect, la
         let rightChecked = 0;
         newOptions.forEach(item => {
             if (item.checked) {//this item is checked
-                console.log(item.selected)
+                //console.log(item.selected)
                 if (item.selected) {
                     rightChecked = rightChecked + 1
                 }
@@ -223,7 +232,6 @@ export default function TransferList({ options, handleSelect, handleUnselect, la
         </Paper >
     );
 
-    console.log("melaeke extra options is ", extraOptions)
     const RecommendationsList = () => (
         <Paper className={classes.popover}>
             <List dense component="div" role="list">
@@ -251,24 +259,25 @@ export default function TransferList({ options, handleSelect, handleUnselect, la
 
     return (
         <>
-            <h4>{label} :
-                <TextField
-                    className={classes.inputField}
-                    id={label + "-serach"}
+            {label} : 
+            <InputBase
+              placeholder=' Search…'
+              inputProps={{ 'aria-label': 'search' }}
+              variant="outlined"
+              id={label + "-serach"}
                     label=""
                     value={searchText}
                     onChange={
                         (event) => { handleSearchTextChange(event.target.value) }
                     }
-                >
-                </TextField></h4>
+            />
             <Grid
                 container
                 spacing={1}
                 justifyContent="left"
                 alignItems="center"
                 className={classes.root}>
-                <Grid item xs={6}>{LeftList()}</Grid>
+                <Grid item xs={5} sm={5} md={6}>{LeftList()}</Grid>
                 <Grid item xs={1}>
                     <Grid container direction="column" alignItems="center">
                         <Button
@@ -343,7 +352,7 @@ export default function TransferList({ options, handleSelect, handleUnselect, la
                         </Button>
                     </Grid>
                 </Grid>
-                <Grid item xs={5}>{RightList()}</Grid>
+                <Grid item xs={6} sm={6} md={5}>{RightList()}</Grid>
             </Grid>
         </ >
 
