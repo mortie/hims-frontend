@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import { getAPI, postAPI } from "../../../../../services/index";
 
 import { 
@@ -28,12 +28,13 @@ const styles = (theme) => ({
 function Labtest(props) {
   const classes = useStyles();
   const locationType = props.locationType;
-  const [formValues, setFormValues] = useState([]);
   const conceptName = props.name;
-  var [formData, setformData] = useState([]);
+  const [formValues, setFormValues] = useState([]);
+  const [formData, setformData] = useState([]);
   const [checked, setChecked] = React.useState(props.checkedValue);
   const [checkedVal, setCheckedVal] = React.useState([]);
 
+  console.log(formValues)
   const saveValues = (e) => {
     e.preventDefault();
     let concepts = {};
@@ -44,7 +45,7 @@ function Labtest(props) {
       concepts["serviceConUuid"] = ename ;
       concepts["priceCategoryConUuid"] = locationType ;
       concepts["price"] = e.target.value ;
-      concepts["enable"] = checkedVal["checked_"+ename] ;
+      concepts["enable"] = false ;
       console.log(e.target.value);
       let billservice = {
         "servicesDetails":[
@@ -73,6 +74,7 @@ function Labtest(props) {
   };
   
   React.useEffect(() => {
+    console.log(conceptName);
     getAPI(
   `/concept?q=${conceptName}&v=custom:(answers:(uuid,display,description))`
 )
@@ -82,32 +84,31 @@ function Labtest(props) {
   })
   .catch((error) => {console.log(error);  });
 
+  console.log(locationType);
   getAPI(
     `/services/billable`
   )
     .then((response) => {
       var res = response.data;
-      console.log(locationType)
-      console.log(res[locationType])
-        if(res[locationType])
-        {
-          const resVal = res[locationType];
-          setFormValues(resVal);
-        }
-        console.log(formValues)
+      if(res[locationType])    {setFormValues(res[locationType]);}  
+      
     })
     .catch((error) => {console.log(error);  });
+      console.log(formValues)
+}, [conceptName]);
 
-}, []);
+    
     return (
+      
     <Grid className={classes.subcontent}> 
     <GridContainer >
         {formData.map((item,key) =>
-          <GridContainer key={key}>
+          
+          <GridContainer key={key}>          
             <GridItem item >
             <Checkbox
             id={"checked_"+item.uuid} 
-            checked={checkedVal["checked_"+item.uuid]}
+            checked={false}
             onChange={handleChecked}
             size="small"
             inputProps={{ 'aria-label': 'checkbox with small size' }} 
@@ -122,13 +123,14 @@ function Labtest(props) {
                 label={item.display}
                 disabled={checkedVal["checked_"+item.uuid] && true}
                 name={item.uuid}
-                defaultValue ={formValues[item.uuid]?formValues[item.uuid]:""}
+                defaultValue ={formValues[item.uuid]?formValues[item.uuid].price:""}
                 className={classes.field}
                 onChange={saveValues}
             />
             </GridItem>
+            
             </GridContainer>
-        )}
+            )}
         
         </GridContainer>
    

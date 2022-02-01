@@ -29,9 +29,9 @@ function VisitOutcome({ getAllLocationsAction, loadingLocations, locations, visi
 
     return (
         < div >
-            <h4>
+            
                 OPD Visit outcome*:
-            </h4>
+            
             <RadioGroup row aria-label="OPD-visit-outcome" name="visitOutcome" value={visitOutcome ? visitOutcome.display : ""} onChange={handleVisitOutcomeChange}>
                 {
                     visitOutcomes.answers && visitOutcomes.answers.length > 0 && visitOutcomes.answers.map(answer =>

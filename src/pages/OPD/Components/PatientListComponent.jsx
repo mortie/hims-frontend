@@ -10,6 +10,8 @@ import { LocationContext } from '../Contexts/LocationContext';
 import { PatientContext } from '../Contexts/PatientContext';
 import PatientComponent from './PatientComponent';
 import SimplePopover from './Popover';
+import { TestOrderDetails } from "../../../services/data";
+import moment from "moment";
 
 const useStyles = makeStyles((theme) => ({
     input: {
@@ -22,11 +24,23 @@ const useStyles = makeStyles((theme) => ({
 function PatientList({ getAllVisitsAction, loadingVisits, visits }) {
     const { location, changeLocation } = useContext(LocationContext)
     const { selectedVisit, selectVisit } = useContext(PatientContext)
+    const [patientOrderData, setPatientOrderData] = useState([]);
 
     //Created a state variable here because it will not be used anywhere else. 
     const [searchText, setSearchText] = useState("");
+    const curDate = new Date();
+
+    async function fetchData() {
+        const response = await TestOrderDetails.TestOnlySelectDateFunc(
+            
+            moment(curDate).format("DD-MM-YYYY")
+        );
+        console.log(response);
+        setPatientOrderData(response.testOrderDetails);
+      }
     useEffect(() => {
-        getAllVisitsAction()
+        getAllVisitsAction();
+        fetchData();
     }, [])
 
     //This effect is performed only when visits is finished loaded or when visits changes.
@@ -34,7 +48,7 @@ function PatientList({ getAllVisitsAction, loadingVisits, visits }) {
         filterPatientList({ visits, location, searchText })
     }, [visits, searchText, location])
 
-    const {
+    let {
         patientsList,
         filterPatientList
     } = useContext(PatientListContext)
@@ -54,8 +68,11 @@ function PatientList({ getAllVisitsAction, loadingVisits, visits }) {
         { field: 'location', hederName: "Location", width: 150 },
         { field: 'time', hederName: "Date Time" , width: 150 }
     ]
-
-
+   patientsList = patientsList.filter(function(o1){
+        return !patientOrderData.some(function(o2){
+            return o1.id === o2.patientUuid;  
+        });
+    })
     const handleSelectPatient = (selectedRow) => {
         selectVisit(selectedRow.row)
     }
@@ -117,10 +134,11 @@ function PatientList({ getAllVisitsAction, loadingVisits, visits }) {
 
 
 const mapStateToProps = state => {
-    console.log(state)
+    
     return {
         loadingVisits: state.visits.loadingVisits,
-        visits: state.visits.visits
+        visits: state.visits.visits,
+        selectVisit:state.selectVisit
     }
 }
 

@@ -20,18 +20,27 @@ const rows = [
 
 export default function DataTable() {
 
-  useEffect(() => {
+  var [rows, setRows] = useState([]);
+  useEffect(async() => {
     let count = 0;
     let url =
-    "/concept?v=custom:(uuid,display,answers,datatype,conceptClass:(uuid,display),setMembers:(uuid))";
-    let concepts = getAPI(url)
+    "/concept?set=true&v=custom:(id,uuid,display,answers,set)";
+    let concepts = await getAPI(url).then((response) => {
+      const res = response.data.results;
+        return res;
+    })
+    concepts = concepts.filter((item) => item.set === true);
+    console.log(concepts);
+    const conceptList = concepts.map((result,index) => {
+      return {
+        id:index,
+        uuid:result.id,
+        display:result.display
+    }})
+   
+      setRows(conceptList);
     console.log(concepts)
-    /*concepts.forEach(concept => {
-      count++;
-      rows.id = count;
-      rows.uuid = concept.uuid;
-      rows.display = concept.display;
-    })*/
+   
    }, []);
 
   return (

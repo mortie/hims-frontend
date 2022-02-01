@@ -21,7 +21,7 @@ const PatientContextProvider = (props) => {
 
     return (
         <PatientContext.Provider value={valuesToReturn}>
-            {props.children}
+            {props.children } 
         </PatientContext.Provider>
     )
 }
