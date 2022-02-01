@@ -1180,6 +1180,7 @@ export default function PatientSearch(props) {
                       label="Range"
                       value={resultAge}
                       onChange={(e) => searchOnKey(e, "range", "press")}
+                      defaultValue={0}
                     >
                       <MenuItem value={0}>0</MenuItem>
                       <MenuItem value={1}>1</MenuItem>
