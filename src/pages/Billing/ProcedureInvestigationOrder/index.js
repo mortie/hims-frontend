@@ -29,11 +29,24 @@ const useStyles = makeStyles(styles);
 function ProcedureInvestigationOrder(props) {
   const classes = useStyles();
   const patientData = props.patientData;
+  console.log(patientData);
+  const initialformvalues = {
+    service: "",
+    totalamount: "",
+    totalamountPayable: "",
+    amountgiven: "",
+    amountreturnedtoPatient: "",
+    discountamount: 0,
+  };
+  const [formData, setformData] = React.useState(initialformvalues);
+  const [discountrate, setDiscountRate] = React.useState(0);
   const [checked, setChecked] = React.useState(
     patientData.billableServiceDetails.map((item) => {
       return true;
     })
   );
+  //const initialDiscountRate=0.00;
+
   const [textfieldqunatityval, settextfieldqunatityval] = React.useState(
     // patientData.billableServiceDetails.map((item, index) => {
     //   return {
@@ -47,6 +60,11 @@ function ProcedureInvestigationOrder(props) {
   const [checkedprice, setCheckedprice] = React.useState(
     patientData.billableServiceDetails.map((item) => {
       return true;
+    })
+  );
+  const [unitpricetextfield, setunitpricetextfield] = React.useState(
+    patientData.billableServiceDetails.map((item) => {
+      return item.price;
     })
   );
   // const [checkpricedisable, setcheckpricedisable] = React.useState(
@@ -68,53 +86,49 @@ function ProcedureInvestigationOrder(props) {
       return sum + parseInt(item.price) * parseInt("1");
     }, 0)
   );
+  const initialnetamount = total;
+  const [netamount, setNetAmount] = React.useState(initialnetamount);
   const handleQuantityChange = (event, position) => {
-    // setQuantityValue({
-    //   ...quantityvalue,
-    //   [event.target.name]: event.target.value,
-    // });
-    // const unitPricevalue = parseInt(
-    //   document.getElementById("textfieldPriceid" + index).value
-    // );
-    // const quantityvalue = parseInt(
-    //   document.getElementById("textfiledQuantityid" + index).value
-    // );
-    // document.getElementById("textfieldTotalUnitid" + index).value =
-    //   unitPricevalue * quantityvalue;
-
     const data = patientData.billableServiceDetails.map((item, index) => {
       return index === position
-        ? event.target.value
+        ? (textfieldqunatityval[index] = event.target.value)
         : textfieldqunatityval[index];
     });
 
     settextfieldqunatityval(data);
     const totalmultunit = patientData.billableServiceDetails.map(
       (item, index) => {
-        return index === position
-          ? parseInt(event.target.value) * parseInt(item.price)
-          : parseInt(item.price) * parseInt(textfieldqunatityval[index]);
+        // return index === position
+        //   ? parseInt(item.price) * parseInt(textfieldqunatityval[index])
+        //   : parseInt(item.price) * parseInt(textfieldqunatityval[index]);
+        return parseInt(item.price) * parseInt(textfieldqunatityval[index]);
       }
     );
     setquantitymultiplyprice(totalmultunit);
 
-    const totallastData = patientData.billableServiceDetails.reduce(
-      (sum, currentvalue, index) => {
-        if (index === position) {
-          return (
-            sum + parseInt(currentvalue.price) * parseInt(event.target.value)
-          );
-        } else {
-          return (
-            sum +
-            parseInt(currentvalue.price) * parseInt(textfieldqunatityval[index])
-          );
-        }
-      },
-      0
-    );
-    console.log(totallastData);
+    const totallastData = checked.reduce((sum, currentvalue, index) => {
+      if (currentvalue === true) {
+        console.log(unitpricetextfield[index]);
+        console.log(textfieldqunatityval[index]);
+        return (
+          sum +
+          parseInt(unitpricetextfield[index]) *
+            parseInt(textfieldqunatityval[index])
+        );
+      }
+      // else {
+      //   return (
+      //     sum +
+      //     parseInt(currentvalue.price) * parseInt(textfieldqunatityval[index])
+      //   );
+      // }
+      return sum;
+    }, 0);
+
     setTotal(totallastData);
+    const amountdeducted = (totallastData * discountrate) / 100;
+    console.log(amountdeducted);
+    setNetAmount((totallastData - amountdeducted).toFixed(2));
   };
   const handleSelectChange = (event, position) => {
     const updatedCheckedState = checked.map((item, index) => {
@@ -124,25 +138,95 @@ function ProcedureInvestigationOrder(props) {
     const totalPrice = updatedCheckedState.reduce(
       (sum, currentState, index) => {
         if (currentState === true) {
+          // quantitymultiplyprice[index] =
+          //   parseInt(textfieldqunatityval[index]) *
+          //   parseInt(unitpricetextfield[index]);
           return (
             sum +
-            parseInt(
-              document.getElementById("textfieldTotalUnitid" + index).value
-            )
+            parseInt(textfieldqunatityval[index]) *
+              parseInt(unitpricetextfield[index])
           );
         }
+        // else {
+        //   textfieldqunatityval[index] = "0";
+        //   quantitymultiplyprice[index] =
+        //     parseInt(textfieldqunatityval[index]) *
+        //     parseInt(unitpricetextfield[index]);
+        //   return (
+        //     sum +
+        //     parseInt(textfieldqunatityval[index]) *
+        //       parseInt(unitpricetextfield[index])
+        //   );
+        // }
         return sum;
       },
       0
     );
 
     setTotal(totalPrice);
+
+    const amountdeducted = (totalPrice * discountrate) / 100;
+    console.log(amountdeducted);
+    setNetAmount((totalPrice - amountdeducted).toFixed(2));
   };
   const handleSelectPriceChange = (event, position) => {
     const updatedCheckedState = checkedprice.map((item, index) =>
       index === position ? !item : item
     );
+
     setCheckedprice(updatedCheckedState);
+
+    const totalPrice = updatedCheckedState.reduce(
+      (sum, currentState, index) => {
+        if (currentState === true) {
+          //setCommentTextfield(false);
+          textfieldqunatityval[index] = "1";
+          quantitymultiplyprice[index] =
+            parseInt(textfieldqunatityval[index]) *
+            parseInt(unitpricetextfield[index]);
+          return (
+            sum +
+            parseInt(textfieldqunatityval[index]) *
+              parseInt(unitpricetextfield[index])
+          );
+        } else {
+          //setCommentTextfield(true);
+          textfieldqunatityval[index] = "0";
+          quantitymultiplyprice[index] =
+            parseInt(textfieldqunatityval[index]) *
+            parseInt(unitpricetextfield[index]);
+          return (
+            sum +
+            parseInt(textfieldqunatityval[index]) *
+              parseInt(unitpricetextfield[index])
+          );
+        }
+        //return sum;
+      },
+      0
+    );
+
+    setTotal(totalPrice);
+    const amountdeducted = (totalPrice * discountrate) / 100;
+    console.log(amountdeducted);
+    setNetAmount((totalPrice - amountdeducted).toFixed(2));
+  };
+  const handleInputchange = (e) => {
+    setformData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.name === "discountamount") {
+      const discountrate = parseInt(
+        e.target.value === "" ? "0" : e.target.value
+      );
+      setDiscountRate(discountrate);
+      const amountdeducted = (parseInt(total) * discountrate) / 100;
+      setNetAmount((total - amountdeducted).toFixed(2));
+      //console.log(typeofdiscountratedata);
+      //console.log(parseInt(total) * discountratedata);
+      // setDiscountRate(discountratedata);
+      // const totalamount = total;
+      // const discountedAmount = (totalamount * discountrate) / 100;
+      // setNetAmount((total - discountedAmount).toFixed(2));
+    }
   };
   return (
     <>
@@ -199,12 +283,6 @@ function ProcedureInvestigationOrder(props) {
                   {patientData.billableServiceDetails.map((row, index) => (
                     <TableRow key={`keyindex${index}`}>
                       <TableCell className={classes.custompaddingcell}>
-                        {index + 1}
-                      </TableCell>
-                      <TableCell className={classes.custompaddingcell}>
-                        {row.serviceConName}
-                      </TableCell>
-                      <TableCell className={classes.custompaddingcell}>
                         <Checkbox
                           checked={checked[index]}
                           color="primary"
@@ -215,6 +293,12 @@ function ProcedureInvestigationOrder(props) {
                             handleSelectChange(e, index);
                           }}
                         />
+                      </TableCell>
+                      <TableCell className={classes.custompaddingcell}>
+                        {index + 1}
+                      </TableCell>
+                      <TableCell className={classes.custompaddingcell}>
+                        {row.serviceConName}
                       </TableCell>
                       <TableCell className={classes.custompaddingcell}>
                         <TextField
@@ -251,7 +335,7 @@ function ProcedureInvestigationOrder(props) {
                           name={`textfieldPriceid${index}`}
                           variant="outlined"
                           size="small"
-                          value={row.price}
+                          value={unitpricetextfield[index]}
                           InputProps={{
                             readOnly: true,
                           }}
@@ -264,18 +348,12 @@ function ProcedureInvestigationOrder(props) {
                           name={`textfieldTotalUnitid${index}`}
                           variant="outlined"
                           size="small"
-                          // value={
-                          //   parseInt(row.price) *
-                          //   parseInt(quantityvalue[`textfiledQuantityid${index}`])
-                          // }
                           value={quantitymultiplyprice[index]}
                           InputProps={{
                             readOnly: true,
                           }}
                           disabled={checked[index] === true ? false : true}
                         />
-
-                        {/* {row.price * quantityvalue[`textfiledQuantityid${index}`]} */}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -312,6 +390,7 @@ function ProcedureInvestigationOrder(props) {
                       />
                     </TableCell>
                   </TableRow>
+
                   <TableRow>
                     <TableCell
                       className={classes.custompaddingcell}
@@ -335,12 +414,54 @@ function ProcedureInvestigationOrder(props) {
                       <TextField
                         variant="outlined"
                         size="small"
-                        value=""
+                        value={formData.discountamount}
                         id="discountamount"
                         name="discountamount"
+                        onChange={(e) => {
+                          handleInputchange(e);
+                        }}
+                        InputProps={{ inputProps: { min: 0, max: 100 } }}
+                        type="number"
                       />
                     </TableCell>
                   </TableRow>
+                  {checkedprice.includes(false) && checkedprice.length > 0 && (
+                    <TableRow>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell className={classes.custompaddingcell}>
+                        Comment
+                      </TableCell>
+
+                      <TableCell className={classes.custompaddingcell}>
+                        <TextField
+                          // error
+                          variant="outlined"
+                          size="small"
+                          value={formData.Commenttextfield}
+                          id="Commenttextfield"
+                          name="Commenttextfield"
+                          onChange={(e) => {
+                            handleInputchange(e);
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )}
+
                   <TableRow>
                     <TableCell
                       className={classes.custompaddingcell}
@@ -364,7 +485,7 @@ function ProcedureInvestigationOrder(props) {
                       <TextField
                         variant="outlined"
                         size="small"
-                        value=""
+                        value={netamount}
                         id="totalamountpaybale"
                         name="totalamountpaybale"
                       />
@@ -394,9 +515,13 @@ function ProcedureInvestigationOrder(props) {
                       <TextField
                         variant="outlined"
                         size="small"
-                        value=""
+                        value={formData.amountgiven}
                         id="amountgiven"
                         name="amountgiven"
+                        onChange={(e) => {
+                          handleInputchange(e);
+                        }}
+                        type="number"
                       />
                     </TableCell>
                   </TableRow>
