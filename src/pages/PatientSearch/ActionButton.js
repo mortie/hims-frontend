@@ -132,7 +132,7 @@ const headers =
   .get(url1, { headers: headers })
     .then((response) => {
       var visitUuid = response.data.visitUuid;
-      const url2 = `https://ln3.hispindia.org/openmrs/ws/rest/v1/lastVisitAppointmentDeatils/patient?visit=${visitUuid}`;
+      const url2 = `https://ln3.hispindia.org/openmrs/ws/rest/v1/lastVisitDeatils/patient?visit=${visitUuid}`;
 
 axios
   .get(url2, { headers: headers })
