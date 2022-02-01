@@ -281,6 +281,13 @@ export default function PatientSearch(props) {
     }
   };
 
+function Equals(a, b) {
+    return Array.isArray(a) &&
+        Array.isArray(b) &&
+        a.length === b.length &&
+        a.every((val, index) => val === b[index]);
+  }
+
   var multiFilter = (products, filters, isExactLvd, isApproxLvd) => {
     return products.filter((product) => {
       return Object.entries(filters).every(([filterProperty, filterValues]) => {
@@ -338,14 +345,17 @@ export default function PatientSearch(props) {
               }
             } else if (filterProperty != "name") {
               return filterValues.includes(product[filterProperty]);
-            } else {
+            }
+            else {
               var searchTokens = filterValues[0].split(" ");
               var searchString = product[filterProperty];
               var searchRegex = new RegExp(searchTokens.join("|"), "g");
               var numOfMatches = searchString.match(searchRegex);
               if (numOfMatches != null) {
-                return true;
-              } else {
+                var checkE = Equals(searchTokens, numOfMatches)
+                return checkE;
+              }
+              else {
                 return false;
               }
             }

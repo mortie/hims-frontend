@@ -540,7 +540,7 @@ export default function Triage() {
                     id={uuid}
                     name={uuid}
                     label={display}
-                    value={vitalValues[uuid]}
+                    value={vitalValues[uuid] || ''}
                     type="number"
                     size="small"
                     onChange={handleChange}

@@ -340,6 +340,14 @@ else {
           formValues["Relative Name*"] = pResponse.person_attributes["Relative Name*"]
 
         }
+        if (pResponse.person_attributes["Email"]) {
+          formValues["Email"] = pResponse.person_attributes["Email"]
+        }
+        if (pResponse.person_attributes["Address"]) {
+          formValues["Address"] = pResponse.person_attributes["Address"]
+
+        }
+
 
 
         formValues["Town/City"] = { name: pResponse.address["City Village"] }
