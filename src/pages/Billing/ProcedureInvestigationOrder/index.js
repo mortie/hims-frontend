@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core/";
 import { useParams } from "react-router-dom";
 import styles from "../ListtoOrder/styles";
-import { TestOrderDetails } from "../../../services/data";
+import { SaveBillingPostData } from "../../../services/data";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
@@ -24,6 +24,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Checkbox from "@material-ui/core/Checkbox";
+import { Link, Route } from "react-router-dom";
 const useStyles = makeStyles(styles);
 
 function ProcedureInvestigationOrder(props) {
@@ -40,6 +41,7 @@ function ProcedureInvestigationOrder(props) {
   };
   const [formData, setformData] = React.useState(initialformvalues);
   const [discountrate, setDiscountRate] = React.useState(0);
+  const [errors, seterrors] = React.useState(false);
   const [checked, setChecked] = React.useState(
     patientData.billableServiceDetails.map((item) => {
       return true;
@@ -72,7 +74,7 @@ function ProcedureInvestigationOrder(props) {
   //     return false;
   //   })
   // );
-  const [setquantityno, setsetQuantityNo] = React.useState("1");
+  // const [setquantityno, setsetQuantityNo] = React.useState("1");
   console.log(patientData);
   const initialSate = {};
   const [quantitymultiplyprice, setquantitymultiplyprice] = React.useState(
@@ -128,7 +130,15 @@ function ProcedureInvestigationOrder(props) {
     setTotal(totallastData);
     const amountdeducted = (totallastData * discountrate) / 100;
     console.log(amountdeducted);
+    const leftamount = parseFloat(totallastData) - parseFloat(amountdeducted);
     setNetAmount((totallastData - amountdeducted).toFixed(2));
+    const amountreurn = (
+      parseFloat(formData.amountgiven) - parseFloat(leftamount)
+    ).toFixed(2);
+    setformData({
+      ...formData,
+      amountreturnedtoPatient: amountreurn,
+    });
   };
   const handleSelectChange = (event, position) => {
     const updatedCheckedState = checked.map((item, index) => {
@@ -168,6 +178,14 @@ function ProcedureInvestigationOrder(props) {
     const amountdeducted = (totalPrice * discountrate) / 100;
     console.log(amountdeducted);
     setNetAmount((totalPrice - amountdeducted).toFixed(2));
+    const leftamount = parseFloat(totalPrice) - parseFloat(amountdeducted);
+    const amountreurn = (
+      parseFloat(formData.amountgiven) - parseFloat(leftamount)
+    ).toFixed(2);
+    setformData({
+      ...formData,
+      amountreturnedtoPatient: amountreurn,
+    });
   };
   const handleSelectPriceChange = (event, position) => {
     const updatedCheckedState = checkedprice.map((item, index) =>
@@ -210,6 +228,14 @@ function ProcedureInvestigationOrder(props) {
     const amountdeducted = (totalPrice * discountrate) / 100;
     console.log(amountdeducted);
     setNetAmount((totalPrice - amountdeducted).toFixed(2));
+    const leftamount = parseFloat(totalPrice) - parseFloat(amountdeducted);
+    const amountreurn = (
+      parseFloat(formData.amountgiven) - parseFloat(leftamount)
+    ).toFixed(2);
+    setformData({
+      ...formData,
+      amountreturnedtoPatient: amountreurn,
+    });
   };
   const handleInputchange = (e) => {
     setformData({ ...formData, [e.target.name]: e.target.value });
@@ -219,6 +245,7 @@ function ProcedureInvestigationOrder(props) {
       );
       setDiscountRate(discountrate);
       const amountdeducted = (parseInt(total) * discountrate) / 100;
+      const leftamount = (total - amountdeducted).toFixed(2);
       setNetAmount((total - amountdeducted).toFixed(2));
       //console.log(typeofdiscountratedata);
       //console.log(parseInt(total) * discountratedata);
@@ -226,6 +253,77 @@ function ProcedureInvestigationOrder(props) {
       // const totalamount = total;
       // const discountedAmount = (totalamount * discountrate) / 100;
       // setNetAmount((total - discountedAmount).toFixed(2));
+      const amountreurn = (
+        parseFloat(formData.amountgiven) - parseFloat(leftamount)
+      ).toFixed(2);
+      setformData({
+        ...formData,
+        [e.target.name]: e.target.value,
+        amountreturnedtoPatient: amountreurn,
+      });
+    }
+    if (e.target.name === "amountgiven") {
+      if (e.target.value !== "") {
+        const newreturnedvalue = (
+          parseFloat(e.target.value) - parseFloat(netamount)
+        ).toFixed(2);
+        setformData({
+          ...formData,
+          amountreturnedtoPatient: newreturnedvalue,
+          amountgiven: e.target.value,
+        });
+        seterrors(false);
+      } else {
+        seterrors(true);
+      }
+    }
+  };
+  const handleformDataSubmit = async (e) => {
+    e.preventDefault();
+
+    alert("sssssssssssssss");
+    if (formData.amountgiven === "") {
+      seterrors(true);
+      // e.preventDefault();
+    } else {
+      seterrors(false);
+      const formval = document.getElementById("formpatientdata");
+      // console.log(
+      //   formval.elements["Commenttextfield"]
+      //     ? formval.elements["Commenttextfield"].value
+      //     : ""
+      // );
+
+      //console.log(typeof formval.elements["textfiledQuantityid0"].value);
+      const payload = {
+        total: parseFloat(formval.elements["totalamountbilled"].value),
+        waiverPercentage: parseFloat(formval.elements["discountamount"].value),
+        totalAmountPayable: parseFloat(
+          formval.elements["totalamountpaybale"].value
+        ),
+        amountGiven: parseFloat(formval.elements["amountgiven"].value),
+        amountReturned: parseFloat(
+          formval.elements["amountreturnedtoPatient"].value
+        ),
+        comment: formval.elements["Commenttextfield"]
+          ? formval.elements["Commenttextfield"].value
+          : "",
+        orderServiceDetails: [
+          {
+            opdOrderId: patientData.encounterId,
+            quantity: parseInt(formval.elements["textfiledQuantityid0"].value),
+            billed: true,
+          },
+        ],
+      };
+
+      const response = await SaveBillingPostData.saveBillingData(payload);
+      console.log(response);
+      if (response !== null) {
+        alert("Successfully submitted data");
+      } else {
+        alert("Not Successfully submitted data");
+      }
     }
   };
   return (
@@ -265,7 +363,7 @@ function ProcedureInvestigationOrder(props) {
             </Grid>
           </Grid>
           <TableContainer component={Paper} style={{ marginTop: 20 }}>
-            <form>
+            <form onSubmit={handleformDataSubmit} id="formpatientdata">
               <Table className={classes.table} aria-label="spanning table">
                 <TableHead>
                   <TableRow>
@@ -422,6 +520,7 @@ function ProcedureInvestigationOrder(props) {
                         }}
                         InputProps={{ inputProps: { min: 0, max: 100 } }}
                         type="number"
+                        style={{ minWidth: 208 }}
                       />
                     </TableCell>
                   </TableRow>
@@ -448,7 +547,6 @@ function ProcedureInvestigationOrder(props) {
 
                       <TableCell className={classes.custompaddingcell}>
                         <TextField
-                          // error
                           variant="outlined"
                           size="small"
                           value={formData.Commenttextfield}
@@ -513,6 +611,7 @@ function ProcedureInvestigationOrder(props) {
                     </TableCell>
                     <TableCell className={classes.custompaddingcell}>
                       <TextField
+                        error={errors}
                         variant="outlined"
                         size="small"
                         value={formData.amountgiven}
@@ -522,6 +621,9 @@ function ProcedureInvestigationOrder(props) {
                           handleInputchange(e);
                         }}
                         type="number"
+                        helperText={
+                          errors === true ? "Please filled this field" : ""
+                        }
                       />
                     </TableCell>
                   </TableRow>
@@ -549,9 +651,13 @@ function ProcedureInvestigationOrder(props) {
                       <TextField
                         variant="outlined"
                         size="small"
-                        value=""
-                        id="amountreturned"
-                        name="amountreturned"
+                        value={formData.amountreturnedtoPatient}
+                        id="amountreturnedtoPatient"
+                        name="amountreturnedtoPatient"
+                        type="number"
+                        InputProps={{
+                          readOnly: true,
+                        }}
                       />
                     </TableCell>
                   </TableRow>
@@ -560,15 +666,17 @@ function ProcedureInvestigationOrder(props) {
               <Button
                 variant="contained"
                 color="primary"
-                href="#contained-buttons"
                 className={classes.margin}
+                type="submit"
+                disabled={errors === true ? true : false}
               >
                 Save Bill
               </Button>
               <Button
                 variant="contained"
                 color="primary"
-                href="#contained-buttons"
+                component={Link}
+                to="/app/billing/home"
                 className={classes.margin}
               >
                 Cancel
