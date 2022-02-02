@@ -69,8 +69,8 @@ export default function RevisitAction({ data,mlc }) {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [timeSlotsLoading, setTimeSlotsLoading] = useState(false);
   const [timeSlots, setTimeSlots] = useState([]);
-  const [isMlc, setIsMlc] = useState(false)
-  const [isPc, setIsPc] = useState(false)
+  const [isMlc, setIsMlc] = useState(patientCategory ? true : false)
+  const [isPc, setIsPc] = useState(patientCategory ? true : false)
   const [visitAttributeTypes, setVisitAttributeTypes] = useState();
   const [registrationSuccessData, setRegistrationSuccessData] = useState(null);
 
