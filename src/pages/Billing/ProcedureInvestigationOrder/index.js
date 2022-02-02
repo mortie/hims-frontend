@@ -338,6 +338,7 @@ function ProcedureInvestigationOrder(props) {
           },
         ],
       };
+      console.log(payload);
       swal({
         title: "Thank You",
         text: "Billing Data Saved Successfully",
@@ -348,8 +349,8 @@ function ProcedureInvestigationOrder(props) {
           window.location.href = "/app/billing/home";
         }, 200);
       });
-      // const response = await SaveBillingPostData.saveBillingData(payload);
-      // console.log(response);
+      const response = await SaveBillingPostData.saveBillingData(payload);
+      console.log(response);
       // if (response !== null) {
       //   swal({
       //     title: "Thank You",
