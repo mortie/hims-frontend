@@ -75,6 +75,7 @@ export default function OpdQue() {
   const [orderrowdetails, setOrderRowDetails] = useState([]);
   const [countrow, setCountRow] = useState(0);
   const [searchKey, setSearchKey] = useState("");
+  const [pageSize, setPageSize] = React.useState(5);
   const history = useHistory();
   const createPatientList = (results, orderdate) => {
     const patientList = results.map((result, index) => {
@@ -396,7 +397,10 @@ export default function OpdQue() {
             autoHeight
             rowHeight={40}
             headerHeight={40}
-            pageSize={10}
+            pageSize={5}
+            // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            // rowsPerPageOptions={[5]}
+            // pagination
             onCellClick={handleOpen}
             components={{
               LoadingOverlay: CustomLoadingOverlay,
@@ -423,7 +427,6 @@ export default function OpdQue() {
               rowHeight={40}
               headerHeight={40}
               className={classes.table}
-              pageSize={10}
               components={{
                 LoadingOverlay: CustomLoadingOverlay,
                 NoRowsOverlay: CustomNoRowsOverlay,
