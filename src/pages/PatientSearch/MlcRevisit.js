@@ -126,7 +126,7 @@ export default function MlcRevisit(props) {
         <TableCell >
           <GridItem >
           <FormControl component="fieldset">
-          <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
+          <RadioGroup row aria-label="gender" name="row-radio-buttons-group" defaultValue={"MLC No"}>
           {mlcTypes.map((smoker, index) => (
           <FormControlLabel
           value={smoker.display}
