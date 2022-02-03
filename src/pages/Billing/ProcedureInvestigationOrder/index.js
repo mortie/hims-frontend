@@ -346,7 +346,7 @@ function ProcedureInvestigationOrder(props) {
       }).then((value) => {
         setTimeout(() => {
           setIsLoading(false);
-          window.location.href = "/app/billing/home";
+          window.location.href = "/facility/app/billing/home";
         }, 200);
       });
       const response = await SaveBillingPostData.saveBillingData(payload);
