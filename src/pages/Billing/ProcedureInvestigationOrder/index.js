@@ -346,7 +346,8 @@ function ProcedureInvestigationOrder(props) {
       }).then((value) => {
         setTimeout(() => {
           setIsLoading(false);
-          window.location.href = "/facility/app/billing/home";
+          //window.location.href = "/app/billing/home";
+          window.location.reload(false);
         }, 200);
       });
       const response = await SaveBillingPostData.saveBillingData(payload);
@@ -687,6 +688,7 @@ function ProcedureInvestigationOrder(props) {
                         value={formData.amountgiven}
                         id="amountgiven"
                         name="amountgiven"
+                        placeholder="Please enter the amount"
                         onChange={(e) => {
                           console.log(e.target.value.length);
                           if (e.target.value.length > 8) return false;
@@ -747,9 +749,10 @@ function ProcedureInvestigationOrder(props) {
               <Button
                 variant="contained"
                 color="primary"
-                component={Link}
-                to="/app/billing/home"
                 className={classes.colorchange}
+                onClick={(e) => {
+                  window.location.reload(false);
+                }}
               >
                 Cancel
               </Button>
