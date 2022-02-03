@@ -434,9 +434,9 @@ function ProcedureInvestigationOrder(props) {
               <Table className={classes.table} aria-label="spanning table">
                 <TableHead>
                   <TableRow>
+                    <TableCell> Select</TableCell>
                     <TableCell>Sl No.</TableCell>
                     <TableCell>Service</TableCell>
-                    <TableCell>Select</TableCell>
                     <TableCell>Quantity</TableCell>
                     <TableCell>Pay</TableCell>
                     <TableCell>Unit Price</TableCell>
