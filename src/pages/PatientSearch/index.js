@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from "react";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
+import moment from "moment";
 import {
   Button,
   TextField,
@@ -21,10 +22,9 @@ import {
 import { DataGrid } from "@material-ui/data-grid";
 import AddIcon from "@material-ui/icons/Add";
 import { GridContainer, GridItem } from "../../components/Grid";
-import {ADRESSBASE_URL_API} from "../../utils/constants"
 
 import CustomizedMenus from "./ActionButton";
-import { getAPI, postAPI, getaddressAPI } from "../../services/index";
+import { getAPI,getaddressAPI, postAPI } from "../../services/index";
 
 import axios from "axios";
 import styles from "./styles";
@@ -73,15 +73,18 @@ export default function PatientSearch(props) {
     phoneData: true,
     nameData: true,
     identifierData: true,
+    ageData:true,
   });
   var [isDataPresent, setisDataPresent] = useState(false);
   var [phoneData, setphoneData] = useState(false);
   var [nameData, setnameData] = useState(false);
+  var [ageData, setAgeData] = useState(false);
   var [apihit, setapihit] = useState(false);
   var [charErrorMsj, setcharErrorMsj] = useState("");
   var isEnter = "Enter";
   var [PhoneErrorMsj, setPhoneErrorMsj] = useState();
   var [NameErrorMsj, setNameErrorMsj] = useState();
+  var [ageErrorMsj, setAgeErrorMsj] = useState();
   var [IdenErrorMsj, setIdenErrorMsj] = useState();
   const [appointmentTypes, setAppointmentTypes] = useState([]);
   const [patientCategoryTypes, setPatientCategoryTypes] = useState([]);
@@ -132,7 +135,37 @@ export default function PatientSearch(props) {
     },
   ];
 
+  const getAgeYear = ( age,ageV )=> {
+    const lastCharacter = age[age.length - 1];
+    let dob = moment().format("DD/MM/yyyy");
+    console.log(lastCharacter)
+    console.log(ageV)
+    switch (lastCharacter.toLowerCase()) {
+      case "y":
+        dob = moment().subtract(ageV, "years");
+        break;
+      case "m":
+        dob = moment().subtract(ageV, "months");
+        break;
+      case "w":
+        dob = moment().subtract(ageV, "weeks");
+        break;
+      case "d":
+        dob = moment().subtract(ageV, "days");
+        break;
+      default:
+        break;
+    }
+    console.log(dob)
+  var a = moment();
+  var b = moment(dob, 'YYYY');  
+  var diff = a.diff(b, 'years'); // calculates patient's age in years
+  console.log(diff);
+   // this prints out the age
+   return diff;
+  }
   const isEnteredPressed = (charLen, event, name, eventName) => {
+    
     if (
       (event.key === isEnter && event.target.value.length > charLen) ||
       (event.key === isEnter && name == "age")
@@ -155,7 +188,9 @@ export default function PatientSearch(props) {
           setNameErrorMsj("Name is required");
         }
       }
+      if(name === "age"){
 
+      }
       if (name == "phone") {
         setErrors({ phoneData: !phone ? false : true });
         if (phone) {
@@ -478,10 +513,24 @@ function Equals(a, b) {
       setFormErrors({ ...formErrors, [name]: "" });
     }
   }
+  function validateAge(name,value)
+  {
+    const regex = /^[0-9]+(y|Y|m|M|w|W|d|D)$/;
+      
+     if (!regex.test(value)) {
+      setAgeErrorMsj(true);
+        setFormErrors({ ...formErrors, [age]: "Please enter age in given format (20y /20m/ 20d)" });
+    }
+     else {
+      setAgeErrorMsj(false);
+      setFormErrors({ ...formErrors, [age]: "" });
+      setAgeData(false);
+    }
+  }
 
   const searchOnKey = (event, name, eventName) => {
     var searchValue = event.target.value;
-
+    
     if (name == "firstName") {
       setfirstName(searchValue);
       validateName(name, searchValue)
@@ -493,6 +542,7 @@ function Equals(a, b) {
       setidentifier(searchValue);
     }
     if (name == "age") {
+      validateName(name, searchValue)
       setage(searchValue);
     }
     if (name == "lvd") {
@@ -575,8 +625,11 @@ function Equals(a, b) {
       if (isDataAlready) {
         if (name == "age") {
           if (ageRange) {
-            minageRange = Number(event.target.value) - Number(ageRange);
-            maxageRange = Number(event.target.value) + Number(ageRange);
+            var ageactual = event.target.value;
+            var ageV = ageactual.slice(0, -1);
+            const dif = getAgeYear(ageactual,ageV);
+            minageRange = Number(dif) - Number(ageRange);
+            maxageRange = Number(dif) + Number(ageRange);
             for (let k = minageRange; k <= maxageRange; k++) {
               rangeToSend.push(String(k));
             }
@@ -586,6 +639,9 @@ function Equals(a, b) {
           }
         } else if (age) {
           if (ageRange) {
+            //var ageact = age;
+            //var ageVa = ageact.slice(0, -1);
+            //const dif = getAgeYear(ageact,ageVa);
             minageRange = Number(age) - Number(ageRange);
             maxageRange = Number(age) + Number(ageRange);
             for (let k = minageRange; k <= maxageRange; k++) {
@@ -646,8 +702,7 @@ function Equals(a, b) {
           setLoading(false);
         } else {
           let param = firstNameValue;
-          var username = "bhavana";
-          var password = "Admin123";
+          
           param = checkData(
             param,
             firstNameValue,
@@ -662,12 +717,8 @@ function Equals(a, b) {
             setnameData(false);
             setphoneData(false);
 
-            const headers = {
-              Authorization: "Basic " + btoa(`${username}:${password}`),
-            };
-            const url = `${ADRESSBASE_URL_API}/patient_search?name=${param}`;
-            axios
-              .get(url, { headers: headers })
+            const url = `/patient_search?name=${param}`;
+            getaddressAPI(url)
               .then((response) => {
                 setapihit(true);
                 var phoneNo = "";
@@ -729,8 +780,11 @@ function Equals(a, b) {
                     setsearchData([]);
                     if (age) {
                       if (ageRange) {
-                        minageRange = Number(age) - Number(ageRange);
-                        maxageRange = Number(age) + Number(ageRange);
+                      var ageactual = age;
+                      var ageV = ageactual.slice(0, -1);
+                      const dif = getAgeYear(ageactual,ageV);
+                        minageRange = Number(dif) - Number(ageRange);
+                        maxageRange = Number(dif) + Number(ageRange);
                         for (let i = minageRange; i <= maxageRange; i++) {
                           rangeToSend.push(String(i));
                         }
@@ -795,8 +849,7 @@ function Equals(a, b) {
         }
       } else {
         let param = firstNameValue;
-        var username = "bhavana";
-        var password = "Admin123";
+       
         param = checkData(
           param,
           firstNameValue,
@@ -811,12 +864,8 @@ function Equals(a, b) {
           setnameData(false);
           setphoneData(false);
 
-          const headers = {
-            Authorization: "Basic " + btoa(`${username}:${password}`),
-          };
-          const url = `${ADRESSBASE_URL_API}/patient_search?name=${param}`;
-          axios
-            .get(url, { headers: headers })
+          const url = `/patient_search?name=${param}`;
+          getaddressAPI(url)
             .then((response) => {
               setapihit(true);
               var phoneNo = "";
@@ -879,8 +928,13 @@ function Equals(a, b) {
                   setsearchData([]);
                   if (ageValue) {
                     if (ageRange) {
-                      minageRange = Number(age) - Number(ageRange);
-                      maxageRange = Number(age) + Number(ageRange);
+                      var ageactual = age;
+                      var ageV = ageactual.slice(0, -1);
+                      console.log(ageV);
+                      const dif = getAgeYear(ageactual,ageV);
+                      console.log(dif)
+                      minageRange = Number(dif) - Number(ageRange);
+                      maxageRange = Number(dif) + Number(ageRange);
                       for (let i = minageRange; i <= maxageRange; i++) {
                         rangeToSend.push(String(i));
                       }
@@ -963,6 +1017,7 @@ function Equals(a, b) {
     setisDataPresent(false);
     setIdenErrorMsj("");
     setNameErrorMsj("");
+    setAgeErrorMsj("");
     setPhoneErrorMsj("");
     setLoading(false);
     setErrors({ phoneData: true, nameData: true, identifierData: true });
@@ -1163,21 +1218,23 @@ function Equals(a, b) {
                 </Select>
               </FormControl>
             </GridItem>
-            <GridItem item xs={12} sm={6} md={3}>
-              <GridContainer>
-                <GridItem item xs={12} sm={6} md={6}>
+            
+                <GridItem item xs={12} sm={6} md={3}>
                   <TextField
                     id="standard-number"
                     variant="outlined"
                     fullWidth
                     margin="dense"
                     label="Age"
-                    type="number"
+                    placeholder="Enter age in 20y or 10m or 20d"                    
                     className={classes.field}
                     onKeyUp={(e) => searchOnKey(e, "age", "press")}
+                    onBlur={validateAge}
+                    //error={!errors.ageData || formErrors["Age*"] ? true : false}
+                    //helperText={!errors.ageData ? "Invalid Input" : formErrors["Age*"]}
                   />
                 </GridItem>
-                <GridItem item xs={12} sm={6} md={6}>
+                <GridItem item xs={12} sm={6} md={3}>
                   <FormControl
                     variant="outlined"
                     fullWidth
@@ -1201,8 +1258,7 @@ function Equals(a, b) {
                     </Select>
                   </FormControl>
                 </GridItem>
-              </GridContainer>
-            </GridItem>
+              
             <GridItem item xs={12} sm={6} md={3}>
               <FormControl component="fieldset">
                 <FormLabel
@@ -1235,6 +1291,7 @@ function Equals(a, b) {
                 </RadioGroup>
               </FormControl>
             </GridItem>
+            <GridContainer>
             <GridItem item xs={12} sm={6} md={3}>
               <Button
                 variant="contained"
@@ -1252,6 +1309,8 @@ function Equals(a, b) {
                 Reset
               </Button>
             </GridItem>
+            </GridContainer>
+            
           </GridContainer>
         </form>
         {loading && (
