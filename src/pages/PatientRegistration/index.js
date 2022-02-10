@@ -10,7 +10,7 @@ import PrintPatientRegistration from "./components/PrintPatientRegistration";
 import AvailableTimeSlots from "./components/AvailableTimeSlots";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
-
+import moment from "moment";
 
 import {
   Paper,
@@ -69,7 +69,8 @@ export default function PatientRegistration() {
   const [addressfields, setaddessfields]=useState([]);
   const [districtfields, setdistrictfields]=useState([]);
   const [cityfields, setcityfields]=useState([]);
-  const [stateisselected, setstateisselected]=useState(false);
+  const [stateisselected, setstateisselected] = useState(false);
+  const [duplicateAadhar, setDuplicateAadhar] = useState(false);
   useEffect(() => {
     getAPI(
       `/concept?q="Registration Attribute"&v=custom:(answers:(display,answers:(uuid,display,datatype:(display),synonyms:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType),answers:(uuid,display,datatype:(display),names:(display,conceptNameType)))))`
@@ -690,10 +691,22 @@ export default function PatientRegistration() {
   }
   function validateAadhar(name,value)
   {
-
+    getduplicateAadhar(value);
      if (value.length  > 12 || value.length < 12) {
         setFormErrors({ ...formErrors, [name]: "Only 12 digits are allowed" });
       }
+      else if(duplicateAadhar){
+        setFormErrors({ ...formErrors, [name]: "Please Enter Unique Aadhar Number" });
+      }
+  }
+  function getduplicateAadhar(value){    
+    const dob = moment(formValues["Date of Birth"]).format("DD-MM-YYYY");
+    var url = '/aadhaarValidation/patient?aadhaarNo='+value+'&dob='+dob
+    getAPI(url).then((res) =>{
+      setDuplicateAadhar(false); 
+    }).catch((error) =>{
+      setDuplicateAadhar(true);
+    })
   }
   function validateEmail(e) {
     const { name, value } = e.target;

@@ -82,6 +82,7 @@ export default function PatientEdit(props) {
   let [mrsList, setMrsList] = useState([]);
   let [nation, setNation] = useState([])
   let [rela, setRela] = useState([]);
+  const [duplicateAadhar, setDuplicateAadhar] = useState(false);
   const [value, setValue] = useState();
     const { enqueueSnackbar } = useSnackbar();
 
@@ -904,10 +905,22 @@ else {
   }
   function validateAadhar(name,value)
   {
-
+    getduplicateAadhar(value);
      if (value.length  > 12 || value.length < 12) {
         setFormErrors({ ...formErrors, [name]: "Only 12 digits are allowed" });
       }
+      else if(duplicateAadhar){
+        setFormErrors({ ...formErrors, [name]: "Please Enter Unique Aadhar Number" });
+      }
+  }
+  function getduplicateAadhar(value){    
+    const dob = moment(formValues["Date of Birth"]).format("DD-MM-YYYY");
+    var url = '/aadhaarValidation/patient?aadhaarNo='+value+'&dob='+dob
+    getAPI(url).then((res) =>{
+      setDuplicateAadhar(false); 
+    }).catch((error) =>{
+      setDuplicateAadhar(true);
+    })
   }
   function validateEmail(e) {
     const { name, value } = e.target;
