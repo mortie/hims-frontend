@@ -1011,7 +1011,7 @@ function Equals(a, b) {
     setphone("");
     setage("");
     setlvd("");
-    setresultAge("");
+    setresultAge(0);
     setidentifier("");
     setsearchData([]);
     setisDataPresent(false);
@@ -1247,7 +1247,7 @@ function Equals(a, b) {
                       label="Range"
                       value={resultAge}
                       onChange={(e) => searchOnKey(e, "range", "press")}
-                      defaultValue={0}
+                      defaultValue={resultAge}
                     >
                       <MenuItem value={0}>0</MenuItem>
                       <MenuItem value={1}>1</MenuItem>

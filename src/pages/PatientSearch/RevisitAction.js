@@ -38,7 +38,7 @@ import { useSnackbar } from "notistack";
 const useStyles = makeStyles(styles);
 
 
-export default function RevisitAction({ data,mlc }) {
+export default function RevisitAction({ data }) {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const [open, setOpen] = React.useState(true);
@@ -52,7 +52,10 @@ export default function RevisitAction({ data,mlc }) {
     reportingTime,
     patientCategory,
     patientSubCategory1,
-    patientSubCategory2 } = visitData.data;
+    patientSubCategory2,
+    mlc,
+    mlcSubCategory,
+  } = visitData.data;
   const [appointmentTypes, setAppointmentTypes] = useState([]);
   const [mlcTypes, setMlcTypes] = useState([]);
   const [mlcYesTypes, setmlcYesTypes] = useState([]);
@@ -69,7 +72,7 @@ export default function RevisitAction({ data,mlc }) {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [timeSlotsLoading, setTimeSlotsLoading] = useState(false);
   const [timeSlots, setTimeSlots] = useState([]);
-  const [isMlc, setIsMlc] = useState(patientCategory ? true : false)
+  const [isMlc, setIsMlc] = useState(mlc ? true : false)
   const [isPc, setIsPc] = useState(patientCategory ? true : false)
   const [visitAttributeTypes, setVisitAttributeTypes] = useState();
   const [registrationSuccessData, setRegistrationSuccessData] = useState(null);
@@ -412,7 +415,9 @@ const getAge = (birthdate) => {
 
 
           <MlcRevisit
-            visitAttributeTypes = {visitAttributeTypes}
+            visitAttributeTypes={visitAttributeTypes}
+            mlc={mlc}
+            mlcSubCategory = {mlcSubCategory}
             mlcUuid = {mlcUuid}
             mlcTypes={mlcTypes}
             mlcYesUuid = {mlcYesUuid}
@@ -535,7 +540,7 @@ const getAge = (birthdate) => {
                 <Typography>REPORTING TIME</Typography>
               </TableCell>
               <TableCell >
-                <Typography>&nbsp;&nbsp;&nbsp;{ reportingTime }</Typography>
+                <Typography>&nbsp;&nbsp;&nbsp;{ reportingTime ? reportingTime : "N/A"  }</Typography>
             </TableCell>
             </TableRow>
         </TableBody>
