@@ -25,6 +25,8 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Checkbox from "@material-ui/core/Checkbox";
 import { Link, Route } from "react-router-dom";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import swal from "sweetalert";
 const useStyles = makeStyles(styles);
 
 function ProcedureInvestigationOrder(props) {
@@ -38,10 +40,13 @@ function ProcedureInvestigationOrder(props) {
     amountgiven: "",
     amountreturnedtoPatient: "",
     discountamount: 0,
+    Commenttextfield: "",
   };
   const [formData, setformData] = React.useState(initialformvalues);
   const [discountrate, setDiscountRate] = React.useState(0);
   const [errors, seterrors] = React.useState(false);
+  const [commenterror, setCommenterror] = React.useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [checked, setChecked] = React.useState(
     patientData.billableServiceDetails.map((item) => {
       return true;
@@ -103,7 +108,14 @@ function ProcedureInvestigationOrder(props) {
         // return index === position
         //   ? parseInt(item.price) * parseInt(textfieldqunatityval[index])
         //   : parseInt(item.price) * parseInt(textfieldqunatityval[index]);
-        return parseInt(item.price) * parseInt(textfieldqunatityval[index]);
+        return (
+          parseInt(item.price) *
+          parseInt(
+            textfieldqunatityval[index] === ""
+              ? "0"
+              : textfieldqunatityval[index]
+          )
+        );
       }
     );
     setquantitymultiplyprice(totalmultunit);
@@ -115,7 +127,11 @@ function ProcedureInvestigationOrder(props) {
         return (
           sum +
           parseInt(unitpricetextfield[index]) *
-            parseInt(textfieldqunatityval[index])
+            parseInt(
+              textfieldqunatityval[index] === ""
+                ? "0"
+                : textfieldqunatityval[index]
+            )
         );
       }
       // else {
@@ -198,7 +214,7 @@ function ProcedureInvestigationOrder(props) {
       (sum, currentState, index) => {
         if (currentState === true) {
           //setCommentTextfield(false);
-          textfieldqunatityval[index] = "1";
+          // textfieldqunatityval[index] = "1";
           quantitymultiplyprice[index] =
             parseInt(textfieldqunatityval[index]) *
             parseInt(unitpricetextfield[index]);
@@ -277,24 +293,29 @@ function ProcedureInvestigationOrder(props) {
         seterrors(true);
       }
     }
+    if (e.target.name === "Commenttextfield") {
+      if (e.target.value === "") {
+        setCommenterror(true);
+      } else {
+        setCommenterror(false);
+        setformData({
+          ...formData,
+          Commenttextfield: e.target.value,
+        });
+      }
+    }
   };
   const handleformDataSubmit = async (e) => {
     e.preventDefault();
 
-    alert("sssssssssssssss");
+    //alert("sssssssssssssss");
     if (formData.amountgiven === "") {
       seterrors(true);
       // e.preventDefault();
     } else {
       seterrors(false);
       const formval = document.getElementById("formpatientdata");
-      // console.log(
-      //   formval.elements["Commenttextfield"]
-      //     ? formval.elements["Commenttextfield"].value
-      //     : ""
-      // );
 
-      //console.log(typeof formval.elements["textfiledQuantityid0"].value);
       const payload = {
         total: parseFloat(formval.elements["totalamountbilled"].value),
         waiverPercentage: parseFloat(formval.elements["discountamount"].value),
@@ -305,9 +326,10 @@ function ProcedureInvestigationOrder(props) {
         amountReturned: parseFloat(
           formval.elements["amountreturnedtoPatient"].value
         ),
-        comment: formval.elements["Commenttextfield"]
-          ? formval.elements["Commenttextfield"].value
-          : "",
+        // comment: formval.elements["Commenttextfield"]
+        //   ? formval.elements["Commenttextfield"].value
+        //   : "xyz",
+        comment: "xyz",
         orderServiceDetails: [
           {
             opdOrderId: patientData.encounterId,
@@ -316,14 +338,38 @@ function ProcedureInvestigationOrder(props) {
           },
         ],
       };
-
+      console.log(payload);
+      swal({
+        title: "Thank You",
+        text: "Billing Data Saved Successfully",
+        icon: "success",
+      }).then((value) => {
+        setTimeout(() => {
+          setIsLoading(false);
+          //window.location.href = "/app/billing/home";
+          window.location.reload(false);
+        }, 200);
+      });
       const response = await SaveBillingPostData.saveBillingData(payload);
       console.log(response);
-      if (response !== null) {
-        alert("Successfully submitted data");
-      } else {
-        alert("Not Successfully submitted data");
-      }
+      // if (response !== null) {
+      //   swal({
+      //     title: "Thank You",
+      //     text: "Billing Data Saved Successfully",
+      //     icon: "success",
+      //   }).then((value) => {
+      //     setTimeout(() => {
+      //       setIsLoading(false);
+      //       window.location.href = "/app/billing/home";
+      //     }, 2000);
+      //   });
+      // } else {
+      //   swal({
+      //     title: "Server Error !",
+      //     text: "Try Again after Some Time",
+      //     icon: "error",
+      //   });
+      // }
     }
   };
   return (
@@ -339,41 +385,62 @@ function ProcedureInvestigationOrder(props) {
         <CardContent>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={4}>
-              <Typography>PatientId : {patientData.identifier}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={4}>
               <Typography>
-                Name : {patientData.patientName.toUpperCase()}
+                PatientId : <strong>{patientData.identifier}</strong>
               </Typography>
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Typography>Gender : {patientData.gender}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Typography>Age : {patientData.age}</Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <Typography>Date : {patientData.orderdate}</Typography>
+              <Typography>
+                Name : <strong>{patientData.patientName.toUpperCase()}</strong>
+              </Typography>
             </Grid>
             <Grid item xs={12} sm={4}>
               <Typography>
-                Patient Category : {patientData.patientCategory}
+                Gender : <strong>{patientData.gender}</strong>
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Typography>
+                Age : <strong>{patientData.age}</strong>
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12} sm={4}>
+              <Typography>
+                Order Date : <strong>{patientData.orderdate}</strong>
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Typography>
+                Patient Category :
+                <strong>
+                  {" "}
+                  {patientData.patientCategory === null
+                    ? "N.A."
+                    : patientData.patientCategory.substring(
+                        0,
+                        patientData.patientCategory.length - 1
+                      )}
+                </strong>
               </Typography>
             </Grid>
           </Grid>
           <TableContainer component={Paper} style={{ marginTop: 20 }}>
-            <form onSubmit={handleformDataSubmit} id="formpatientdata">
+            <form
+              onSubmit={handleformDataSubmit}
+              id="formpatientdata"
+              method="post"
+            >
               <Table className={classes.table} aria-label="spanning table">
                 <TableHead>
                   <TableRow>
+                    <TableCell> Select</TableCell>
                     <TableCell>Sl No.</TableCell>
                     <TableCell>Service</TableCell>
-                    <TableCell>Select</TableCell>
                     <TableCell>Quantity</TableCell>
                     <TableCell>Pay</TableCell>
                     <TableCell>Unit Price</TableCell>
-                    <TableCell>Q*Unit Price</TableCell>
+                    <TableCell>Quantity * Unit Price</TableCell>
                   </TableRow>
                 </TableHead>
 
@@ -411,7 +478,10 @@ function ProcedureInvestigationOrder(props) {
                             handleQuantityChange(e, index);
                           }}
                           type="number"
-                          disabled={checked[index] === true ? false : true}
+                          disabled={
+                            (checked[index] === true ? false : true) ||
+                            (checkedprice[index] === true ? false : true)
+                          }
                         />
                       </TableCell>
                       <TableCell className={classes.custompaddingcell}>
@@ -516,6 +586,7 @@ function ProcedureInvestigationOrder(props) {
                         id="discountamount"
                         name="discountamount"
                         onChange={(e) => {
+                          if (e.target.value.length > 3) return false;
                           handleInputchange(e);
                         }}
                         InputProps={{ inputProps: { min: 0, max: 100 } }}
@@ -577,7 +648,7 @@ function ProcedureInvestigationOrder(props) {
                       className={classes.custompaddingcell}
                     ></TableCell>
                     <TableCell className={classes.custompaddingcell}>
-                      Total Amount Payable
+                      <strong>Total Amount Payable</strong>
                     </TableCell>
                     <TableCell className={classes.custompaddingcell}>
                       <TextField
@@ -607,7 +678,7 @@ function ProcedureInvestigationOrder(props) {
                       className={classes.custompaddingcell}
                     ></TableCell>
                     <TableCell className={classes.custompaddingcell}>
-                      Amount Given
+                      <strong> Amount Given</strong>
                     </TableCell>
                     <TableCell className={classes.custompaddingcell}>
                       <TextField
@@ -617,12 +688,15 @@ function ProcedureInvestigationOrder(props) {
                         value={formData.amountgiven}
                         id="amountgiven"
                         name="amountgiven"
+                        placeholder="Please enter the amount"
                         onChange={(e) => {
+                          console.log(e.target.value.length);
+                          if (e.target.value.length > 8) return false;
                           handleInputchange(e);
                         }}
                         type="number"
                         helperText={
-                          errors === true ? "Please filled this field" : ""
+                          errors === true ? "This field is required" : ""
                         }
                       />
                     </TableCell>
@@ -675,14 +749,27 @@ function ProcedureInvestigationOrder(props) {
               <Button
                 variant="contained"
                 color="primary"
-                component={Link}
-                to="/app/billing/home"
-                className={classes.margin}
+                className={classes.colorchange}
+                onClick={(e) => {
+                  window.location.reload(false);
+                }}
               >
                 Cancel
               </Button>
             </form>
           </TableContainer>
+          {/* {isLoading && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+              }}
+            >
+              <CircularProgress />
+            </div>
+          )} */}
         </CardContent>
       </Card>
     </>

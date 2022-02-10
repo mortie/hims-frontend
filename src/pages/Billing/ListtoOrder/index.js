@@ -84,26 +84,43 @@ function ListtoOrder(props) {
           <CardContent>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={4}>
-                <Typography>PatientId : {patientData.identifier}</Typography>
-              </Grid>
-              <Grid item xs={12} sm={4}>
                 <Typography>
-                  Name : {patientData.patientName.toUpperCase()}
+                  PatientId : <strong>{patientData.identifier}</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={4}>
-                <Typography>Gender : {patientData.gender}</Typography>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Typography>Age : {patientData.age}</Typography>
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <Typography>Date : {patientData.orderdate}</Typography>
+                <Typography>
+                  Name :{" "}
+                  <strong>{patientData.patientName.toUpperCase()}</strong>
+                </Typography>
               </Grid>
               <Grid item xs={12} sm={4}>
                 <Typography>
-                  Patient Category : {patientData.patientCategory}
+                  Gender : <strong>{patientData.gender}</strong>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Typography>
+                  Age : <strong>{patientData.age}</strong>
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <Typography>
+                  Order Date : <strong>{patientData.orderdate}</strong>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Typography>
+                  Patient Category :{" "}
+                  <strong>
+                    {patientData.patientCategory === null
+                      ? "N.A."
+                      : patientData.patientCategory.substring(
+                          0,
+                          patientData.patientCategory.length - 1
+                        )}
+                  </strong>
                 </Typography>
               </Grid>
             </Grid>

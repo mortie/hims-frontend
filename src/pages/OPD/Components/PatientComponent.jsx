@@ -116,9 +116,9 @@ function Patient({
     }
 
     const handleSaveClick = () => {
-
-        console.log(selectedVisit);
-        
+ 
+        try{
+            console.log(selectedVisit);
         let orderpayload = {
             patient: selectedVisit.id,
             location: selectedVisit.locationId,
@@ -136,6 +136,10 @@ function Patient({
             visitOutcomeDetails: visitOutcomeDetails,
         }
         savePatientDiagnosys(payload);
+        }
+        catch (e){
+            enqueueSnackbar("OPD Order not generated");
+        }
         enqueueSnackbar("OPD Order has successfully generated");
         window.location.reload(false);
     }

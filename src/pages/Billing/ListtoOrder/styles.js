@@ -41,8 +41,20 @@ const opdStyles = (theme) => ({
   margin: {
     margin: theme.spacing(1),
   },
+  colorchange: {
+    margin: theme.spacing(1),
+    "&:hover": {
+      color: "#ffff",
+    },
+  },
   custompaddingcell: {
-    padding: 3,
+    padding: 2,
+  },
+  circularloaader: {
+    display: "flex",
+    "& > * + *": {
+      marginLeft: theme.spacing(2),
+    },
   },
 });
 

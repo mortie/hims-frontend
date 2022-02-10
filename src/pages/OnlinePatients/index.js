@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import { GridOverlay, DataGrid } from "@material-ui/data-grid";
-import { getAPI,getOnlineAPI } from "../../services/index";
-import {  postAPI,statusAppointment } from "../../services/index";
+import { getAPI, getOnlineAPI } from "../../services/index";
+import { postAPI, statusAppointment } from "../../services/index";
 import { Alert } from "@material-ui/lab";
 import clsx from "clsx";
-import {District_Dropdown} from "../../utils/constants"
+import { District_Dropdown } from "../../utils/constants";
 import {
   Button,
   TextField,
   LinearProgress,
   CircularProgress,
   makeStyles,
-  Paper, 
+  Paper,
   Select,
   MenuItem,
   InputLabel,
-  FormControl
+  FormControl,
 } from "@material-ui/core/";
 import { GridContainer, GridItem } from "../../components/Grid";
 import styles from "./styles";
@@ -42,45 +42,40 @@ const CustomNoRowsOverlay = () => {
     </GridOverlay>
   );
 };
-  
-
-
-
 
 export default function InfiniteLoadingGrid() {
-  
   const classes = useStyles();
   const [loading, setLoading] = React.useState(false);
-  const [btnValue, setBtnValue]= React.useState('Check In');
-  let [appointData, setAppointData]= useState([]);
-  let [filterappointData, setFilterAppointData]= React.useState([]);
+  const [btnValue, setBtnValue] = React.useState("Check In");
+  let [appointData, setAppointData] = useState([]);
+  let [filterappointData, setFilterAppointData] = React.useState([]);
   const [visitAttributeTypes, setVisitAttributeTypes] = useState();
-  const [visitId, setVisitId] = useState('');
-  const [gender, setGender] = React.useState('');
+  const [visitId, setVisitId] = useState("");
+  const [gender, setGender] = React.useState("");
   var [searchDetails, setsearchDetails] = useState({
     phone: "",
     name: "",
     age: "",
     gender: "",
   });
-  
+
   const date = new Date();
   const fromDate = new Date(
     date.getFullYear(),
-      date.getMonth(),
-      (date.getDate()+1)
+    date.getMonth(),
+    date.getDate() + 1
   );
-    const toDate = new Date(
-      fromDate.getFullYear(),
-      fromDate.getMonth(),
-      (fromDate.getDate()+1)
-    );
-    
+  const toDate = new Date(
+    fromDate.getFullYear(),
+    fromDate.getMonth(),
+    fromDate.getDate() + 1
+  );
+
   const columns = [
-    { field: 'uuid', hide: true },
-    { field: 'hospitalId', hide: true },
-    { field: 'appointmentId', hide: true },
-    { field: 'appointmentStatus', hide: true },
+    { field: "uuid", hide: true },
+    { field: "hospitalId", hide: true },
+    { field: "appointmentId", hide: true },
+    { field: "appointmentStatus", hide: true },
     { field: "id", headerName: "No.", width: 90 },
     { field: "name", headerName: "Name", width: 120 },
     { field: "phone", headerName: "Phone", width: 120 },
@@ -115,174 +110,180 @@ export default function InfiniteLoadingGrid() {
       headerName: "Check In",
       type: "string",
       width: 120,
-      renderCell: (cellValues) => {  
-        if(cellValues.row.appointmentStatus !== "BOOKED"){
-          return <Button
-        variant="contained" disabled
-      >
-       Arrived
-      </Button>
-        }else{
-             return <Button
-        variant="contained"
-        onClick={(event) => {
-          handleClick(event, cellValues);
-        }}
-      >
-       {btnValue}
-      </Button>;
-        }      
-       
+      renderCell: (cellValues) => {
+        if (cellValues.row.appointmentStatus !== "BOOKED") {
+          return (
+            <Button variant="contained" disabled>
+              Arrived
+            </Button>
+          );
+        } else {
+          return (
+            <Button
+              variant="contained"
+              onClick={(event) => {
+                handleClick(event, cellValues);
+              }}
+            >
+              {btnValue}
+            </Button>
+          );
+        }
+      },
     },
-  }
   ];
- 
-function keyUpFun(e){
 
-  searchDetails[e.target.id] = e.target.value;
-}
-
-function resetOnKey(e){
-  
-  setAppointData(appointData);
-  document.getElementById("searchForm").reset();
-}
-  function searchOnKey(e){
-   if(searchDetails["name"] !== ""){
-    filterappointData = filterappointData.filter( function (appointment) {
-      return appointment.name === searchDetails["name"];
-    })
-    setFilterAppointData(appointData)
-   }
-   if(searchDetails["phone"] !== ""){
-    filterappointData = filterappointData.filter( function (appointment) {
-      return appointment.phone === "91"+searchDetails["phone"];
-    })
-    setFilterAppointData(filterappointData)
-   }
-   if(searchDetails["age"] !== ""){
-    filterappointData = filterappointData.filter( function (appointment) {
-      return appointment.age === searchDetails["age"];
-    })
-    setFilterAppointData(filterappointData)
-   }
-   if(searchDetails["gender"] !== ""){
-    filterappointData = filterappointData.filter( function (appointment) {
-      return appointment.gender === searchDetails["gender"];
-    })
-    setFilterAppointData(filterappointData)
-   }
-   else{
-    setFilterAppointData(filterappointData);
-   }
+  function keyUpFun(e) {
+    searchDetails[e.target.id] = e.target.value;
   }
- const getAppointmentData = async() => {
-  await getOnlineAPI(
-    `/onlineappointment/onlineAppointments?&frdate=${fromDate.toISOString()}&todate=${toDate.toISOString()}`
-      )
-    .then((response) => {
-     response.data.appointments = response.data.appointments.filter( function (appointment) {
+  function handleOnchange(e) {
+    searchDetails[e.target.id] = e.target.value;
+    console.log(appointData);
+    setFilterAppointData(getFilteredPatientList(e.target.value.toLowerCase()));
+  }
+  const getFilteredPatientList = (key) => {
+    if (key.length >= 1) {
+      console.log(key);
+      const newitem = appointData.filter(
+        (item) =>
+          item.name.toLowerCase().includes(key) || item.phone.includes(key)
+      );
+      return newitem;
+    } else {
+      return appointData;
+    }
+  };
+  function resetOnKey(e) {
+    setAppointData(appointData);
+    document.getElementById("searchForm").reset();
+  }
+  function searchOnKey(e) {
+    if (searchDetails["name"] !== "") {
+      filterappointData = filterappointData.filter(function (appointment) {
+        return appointment.name === searchDetails["name"];
+      });
+      setFilterAppointData(appointData);
+    }
+    if (searchDetails["phone"] !== "") {
+      filterappointData = filterappointData.filter(function (appointment) {
+        return appointment.phone === "91" + searchDetails["phone"];
+      });
+      setFilterAppointData(filterappointData);
+    }
+    if (searchDetails["age"] !== "") {
+      filterappointData = filterappointData.filter(function (appointment) {
+        return appointment.age === searchDetails["age"];
+      });
+      setFilterAppointData(filterappointData);
+    }
+    if (searchDetails["gender"] !== "") {
+      filterappointData = filterappointData.filter(function (appointment) {
+        return appointment.gender === searchDetails["gender"];
+      });
+      setFilterAppointData(filterappointData);
+    } else {
+      setFilterAppointData(filterappointData);
+    }
+  }
+  const getAppointmentData = async () => {
+    await getOnlineAPI(
+      `/onlineappointment/onlineAppointments?&frdate=${fromDate.toISOString()}&todate=${toDate.toISOString()}`
+    ).then((response) => {
+      response.data.appointments = response.data.appointments.filter(function (
+        appointment
+      ) {
         return appointment.district_name === District_Dropdown;
-      })
+      });
       const appointList = createAppointmentList(response.data.appointments);
-        setFilterAppointData(appointList);
-        setAppointData(appointList);
-        setLoading(false);
-    })
- }
+      setFilterAppointData(appointList);
+      setAppointData(appointList);
+      setLoading(false);
+    });
+  };
 
   const handleClick = (event, data) => {
-   if(event.target.innerHTML !== "Arrived"){
-   
-    const patientId = data.row.uuid;
+    if (event.target.innerHTML !== "Arrived") {
+      const patientId = data.row.uuid;
 
-    let visit = {
-      visitType: "7b0f5697-27e3-40c4-8bae-f4049abfb4ed",
-    };
-    
-    const getVisitAttrs = async(data) =>{
-      console.log(data);
-      if(data.length === 1){
-        setVisitId(data[0].uuid);
-      }else{
-        await data.map((result) => {
-          console.log(result);
-           getAPI("/visit/"+result.uuid)
-          .then((resp) => {
-            if(resp.data.attributes.length > 0)
-            {
-              console.log(resp.data);
-              setVisitId(result.uuid);
-            }
-          })
-        })
-      }
-    return visitId;
-    };
-    
-    getAPI("/onlineappointment/onlinePatientVisits?patientId="+patientId)
-    .then((response) => {
-      let visits = response.data.visits;
-      getVisitAttrs(visits);
-      getAPI("/visit/"+visitId)
-        .then((resp) => {          
-          let attributes =[];
-          attributes = resp.data.attributes;
-          console.log(attributes);
-         visit.attributes = attributes;
-          visit.patient = data.row.uuid;
-          visit.location = resp.data.location.uuid;          
-          postAPI("/visit", visit)
-            .then((visitResponse) => {
+      let visit = {
+        visitType: "7b0f5697-27e3-40c4-8bae-f4049abfb4ed",
+      };
+
+      const getVisitAttrs = async (data) => {
+        console.log(data);
+        if (data.length === 1) {
+          setVisitId(data[0].uuid);
+        } else {
+          await data.map((result) => {
+            console.log(result);
+            getAPI("/visit/" + result.uuid).then((resp) => {
+              if (resp.data.attributes.length > 0) {
+                console.log(resp.data);
+                setVisitId(result.uuid);
+              }
+            });
+          });
+        }
+        return visitId;
+      };
+
+      getAPI("/onlineappointment/onlinePatientVisits?patientId=" + patientId)
+        .then((response) => {
+          let visits = response.data.visits;
+          getVisitAttrs(visits);
+          getAPI("/visit/" + visitId).then((resp) => {
+            let attributes = [];
+            attributes = resp.data.attributes;
+            console.log(attributes);
+            visit.attributes = attributes;
+            visit.patient = data.row.uuid;
+            visit.location = resp.data.location.uuid;
+            postAPI("/visit", visit).then((visitResponse) => {
               console.log(visitResponse);
-              statusAppointment( data.row.appointmentId,"CONFIRM");
+              statusAppointment(data.row.appointmentId, "CONFIRM");
               getAppointmentData();
-          })
-          
-      })
-      
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-    
-    
-  } 
-    return ;
+            });
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+    return;
   };
   const createAppointmentList = (results) => {
-    const patientList = results.map((result,index) => {
+    const patientList = results.map((result, index) => {
       return {
-        id: index+1,        
+        id: index + 1,
         uuid: result.patient_id,
-        appointmentId:result.appointment_id,
+        appointmentId: result.appointment_id,
         appointmentStatus: result.appointment_status,
-        hospitalId:result.hospital_appointment_id,
-        name:result.patient_name,
+        hospitalId: result.hospital_appointment_id,
+        name: result.patient_name,
         phone: result.patient_mobile,
-        gender:result.patient_gender,
-        age:result.patient_age,
-        district:result.district_name,
-        hospital:result.hospital_name,
+        gender: result.patient_gender,
+        age: result.patient_age,
+        district: result.district_name,
+        hospital: result.hospital_name,
         appointmentTime: new Date(result.appointment_date).toLocaleTimeString(),
       };
     });
-  
+
     return patientList;
   };
- 
+
   React.useEffect(() => {
-   setLoading(true); 
-   getAppointmentData();
-  },[]);
+    setLoading(true);
+    getAppointmentData();
+  }, []);
 
   return (
     <>
-    <Paper className={classes.paper}>
-        <form noValidate id="searchForm" >
+      <Paper className={classes.paper}>
+        <form noValidate id="searchForm">
           <GridContainer>
             <GridItem item xs={12} sm={6} md={3}>
-              <TextField                
+              <TextField
                 name={searchDetails["name"]}
                 variant="outlined"
                 margin="dense"
@@ -293,6 +294,7 @@ function resetOnKey(e){
                 label="Name"
                 className={classes.field}
                 onKeyUp={(e) => keyUpFun(e, "clicked")}
+                onChange={(e) => handleOnchange(e)}
               />
             </GridItem>
             <GridItem item xs={12} sm={6} md={3}>
@@ -313,40 +315,41 @@ function resetOnKey(e){
                     .toString()
                     .slice(0, 10);
                 }}
+                onChange={(e) => handleOnchange(e)}
               />
             </GridItem>
-            
-                <GridItem item xs={12} sm={6} md={3}>
-                  <TextField
-                    id="age"
-                    name= "age"
-                    variant="outlined"
-                    fullWidth
-                    margin="dense"
-                    label="Age"
-                    type="number"
-                    onKeyUp={(e) => keyUpFun(e, "clicked")}
-                    className={classes.field}
-                  />
-                </GridItem>               
-              
+
             <GridItem item xs={12} sm={6} md={3}>
-            
-                <FormControl fullWidth variant="outlined" >
-                  <InputLabel id="select-gender">Gender</InputLabel>
-                  <Select
-                          labelId="select-gender"
-                          variant="outlined"
-                          fullWidth
-                          margin="dense"
-                          className={classes.field}
-                          onChange={(e) => keyUpFun(e, "clicked")}
-                          >
-                            <MenuItem value="M">Male</MenuItem>
-                            <MenuItem value="F">Female</MenuItem>
-                          </Select>
-                          </FormControl>
-                     </GridItem>
+              <TextField
+                id="age"
+                name="age"
+                variant="outlined"
+                fullWidth
+                margin="dense"
+                label="Age"
+                type="number"
+                onKeyUp={(e) => keyUpFun(e, "clicked")}
+                className={classes.field}
+                // onChange={(e) => handleOnchange(e)}
+              />
+            </GridItem>
+
+            <GridItem item xs={12} sm={6} md={3}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel id="select-gender">Gender</InputLabel>
+                <Select
+                  labelId="select-gender"
+                  variant="outlined"
+                  fullWidth
+                  margin="dense"
+                  className={classes.field}
+                  onChange={(e) => keyUpFun(e, "clicked")}
+                >
+                  <MenuItem value="M">Male</MenuItem>
+                  <MenuItem value="F">Female</MenuItem>
+                </Select>
+              </FormControl>
+            </GridItem>
             <GridItem item xs={12} sm={6} md={3}>
               <Button
                 variant="contained"
@@ -370,11 +373,10 @@ function resetOnKey(e){
           <CircularProgress size={24} className={classes.buttonProgress} />
         )}
 
-      
-      <DataGrid
+        <DataGrid
           loading={loading}
           rows={filterappointData}
-          columns={columns} 
+          columns={columns}
           disableColumnMenu
           autoHeight
           rowHeight={40}
@@ -384,8 +386,8 @@ function resetOnKey(e){
             LoadingOverlay: CustomLoadingOverlay,
             NoRowsOverlay: CustomNoRowsOverlay,
           }}
-      />
-     </Paper>
+        />
+      </Paper>
     </>
   );
 }
