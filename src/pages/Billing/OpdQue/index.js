@@ -40,6 +40,7 @@ import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
 import { useHistory } from "react-router-dom";
 import ListtoOrder from "../ListtoOrder";
+import { calculateAge } from "../../../utils/commons";
 
 const useStyles = makeStyles(styles);
 function createData(name, calories, fat, carbs, protein) {
@@ -79,20 +80,17 @@ export default function OpdQue() {
   const history = useHistory();
   const createPatientList = (results, orderdate) => {
     const patientList = results.map((result, index) => {
+      console.log(moment(result.birthDate).toISOString());
       return {
         slno: index + 1,
         identifier: result.patientId,
         patientName: result.patientName,
         gender: result.gender,
-        age: result.age,
+        age: calculateAge(moment(result.birthDate).toISOString()),
         orderdate: orderdate,
-        patientuuid: result.patientUuid,
-        encounterId: result.encounterId,
-        locationUuid: result.locationUuid,
-        locationName: result.locationName,
+        id: result.patientUuid,
+        extraData: result.serviceDetailsForTestOrder,
         patientCategory: result.patientCategory,
-        billableServiceDetails: result.billableServiceDetails,
-        id: result.encounterId,
       };
     });
 
@@ -105,7 +103,7 @@ export default function OpdQue() {
         const request = await TestOrderDetails.TestOnlySelectDateFunc(
           actualorderdate
         );
-        console.log(request);
+        //console.log(request);
         const patientList = createPatientList(
           request.testOrderDetails,
           actualorderdate
@@ -161,8 +159,8 @@ export default function OpdQue() {
     }
   };
   const handleDateChange = (date, value) => {
-    console.log(date);
-    console.log(value);
+    // console.log(date);
+    // console.log(value);
     //setActualOrderdate(moment(date["_d"]).format("DD-MM-YYYY"));
     setActualOrderdate(value);
     setSelectedDate(date);
@@ -187,7 +185,6 @@ export default function OpdQue() {
     {
       field: "age",
       headerName: "Age",
-      type: "number",
       width: 100,
     },
     {
@@ -197,48 +194,19 @@ export default function OpdQue() {
     },
     {
       field: "orderdate",
-      headerName: "Date",
+      headerName: "Order Date",
       width: 220,
     },
+
     {
       field: "id",
-      headerName: "encounterid",
-      width: 220,
-      hide: true,
-    },
-    {
-      field: "patientuuid",
       headerName: "patientUuid",
       width: 220,
       hide: true,
     },
     {
-      field: "patientCategory",
-      headerName: "patientCategory",
-      width: 220,
-      hide: true,
-    },
-    {
-      field: "encounterUuid",
-      headerName: "encounterUuid",
-      width: 220,
-      hide: true,
-    },
-    {
-      field: "locationUuid",
-      headerName: "locationUuid",
-      width: 220,
-      hide: true,
-    },
-    {
-      field: "locationName",
-      headerName: "locationName",
-      width: 220,
-      hide: true,
-    },
-    {
-      field: "billableServiceDetails",
-      headerName: "billableServiceDetails",
+      field: "extraData",
+      headerName: "extraData",
       width: 220,
       hide: true,
     },

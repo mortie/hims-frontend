@@ -282,7 +282,7 @@ export default function InfiniteLoadingGrid() {
       <Paper className={classes.paper}>
         <form noValidate id="searchForm">
           <GridContainer>
-            <GridItem item xs={12} sm={6} md={3}>
+            <GridItem item xs={12} sm={6} md={3} style={{ marginTop: 6 }}>
               <TextField
                 name={searchDetails["name"]}
                 variant="outlined"
@@ -294,10 +294,10 @@ export default function InfiniteLoadingGrid() {
                 label="Name"
                 className={classes.field}
                 onKeyUp={(e) => keyUpFun(e, "clicked")}
-                onChange={(e) => handleOnchange(e)}
+                // onChange={(e) => handleOnchange(e)}
               />
             </GridItem>
-            <GridItem item xs={12} sm={6} md={3}>
+            <GridItem item xs={12} sm={6} md={3} style={{ marginTop: 6 }}>
               <TextField
                 variant="outlined"
                 required
@@ -315,11 +315,11 @@ export default function InfiniteLoadingGrid() {
                     .toString()
                     .slice(0, 10);
                 }}
-                onChange={(e) => handleOnchange(e)}
+                // onChange={(e) => handleOnchange(e)}
               />
             </GridItem>
 
-            <GridItem item xs={12} sm={6} md={3}>
+            <GridItem item xs={12} sm={6} md={3} style={{ marginTop: 6 }}>
               <TextField
                 id="age"
                 name="age"
@@ -334,7 +334,7 @@ export default function InfiniteLoadingGrid() {
               />
             </GridItem>
 
-            <GridItem item xs={12} sm={6} md={3}>
+            <GridItem item xs={12} sm={6} md={3} style={{ marginTop: 6 }}>
               <FormControl fullWidth variant="outlined">
                 <InputLabel id="select-gender">Gender</InputLabel>
                 <Select

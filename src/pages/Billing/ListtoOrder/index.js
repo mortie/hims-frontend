@@ -17,8 +17,10 @@ const useStyles = makeStyles(styles);
 function ListtoOrder(props) {
   const classes = useStyles();
   const patientData = props.patientData;
+
   const [procedureinvestigationorder, setProcedureInvestigationOrder] =
     useState();
+  const [passpatientdata, setPassPatientData] = useState();
   const CustomLoadingOverlay = () => {
     return (
       <GridOverlay>
@@ -38,38 +40,53 @@ function ListtoOrder(props) {
     );
   };
 
-  const row = [
-    {
-      id: 1,
-      orderid: patientData.encounterId,
+  // const row = [
+  //   {
+  //     id: 1,
+  //     orderid: patientData.encounterId,
+  //     date: patientData.orderdate,
+  //     sentFrom: patientData.locationName,
+  //     extradataPatient: patientData.billableServiceDetails,
+  //   },
+  // ];
+  const row = patientData.extraData.map((item, index) => {
+    return {
+      id: index + 1,
+      orderid: item.encounterId,
       date: patientData.orderdate,
-      sentFrom: patientData.locationName,
-      extradataPatient: patientData.billableServiceDetails,
-    },
-  ];
+      sentFrom: item.locationName,
+      serviceDetails: item.billableServiceDetails,
+    };
+  });
 
   const columns = [
     { field: "id", headerName: "Sl No.", width: 180 },
     { field: "orderid", headerName: "Order ID", width: 320 },
-    { field: "date", headerName: "Date", width: 220 },
+    { field: "date", headerName: "Order Date", width: 220 },
     { field: "sentFrom", headerName: "Sent From", width: 220 },
     {
-      field: "extradataPatient",
-      headerName: "Extra Data",
+      field: "serviceDetails",
+      headerName: "service Details",
       width: 120,
       hide: true,
     },
   ];
   const handleOpen = (event) => {
-    console.log(event.row);
+    // console.log(event.row);
     setProcedureInvestigationOrder(true);
+    setPassPatientData(event.row);
   };
   const { id, param2 } = useParams();
   useEffect(() => {
-    console.log(patientData);
+    //console.log(patientData);
   }, []);
   if (procedureinvestigationorder) {
-    return <ProcedureInvestigationOrder patientData={patientData} />;
+    return (
+      <ProcedureInvestigationOrder
+        patientData={patientData}
+        serviceDetailsprops={passpatientdata}
+      />
+    );
   } else {
     return (
       <>
