@@ -28,7 +28,8 @@ const useStyles = makeStyles(styles);
 export default function MlcRevisit(props) {
   const classes = useStyles();
   var mlcTypes = props.mlcTypes;
-
+  var mlc = props.mlc;
+  var mlcSubCategory = props.mlcSubCategory;
   var mlcUuid = props.mlcUuid;
   var formValues = props.formValues;
   var formErrors = props.formErrors;
@@ -126,7 +127,7 @@ export default function MlcRevisit(props) {
         <TableCell >
           <GridItem >
           <FormControl component="fieldset">
-          <RadioGroup row aria-label="gender" name="row-radio-buttons-group" defaultValue={"MLC No"}>
+          <RadioGroup row aria-label="gender" name="row-radio-buttons-group" defaultValue={mlc}>
           {mlcTypes.map((smoker, index) => (
           <FormControlLabel
           value={smoker.display}
@@ -140,7 +141,7 @@ export default function MlcRevisit(props) {
           ))}
           </RadioGroup>
 
-          <RadioGroup row aria-label="yes" name="row-radio-buttons-group">
+          <RadioGroup row aria-label="yes" name="row-radio-buttons-group" defaultValue = {mlcSubCategory}>
           {showSurgical &&
           surgicalDetails.map((item2, index) => (
           <FormControlLabel
