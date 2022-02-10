@@ -371,11 +371,13 @@ function ProcedureInvestigationOrder(props) {
       const filterdata = dtatatoSend.filter((item) => item.billed === true);
 
       const finalDatatosend = {
-        total: parseFloat(formval.elements["totalamountbilled"].value),
+        total: parseFloat(formval.elements["totalamountbilled"].value).toFixed(
+          2
+        ),
         waiverPercentage: parseFloat(formval.elements["discountamount"].value),
         totalAmountPayable: parseFloat(
           formval.elements["totalamountpaybale"].value
-        ),
+        ).toFixed(2),
         amountGiven: parseFloat(formval.elements["amountgiven"].value),
         amountReturned: parseFloat(
           formval.elements["amountreturnedtoPatient"].value
@@ -400,28 +402,29 @@ function ProcedureInvestigationOrder(props) {
       };
       //console.log(payload);
       setPayLoadData(finalDatatosend);
-      setPrintData(true);
-      // const response = await SaveBillingPostData.saveBillingData(payload);
-      // console.log(response);
-      // if (response === true) {
-      //   swal({
-      //     title: "Thank You",
-      //     text: "Billing Data Saved Successfully",
-      //     icon: "success",
-      //   });
-      //   setPrintData(true);
-      // } else {
-      //   swal({
-      //     title: "Error",
-      //     text: "Error saving Billing Data",
-      //     icon: "error",
-      //   }).then((value) => {
-      //     setTimeout(() => {
-      //       setIsLoading(false);
-      //     }, 200);
-      //   });
-      //   setPrintData(false);
-      // }
+      // setPrintData(true);
+      const response = await SaveBillingPostData.saveBillingData(payload);
+      console.log(response);
+      if (response === true) {
+        swal({
+          title: "Thank You",
+          text: "Billing Data Saved Successfully",
+          icon: "success",
+        }).then((value) => {
+          setPrintData(true);
+        });
+      } else {
+        swal({
+          title: "Error",
+          text: "Error saving Billing Data",
+          icon: "error",
+        }).then((value) => {
+          setTimeout(() => {
+            window.location.reload(false);
+          }, 200);
+        });
+        setPrintData(false);
+      }
     }
   };
   if (printdata === true) {

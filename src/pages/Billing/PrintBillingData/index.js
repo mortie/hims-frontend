@@ -17,23 +17,10 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
-const useStyles = makeStyles({
-  root: {
-    minWidth: 275,
-    marginTop: 10,
-  },
-  bullet: {
-    display: "inline-block",
-    margin: "0 2px",
-    transform: "scale(0.8)",
-  },
-  title: {
-    fontSize: 14,
-  },
-  pos: {
-    marginBottom: 12,
-  },
-});
+import styles from "../ListtoOrder/styles";
+import Box from "@material-ui/core/Box";
+import { Link, Route } from "react-router-dom";
+const useStyles = makeStyles(styles);
 function PrintBillingData(props) {
   const classes = useStyles();
   const ref = useRef();
@@ -52,7 +39,45 @@ function PrintBillingData(props) {
       <BillingNavbar></BillingNavbar>
       <Card className={classes.root} variant="outlined">
         <CardContent ref={ref}>
-          <Grid container spacing={2}>
+          <div style={{ width: "100%" }}>
+            <Box display="flex" justifyContent="space-between">
+              <Box p={1} style={{ width: "30%" }}>
+                PatientId : <strong>{patientDataresult.identifier}</strong>
+              </Box>
+              <Box p={1} style={{ width: "30%" }}>
+                Name :
+                <strong>{patientDataresult.patientName.toUpperCase()}</strong>
+              </Box>
+              <Box p={1} style={{ width: "30%" }}>
+                Gender : <strong>{patientDataresult.gender}</strong>
+              </Box>
+            </Box>
+            <Box display="flex" justifyContent="space-between">
+              <Box p={1} style={{ width: "30%" }}>
+                Age : <strong>{patientDataresult.age}</strong>
+              </Box>
+              <Box p={1} style={{ width: "30%" }}>
+                Order Date : <strong>{patientDataresult.orderdate}</strong>
+              </Box>
+              <Box p={1} style={{ width: "30%" }}>
+                Patient Category :
+                <strong>
+                  {" "}
+                  {patientDataresult.patientCategory === null
+                    ? "N.A."
+                    : patientDataresult.patientCategory.substring(
+                        0,
+                        patientDataresult.patientCategory.length - 1
+                      )}
+                </strong>
+              </Box>
+            </Box>
+            {/* <Box p={1} style={{ width: "30%" }}>
+              BillId:
+            </Box> */}
+          </div>
+
+          {/* <Grid container spacing={2}>
             <Grid item xs={12} sm={4}>
               <Typography>
                 PatientId : <strong>{patientDataresult.identifier}</strong>
@@ -94,8 +119,8 @@ function PrintBillingData(props) {
                 </strong>
               </Typography>
             </Grid>
-          </Grid>
-          <TableContainer component={Paper}>
+          </Grid> */}
+          <TableContainer component={Paper} style={{ marginTop: 20 }}>
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
                 <TableRow>
@@ -110,52 +135,106 @@ function PrintBillingData(props) {
               <TableBody>
                 {billingDataresult.billdata.map((row, index) => (
                   <TableRow key={`keytablerow${index}`}>
-                    <TableCell component="th" scope="row">
+                    <TableCell
+                      className={classes.custompaddingcellbilled}
+                      component="th"
+                      scope="row"
+                    >
                       {index + 1}
                     </TableCell>
-                    <TableCell>{row.serviceName}</TableCell>
-                    <TableCell>{row.quantity}</TableCell>
-                    <TableCell>{row.UnitPrice}</TableCell>
-                    <TableCell>{row.totalUnitPrice}</TableCell>
+                    <TableCell className={classes.custompaddingcellbilled}>
+                      <strong>{row.serviceName}</strong>
+                    </TableCell>
+                    <TableCell className={classes.custompaddingcellbilled}>
+                      {row.quantity}
+                    </TableCell>
+                    <TableCell className={classes.custompaddingcellbilled}>
+                      {row.UnitPrice}
+                    </TableCell>
+                    <TableCell className={classes.custompaddingcellbilled}>
+                      {row.totalUnitPrice}
+                    </TableCell>
                   </TableRow>
                 ))}
                 <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
 
-                  <TableCell>Total</TableCell>
-                  <TableCell>{billingDataresult.total}</TableCell>
+                  <TableCell className={classes.custompaddingcellbilled}>
+                    <strong>Total</strong>
+                  </TableCell>
+                  <TableCell className={classes.custompaddingcellbilled}>
+                    <strong> {billingDataresult.total}</strong>
+                  </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
 
-                  <TableCell>Discount(%)</TableCell>
-                  <TableCell>{billingDataresult.waiverPercentage}</TableCell>
+                  <TableCell className={classes.custompaddingcellbilled}>
+                    Discount(%)
+                  </TableCell>
+                  <TableCell className={classes.custompaddingcellbilled}>
+                    {billingDataresult.waiverPercentage}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
 
-                  <TableCell>Total Amount Payable</TableCell>
-                  <TableCell>{billingDataresult.totalAmountPayable}</TableCell>
+                  <TableCell className={classes.custompaddingcellbilled}>
+                    <strong>Total Amount Payable</strong>
+                  </TableCell>
+                  <TableCell className={classes.custompaddingcellbilled}>
+                    <strong>{billingDataresult.totalAmountPayable}</strong>
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
           </TableContainer>
         </CardContent>
         <CardActions>
-          <Button
-            size="small"
-            variant="contained"
-            color="primary"
-            onClick={handlePrint}
-          >
-            Print
-          </Button>
+          <Grid container justify="center">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handlePrint}
+              style={{ marginRight: 4 }}
+              className={classes.colorchange}
+            >
+              Print
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              component={Link}
+              className={classes.colorchange}
+              to="/app/billing/home"
+            >
+              Cancel
+            </Button>
+          </Grid>
         </CardActions>
       </Card>
     </>

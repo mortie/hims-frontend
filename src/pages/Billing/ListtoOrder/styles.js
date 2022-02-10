@@ -50,6 +50,9 @@ const opdStyles = (theme) => ({
   custompaddingcell: {
     padding: 2,
   },
+  custompaddingcellbilled: {
+    padding: 10,
+  },
   circularloaader: {
     display: "flex",
     "& > * + *": {
