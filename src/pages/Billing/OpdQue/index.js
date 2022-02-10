@@ -78,15 +78,24 @@ export default function OpdQue() {
   const [searchKey, setSearchKey] = useState("");
   const [pageSize, setPageSize] = React.useState(5);
   const history = useHistory();
+  const calculateAgeFunction = (dateval) => {
+    const valueresult = dateval.split("-");
+    const dobj = new Date(
+      parseInt(valueresult[2]),
+      parseInt(valueresult[1]) - 1,
+      parseInt(valueresult[0])
+    );
+    return moment(dobj).format();
+  };
   const createPatientList = (results, orderdate) => {
     const patientList = results.map((result, index) => {
-      console.log(moment(result.birthDate).toISOString());
+      //console.log(moment(result.birthDate).format());
       return {
         slno: index + 1,
         identifier: result.patientId,
         patientName: result.patientName,
         gender: result.gender,
-        age: calculateAge(moment(result.birthDate).toISOString()),
+        age: calculateAge(calculateAgeFunction(result.birthDate)),
         orderdate: orderdate,
         id: result.patientUuid,
         extraData: result.serviceDetailsForTestOrder,
