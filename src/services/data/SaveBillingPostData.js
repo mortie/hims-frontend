@@ -9,9 +9,9 @@ export class SaveBillingPostData {
 
     try {
       let response = await postAPI(url, payload);
-      return response;
+      return true;
     } catch (err) {
-      return null;
+      return false;
     }
   };
 }

@@ -27,12 +27,22 @@ import Checkbox from "@material-ui/core/Checkbox";
 import { Link, Route } from "react-router-dom";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import swal from "sweetalert";
+import PrintBillingData from "../PrintBillingData";
 const useStyles = makeStyles(styles);
 
 function ProcedureInvestigationOrder(props) {
   const classes = useStyles();
   const patientData = props.patientData;
   console.log(patientData);
+  const servicdetailsVal = props.serviceDetailsprops.serviceDetails;
+  console.log(servicdetailsVal);
+  const [checkboxstatus, setcheckboxStatus] = React.useState(false);
+  const [checked, setChecked] = React.useState(
+    servicdetailsVal.map((item) => {
+      return true;
+    })
+  );
+  const [printdata, setPrintData] = React.useState(false);
   const initialformvalues = {
     service: "",
     totalamount: "",
@@ -47,11 +57,7 @@ function ProcedureInvestigationOrder(props) {
   const [errors, seterrors] = React.useState(false);
   const [commenterror, setCommenterror] = React.useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [checked, setChecked] = React.useState(
-    patientData.billableServiceDetails.map((item) => {
-      return true;
-    })
-  );
+  const [payloadData, setPayLoadData] = useState("");
   //const initialDiscountRate=0.00;
 
   const [textfieldqunatityval, settextfieldqunatityval] = React.useState(
@@ -60,17 +66,17 @@ function ProcedureInvestigationOrder(props) {
     //     ["textfiledQuantityid" + index]: "1",
     //   };
     // })
-    patientData.billableServiceDetails.map((item) => {
+    servicdetailsVal.map((item) => {
       return "1";
     })
   );
   const [checkedprice, setCheckedprice] = React.useState(
-    patientData.billableServiceDetails.map((item) => {
+    servicdetailsVal.map((item) => {
       return true;
     })
   );
   const [unitpricetextfield, setunitpricetextfield] = React.useState(
-    patientData.billableServiceDetails.map((item) => {
+    servicdetailsVal.map((item) => {
       return item.price;
     })
   );
@@ -80,44 +86,40 @@ function ProcedureInvestigationOrder(props) {
   //   })
   // );
   // const [setquantityno, setsetQuantityNo] = React.useState("1");
-  console.log(patientData);
+  //console.log(patientData);
   const initialSate = {};
   const [quantitymultiplyprice, setquantitymultiplyprice] = React.useState(
-    patientData.billableServiceDetails.map((item) => {
+    servicdetailsVal.map((item) => {
       return parseInt(item.price) * parseInt("1");
     })
   );
   const [pricevalue, setPriceValue] = React.useState(initialSate);
   const [total, setTotal] = useState(
-    patientData.billableServiceDetails.reduce((sum, item) => {
+    servicdetailsVal.reduce((sum, item) => {
       return sum + parseInt(item.price) * parseInt("1");
     }, 0)
   );
   const initialnetamount = total;
   const [netamount, setNetAmount] = React.useState(initialnetamount);
   const handleQuantityChange = (event, position) => {
-    const data = patientData.billableServiceDetails.map((item, index) => {
+    const data = servicdetailsVal.map((item, index) => {
       return index === position
         ? (textfieldqunatityval[index] = event.target.value)
         : textfieldqunatityval[index];
     });
 
     settextfieldqunatityval(data);
-    const totalmultunit = patientData.billableServiceDetails.map(
-      (item, index) => {
-        // return index === position
-        //   ? parseInt(item.price) * parseInt(textfieldqunatityval[index])
-        //   : parseInt(item.price) * parseInt(textfieldqunatityval[index]);
-        return (
-          parseInt(item.price) *
-          parseInt(
-            textfieldqunatityval[index] === ""
-              ? "0"
-              : textfieldqunatityval[index]
-          )
-        );
-      }
-    );
+    const totalmultunit = servicdetailsVal.map((item, index) => {
+      // return index === position
+      //   ? parseInt(item.price) * parseInt(textfieldqunatityval[index])
+      //   : parseInt(item.price) * parseInt(textfieldqunatityval[index]);
+      return (
+        parseInt(item.price) *
+        parseInt(
+          textfieldqunatityval[index] === "" ? "0" : textfieldqunatityval[index]
+        )
+      );
+    });
     setquantitymultiplyprice(totalmultunit);
 
     const totallastData = checked.reduce((sum, currentvalue, index) => {
@@ -160,7 +162,20 @@ function ProcedureInvestigationOrder(props) {
     const updatedCheckedState = checked.map((item, index) => {
       return index === position ? !item : item;
     });
+
     setChecked(updatedCheckedState);
+
+    if (!updatedCheckedState.includes(true)) {
+      setcheckboxStatus(true);
+      swal({
+        title: "Warning",
+        text: "Please Select Atleast One Checkbox To proceed",
+        icon: "warning",
+      });
+    } else {
+      setcheckboxStatus(false);
+    }
+
     const totalPrice = updatedCheckedState.reduce(
       (sum, currentState, index) => {
         if (currentState === true) {
@@ -188,7 +203,7 @@ function ProcedureInvestigationOrder(props) {
       },
       0
     );
-
+    console.log(typeof totalPrice);
     setTotal(totalPrice);
 
     const amountdeducted = (totalPrice * discountrate) / 100;
@@ -307,15 +322,68 @@ function ProcedureInvestigationOrder(props) {
   };
   const handleformDataSubmit = async (e) => {
     e.preventDefault();
-
-    //alert("sssssssssssssss");
     if (formData.amountgiven === "") {
       seterrors(true);
-      // e.preventDefault();
     } else {
       seterrors(false);
       const formval = document.getElementById("formpatientdata");
+      const getdataserviceorder = () => {
+        const data = servicdetailsVal.map((item, index) => {
+          return {
+            opdOrderId: item.opdOrderId,
+            quantity: parseInt(
+              formval.elements["textfiledQuantityid" + index].value
+            ),
+            billed: checked[index],
+          };
+        });
+        return data;
+      };
+      const dtatatoSend = servicdetailsVal.map((item, index) => {
+        if (checked[index] === true) {
+          return {
+            serviceName: item.serviceConName,
+            opdOrderId: item.opdOrderId,
+            quantity: parseInt(
+              formval.elements["textfiledQuantityid" + index].value
+            ),
+            UnitPrice: parseInt(
+              formval.elements["textfieldPriceid" + index].value
+            ),
+            totalUnitPrice: parseInt(
+              formval.elements["textfieldTotalUnitid" + index].value
+            ),
+            billed: checked[index],
+          };
+        } else {
+          return {
+            serviceName: item.serviceConName,
+            opdOrderId: item.opdOrderId,
+            quantity: 0,
+            UnitPrice: parseInt(
+              formval.elements["textfieldPriceid" + index].value
+            ),
+            totalUnitPrice: 0,
+            billed: checked[index],
+          };
+        }
+      });
+      const filterdata = dtatatoSend.filter((item) => item.billed === true);
 
+      const finalDatatosend = {
+        total: parseFloat(formval.elements["totalamountbilled"].value),
+        waiverPercentage: parseFloat(formval.elements["discountamount"].value),
+        totalAmountPayable: parseFloat(
+          formval.elements["totalamountpaybale"].value
+        ),
+        amountGiven: parseFloat(formval.elements["amountgiven"].value),
+        amountReturned: parseFloat(
+          formval.elements["amountreturnedtoPatient"].value
+        ),
+
+        comment: "xyz",
+        billdata: [...filterdata],
+      };
       const payload = {
         total: parseFloat(formval.elements["totalamountbilled"].value),
         waiverPercentage: parseFloat(formval.elements["discountamount"].value),
@@ -326,276 +394,201 @@ function ProcedureInvestigationOrder(props) {
         amountReturned: parseFloat(
           formval.elements["amountreturnedtoPatient"].value
         ),
-        // comment: formval.elements["Commenttextfield"]
-        //   ? formval.elements["Commenttextfield"].value
-        //   : "xyz",
+
         comment: "xyz",
-        orderServiceDetails: [
-          {
-            opdOrderId: patientData.encounterId,
-            quantity: parseInt(formval.elements["textfiledQuantityid0"].value),
-            billed: true,
-          },
-        ],
+        orderServiceDetails: getdataserviceorder(),
       };
-      console.log(payload);
-      swal({
-        title: "Thank You",
-        text: "Billing Data Saved Successfully",
-        icon: "success",
-      }).then((value) => {
-        setTimeout(() => {
-          setIsLoading(false);
-          //window.location.href = "/app/billing/home";
-          window.location.reload(false);
-        }, 200);
-      });
-      const response = await SaveBillingPostData.saveBillingData(payload);
-      console.log(response);
-      // if (response !== null) {
+      //console.log(payload);
+      setPayLoadData(finalDatatosend);
+      setPrintData(true);
+      // const response = await SaveBillingPostData.saveBillingData(payload);
+      // console.log(response);
+      // if (response === true) {
       //   swal({
       //     title: "Thank You",
       //     text: "Billing Data Saved Successfully",
       //     icon: "success",
+      //   });
+      //   setPrintData(true);
+      // } else {
+      //   swal({
+      //     title: "Error",
+      //     text: "Error saving Billing Data",
+      //     icon: "error",
       //   }).then((value) => {
       //     setTimeout(() => {
       //       setIsLoading(false);
-      //       window.location.href = "/app/billing/home";
-      //     }, 2000);
+      //     }, 200);
       //   });
-      // } else {
-      //   swal({
-      //     title: "Server Error !",
-      //     text: "Try Again after Some Time",
-      //     icon: "error",
-      //   });
+      //   setPrintData(false);
       // }
     }
   };
-  return (
-    <>
-      <BillingNavbar></BillingNavbar>
+  if (printdata === true) {
+    return (
+      <PrintBillingData
+        billingData={payloadData}
+        patientDataprops={patientData}
+        serviceDetailsprops={servicdetailsVal}
+      />
+    );
+  } else {
+    return (
+      <>
+        <BillingNavbar></BillingNavbar>
 
-      <Card className={classes.root}>
-        <CardHeader
-          title="List of Procedures and Investigations"
-          className={classes.title}
-          titleTypographyProps={{ variant: "body1" }}
-        />
-        <CardContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
-              <Typography>
-                PatientId : <strong>{patientData.identifier}</strong>
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Typography>
-                Name : <strong>{patientData.patientName.toUpperCase()}</strong>
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Typography>
-                Gender : <strong>{patientData.gender}</strong>
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Typography>
-                Age : <strong>{patientData.age}</strong>
-              </Typography>
-            </Grid>
+        <Card className={classes.root}>
+          <CardHeader
+            title="List of Procedures and Investigations"
+            className={classes.title}
+            titleTypographyProps={{ variant: "body1" }}
+          />
+          <CardContent>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={4}>
+                <Typography>
+                  PatientId : <strong>{patientData.identifier}</strong>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Typography>
+                  Name :{" "}
+                  <strong>{patientData.patientName.toUpperCase()}</strong>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Typography>
+                  Gender : <strong>{patientData.gender}</strong>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Typography>
+                  Age : <strong>{patientData.age}</strong>
+                </Typography>
+              </Grid>
 
-            <Grid item xs={12} sm={4}>
-              <Typography>
-                Order Date : <strong>{patientData.orderdate}</strong>
-              </Typography>
+              <Grid item xs={12} sm={4}>
+                <Typography>
+                  Order Date : <strong>{patientData.orderdate}</strong>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Typography>
+                  Patient Category :
+                  <strong>
+                    {" "}
+                    {patientData.patientCategory === null
+                      ? "N.A."
+                      : patientData.patientCategory.substring(
+                          0,
+                          patientData.patientCategory.length - 1
+                        )}
+                  </strong>
+                </Typography>
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={4}>
-              <Typography>
-                Patient Category :
-                <strong>
-                  {" "}
-                  {patientData.patientCategory === null
-                    ? "N.A."
-                    : patientData.patientCategory.substring(
-                        0,
-                        patientData.patientCategory.length - 1
-                      )}
-                </strong>
-              </Typography>
-            </Grid>
-          </Grid>
-          <TableContainer component={Paper} style={{ marginTop: 20 }}>
-            <form
-              onSubmit={handleformDataSubmit}
-              id="formpatientdata"
-              method="post"
-            >
-              <Table className={classes.table} aria-label="spanning table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell> Select</TableCell>
-                    <TableCell>Sl No.</TableCell>
-                    <TableCell>Service</TableCell>
-                    <TableCell>Quantity</TableCell>
-                    <TableCell>Pay</TableCell>
-                    <TableCell>Unit Price</TableCell>
-                    <TableCell>Quantity * Unit Price</TableCell>
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {patientData.billableServiceDetails.map((row, index) => (
-                    <TableRow key={`keyindex${index}`}>
-                      <TableCell className={classes.custompaddingcell}>
-                        <Checkbox
-                          checked={checked[index]}
-                          color="primary"
-                          inputProps={{ "aria-label": "secondary checkbox" }}
-                          id={`checkboxselectid${index}`}
-                          name={`checkboxselectid${index}`}
-                          onChange={(e) => {
-                            handleSelectChange(e, index);
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell className={classes.custompaddingcell}>
-                        {index + 1}
-                      </TableCell>
-                      <TableCell className={classes.custompaddingcell}>
-                        {row.serviceConName}
-                      </TableCell>
-                      <TableCell className={classes.custompaddingcell}>
-                        <TextField
-                          id={`textfiledQuantityid${index}`}
-                          name={`textfiledQuantityid${index}`}
-                          variant="outlined"
-                          size="small"
-                          // defaultValue={1}
-                          InputProps={{ inputProps: { min: 0, max: 10 } }}
-                          value={textfieldqunatityval[index]}
-                          onChange={(e) => {
-                            handleQuantityChange(e, index);
-                          }}
-                          type="number"
-                          disabled={
-                            (checked[index] === true ? false : true) ||
-                            (checkedprice[index] === true ? false : true)
-                          }
-                        />
-                      </TableCell>
-                      <TableCell className={classes.custompaddingcell}>
-                        <Checkbox
-                          color="primary"
-                          checked={checkedprice[index]}
-                          inputProps={{ "aria-label": "secondary checkbox" }}
-                          id={`checkboxpriceid${index}`}
-                          name={`checkboxpriceid${index}`}
-                          onChange={(e) => {
-                            handleSelectPriceChange(e, index);
-                          }}
-                          disabled={checked[index] === true ? false : true}
-                        />
-                      </TableCell>
-                      <TableCell className={classes.custompaddingcell}>
-                        <TextField
-                          id={`textfieldPriceid${index}`}
-                          name={`textfieldPriceid${index}`}
-                          variant="outlined"
-                          size="small"
-                          value={unitpricetextfield[index]}
-                          InputProps={{
-                            readOnly: true,
-                          }}
-                          disabled={checked[index] === true ? false : true}
-                        />
-                      </TableCell>
-                      <TableCell className={classes.custompaddingcell}>
-                        <TextField
-                          id={`textfieldTotalUnitid${index}`}
-                          name={`textfieldTotalUnitid${index}`}
-                          variant="outlined"
-                          size="small"
-                          value={quantitymultiplyprice[index]}
-                          InputProps={{
-                            readOnly: true,
-                          }}
-                          disabled={checked[index] === true ? false : true}
-                        />
-                      </TableCell>
+            <TableContainer component={Paper} style={{ marginTop: 20 }}>
+              <form
+                onSubmit={handleformDataSubmit}
+                id="formpatientdata"
+                method="post"
+              >
+                <Table className={classes.table} aria-label="spanning table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell> Select</TableCell>
+                      <TableCell>Sl No.</TableCell>
+                      <TableCell>Service</TableCell>
+                      <TableCell>Quantity</TableCell>
+                      <TableCell>Pay</TableCell>
+                      <TableCell>Unit Price</TableCell>
+                      <TableCell>Quantity * Unit Price</TableCell>
                     </TableRow>
-                  ))}
+                  </TableHead>
 
-                  <TableRow>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell className={classes.custompaddingcell}>
-                      Total
-                    </TableCell>
-                    <TableCell className={classes.custompaddingcell}>
-                      <TextField
-                        variant="outlined"
-                        size="small"
-                        value={total}
-                        id="totalamountbilled"
-                        name="totalamountbilled"
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                    </TableCell>
-                  </TableRow>
+                  <TableBody>
+                    {servicdetailsVal.map((row, index) => (
+                      <TableRow key={`keyindex${index}`}>
+                        <TableCell className={classes.custompaddingcell}>
+                          <Checkbox
+                            checked={checked[index]}
+                            color="primary"
+                            inputProps={{ "aria-label": "secondary checkbox" }}
+                            id={`checkboxselectid${index}`}
+                            name={`checkboxselectid${index}`}
+                            onChange={(e) => {
+                              handleSelectChange(e, index);
+                            }}
+                            name={`checkboxselectid${index}`}
+                          />
+                        </TableCell>
+                        <TableCell className={classes.custompaddingcell}>
+                          {index + 1}
+                        </TableCell>
+                        <TableCell className={classes.custompaddingcell}>
+                          {row.serviceConName}
+                        </TableCell>
+                        <TableCell className={classes.custompaddingcell}>
+                          <TextField
+                            id={`textfiledQuantityid${index}`}
+                            name={`textfiledQuantityid${index}`}
+                            variant="outlined"
+                            size="small"
+                            // defaultValue={1}
+                            InputProps={{ inputProps: { min: 0, max: 10 } }}
+                            value={textfieldqunatityval[index]}
+                            onChange={(e) => {
+                              handleQuantityChange(e, index);
+                            }}
+                            type="number"
+                            disabled={
+                              (checked[index] === true ? false : true) ||
+                              (checkedprice[index] === true ? false : true)
+                            }
+                          />
+                        </TableCell>
+                        <TableCell className={classes.custompaddingcell}>
+                          <Checkbox
+                            color="primary"
+                            checked={checkedprice[index]}
+                            inputProps={{ "aria-label": "secondary checkbox" }}
+                            id={`checkboxpriceid${index}`}
+                            name={`checkboxpriceid${index}`}
+                            onChange={(e) => {
+                              handleSelectPriceChange(e, index);
+                            }}
+                            disabled={checked[index] === true ? false : true}
+                          />
+                        </TableCell>
+                        <TableCell className={classes.custompaddingcell}>
+                          <TextField
+                            id={`textfieldPriceid${index}`}
+                            name={`textfieldPriceid${index}`}
+                            variant="outlined"
+                            size="small"
+                            value={unitpricetextfield[index]}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                            disabled={checked[index] === true ? false : true}
+                          />
+                        </TableCell>
+                        <TableCell className={classes.custompaddingcell}>
+                          <TextField
+                            id={`textfieldTotalUnitid${index}`}
+                            name={`textfieldTotalUnitid${index}`}
+                            variant="outlined"
+                            size="small"
+                            value={quantitymultiplyprice[index]}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                            disabled={checked[index] === true ? false : true}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
 
-                  <TableRow>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell className={classes.custompaddingcell}>
-                      Discount(%)
-                    </TableCell>
-                    <TableCell className={classes.custompaddingcell}>
-                      <TextField
-                        variant="outlined"
-                        size="small"
-                        value={formData.discountamount}
-                        id="discountamount"
-                        name="discountamount"
-                        onChange={(e) => {
-                          if (e.target.value.length > 3) return false;
-                          handleInputchange(e);
-                        }}
-                        InputProps={{ inputProps: { min: 0, max: 100 } }}
-                        type="number"
-                        style={{ minWidth: 208 }}
-                      />
-                    </TableCell>
-                  </TableRow>
-                  {checkedprice.includes(false) && checkedprice.length > 0 && (
                     <TableRow>
                       <TableCell
                         className={classes.custompaddingcell}
@@ -613,167 +606,229 @@ function ProcedureInvestigationOrder(props) {
                         className={classes.custompaddingcell}
                       ></TableCell>
                       <TableCell className={classes.custompaddingcell}>
-                        Comment
+                        Total
                       </TableCell>
-
                       <TableCell className={classes.custompaddingcell}>
                         <TextField
                           variant="outlined"
                           size="small"
-                          value={formData.Commenttextfield}
-                          id="Commenttextfield"
-                          name="Commenttextfield"
-                          onChange={(e) => {
-                            handleInputchange(e);
+                          value={total}
+                          id="totalamountbilled"
+                          name="totalamountbilled"
+                          InputProps={{
+                            readOnly: true,
                           }}
                         />
                       </TableCell>
                     </TableRow>
-                  )}
 
-                  <TableRow>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell className={classes.custompaddingcell}>
-                      <strong>Total Amount Payable</strong>
-                    </TableCell>
-                    <TableCell className={classes.custompaddingcell}>
-                      <TextField
-                        variant="outlined"
-                        size="small"
-                        value={netamount}
-                        id="totalamountpaybale"
-                        name="totalamountpaybale"
-                      />
-                    </TableCell>
-                  </TableRow>
+                    <TableRow>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell className={classes.custompaddingcell}>
+                        Discount(%)
+                      </TableCell>
+                      <TableCell className={classes.custompaddingcell}>
+                        <TextField
+                          variant="outlined"
+                          size="small"
+                          value={formData.discountamount}
+                          id="discountamount"
+                          name="discountamount"
+                          onChange={(e) => {
+                            if (e.target.value.length > 3) return false;
+                            handleInputchange(e);
+                          }}
+                          InputProps={{ inputProps: { min: 0, max: 100 } }}
+                          type="number"
+                          style={{ minWidth: 208 }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                    {checkedprice.includes(false) && checkedprice.length > 0 && (
+                      <TableRow>
+                        <TableCell
+                          className={classes.custompaddingcell}
+                        ></TableCell>
+                        <TableCell
+                          className={classes.custompaddingcell}
+                        ></TableCell>
+                        <TableCell
+                          className={classes.custompaddingcell}
+                        ></TableCell>
+                        <TableCell
+                          className={classes.custompaddingcell}
+                        ></TableCell>
+                        <TableCell
+                          className={classes.custompaddingcell}
+                        ></TableCell>
+                        <TableCell className={classes.custompaddingcell}>
+                          Comment
+                        </TableCell>
 
-                  <TableRow>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell className={classes.custompaddingcell}>
-                      <strong> Amount Given</strong>
-                    </TableCell>
-                    <TableCell className={classes.custompaddingcell}>
-                      <TextField
-                        error={errors}
-                        variant="outlined"
-                        size="small"
-                        value={formData.amountgiven}
-                        id="amountgiven"
-                        name="amountgiven"
-                        placeholder="Please enter the amount"
-                        onChange={(e) => {
-                          console.log(e.target.value.length);
-                          if (e.target.value.length > 8) return false;
-                          handleInputchange(e);
-                        }}
-                        type="number"
-                        helperText={
-                          errors === true ? "This field is required" : ""
-                        }
-                      />
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
-                    <TableCell
-                      className={classes.custompaddingcell}
-                    ></TableCell>
+                        <TableCell className={classes.custompaddingcell}>
+                          <TextField
+                            variant="outlined"
+                            size="small"
+                            value={formData.Commenttextfield}
+                            id="Commenttextfield"
+                            name="Commenttextfield"
+                            onChange={(e) => {
+                              handleInputchange(e);
+                            }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )}
 
-                    <TableCell className={classes.custompaddingcell}>
-                      Amount Returned to Patient
-                    </TableCell>
-                    <TableCell className={classes.custompaddingcell}>
-                      <TextField
-                        variant="outlined"
-                        size="small"
-                        value={formData.amountreturnedtoPatient}
-                        id="amountreturnedtoPatient"
-                        name="amountreturnedtoPatient"
-                        type="number"
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-              <Button
-                variant="contained"
-                color="primary"
-                className={classes.margin}
-                type="submit"
-                disabled={errors === true ? true : false}
-              >
-                Save Bill
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                className={classes.colorchange}
-                onClick={(e) => {
-                  window.location.reload(false);
-                }}
-              >
-                Cancel
-              </Button>
-            </form>
-          </TableContainer>
-          {/* {isLoading && (
-            <div
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-              }}
-            >
-              <CircularProgress />
-            </div>
-          )} */}
-        </CardContent>
-      </Card>
-    </>
-  );
+                    <TableRow>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell className={classes.custompaddingcell}>
+                        <strong>Total Amount Payable</strong>
+                      </TableCell>
+                      <TableCell className={classes.custompaddingcell}>
+                        <TextField
+                          variant="outlined"
+                          size="small"
+                          value={netamount}
+                          id="totalamountpaybale"
+                          name="totalamountpaybale"
+                        />
+                      </TableCell>
+                    </TableRow>
+
+                    <TableRow>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell className={classes.custompaddingcell}>
+                        <strong> Amount Given</strong>
+                      </TableCell>
+                      <TableCell className={classes.custompaddingcell}>
+                        <TextField
+                          error={errors}
+                          variant="outlined"
+                          size="small"
+                          value={formData.amountgiven}
+                          id="amountgiven"
+                          name="amountgiven"
+                          placeholder="Please enter the amount"
+                          onChange={(e) => {
+                            console.log(e.target.value.length);
+                            if (e.target.value.length > 8) return false;
+                            handleInputchange(e);
+                          }}
+                          type="number"
+                          helperText={
+                            errors === true ? "This field is required" : ""
+                          }
+                        />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+                      <TableCell
+                        className={classes.custompaddingcell}
+                      ></TableCell>
+
+                      <TableCell className={classes.custompaddingcell}>
+                        Amount Returned to Patient
+                      </TableCell>
+                      <TableCell className={classes.custompaddingcell}>
+                        <TextField
+                          variant="outlined"
+                          size="small"
+                          value={formData.amountreturnedtoPatient}
+                          id="amountreturnedtoPatient"
+                          name="amountreturnedtoPatient"
+                          type="number"
+                          InputProps={{
+                            readOnly: true,
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  className={classes.margin}
+                  type="submit"
+                  disabled={
+                    (errors === true ? true : false) ||
+                    (checkboxstatus === true ? true : false)
+                  }
+                >
+                  Save Bill
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  className={classes.colorchange}
+                  onClick={(e) => {
+                    window.location.reload(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </form>
+            </TableContainer>
+          </CardContent>
+        </Card>
+      </>
+    );
+  }
 }
 
 export default ProcedureInvestigationOrder;
