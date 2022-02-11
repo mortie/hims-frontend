@@ -204,7 +204,7 @@ function PrintBillingData(props) {
                   ></TableCell>
 
                   <TableCell className={classes.custompaddingcellbilled}>
-                    Discount(%)
+                    <strong> Discount(%)</strong>
                   </TableCell>
                   <TableCell className={classes.custompaddingcellbilled}>
                     {billingDataresult.waiverPercentage}
