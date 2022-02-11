@@ -186,6 +186,24 @@ function PrintBillingData(props) {
                   ></TableCell>
 
                   <TableCell className={classes.custompaddingcellbilled}>
+                    <strong>Total Amount Paid as Advance</strong>
+                  </TableCell>
+                  <TableCell className={classes.custompaddingcellbilled}>
+                    <strong> {billingDataresult.amountGiven}</strong>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+
+                  <TableCell className={classes.custompaddingcellbilled}>
                     Discount(%)
                   </TableCell>
                   <TableCell className={classes.custompaddingcellbilled}>
