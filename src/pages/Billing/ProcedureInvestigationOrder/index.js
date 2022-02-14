@@ -28,6 +28,9 @@ import { Link, Route } from "react-router-dom";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import swal from "sweetalert";
 import PrintBillingData from "../PrintBillingData";
+import NewInvestigation from "./NewInvestigation";
+
+
 const useStyles = makeStyles(styles);
 
 function ProcedureInvestigationOrder(props) {
@@ -37,12 +40,14 @@ function ProcedureInvestigationOrder(props) {
   const servicdetailsVal = props.serviceDetailsprops.serviceDetails;
   console.log(servicdetailsVal);
   const [checkboxstatus, setcheckboxStatus] = React.useState(false);
+  const investigationList = props.investigationList;
   const [checked, setChecked] = React.useState(
     servicdetailsVal.map((item) => {
       return true;
     })
   );
   const [printdata, setPrintData] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
   const initialformvalues = {
     service: "",
     totalamount: "",
@@ -58,6 +63,10 @@ function ProcedureInvestigationOrder(props) {
   const [commenterror, setCommenterror] = React.useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [payloadData, setPayLoadData] = useState("");
+
+  React.useEffect(() => {
+    
+  })
   //const initialDiscountRate=0.00;
 
   const [textfieldqunatityval, settextfieldqunatityval] = React.useState(
@@ -218,10 +227,19 @@ function ProcedureInvestigationOrder(props) {
       amountreturnedtoPatient: amountreurn,
     });
   };
+  const handleNewInvestigationOpen = (e) => {
+    e.preventDefault();
+    setOpen(true);
+  }
+  const handleNewInvestigationClose = () => {
+    setOpen(false);
+  }
   const handleSelectPriceChange = (event, position) => {
     const updatedCheckedState = checkedprice.map((item, index) =>
       index === position ? !item : item
     );
+   
+    
 
     setCheckedprice(updatedCheckedState);
 
@@ -320,6 +338,7 @@ function ProcedureInvestigationOrder(props) {
       }
     }
   };
+ 
   const handleformDataSubmit = async (e) => {
     e.preventDefault();
     if (formData.amountgiven === "") {
@@ -447,7 +466,17 @@ function ProcedureInvestigationOrder(props) {
             titleTypographyProps={{ variant: "body1" }}
           />
           <CardContent>
+          <Grid container>
+          
+          <Grid item xs align="right">
+            <Button  variant="contained" color="primary" onClick={handleNewInvestigationOpen}>
+              Add New 
+            </Button>
+            </Grid>
+            {open && (<NewInvestigation open={open} orderDtl = {patientData} investigationList={investigationList}/>)}
+          </Grid>
             <Grid container spacing={2}>
+
               <Grid item xs={12} sm={4}>
                 <Typography>
                   PatientId : <strong>{patientData.identifier}</strong>

@@ -12,12 +12,13 @@ import Grid from "@material-ui/core/Grid";
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 import { Alert } from "@material-ui/lab";
 import ProcedureInvestigationOrder from "../ProcedureInvestigationOrder";
+import { getAPI } from "../../../services/index";
 const useStyles = makeStyles(styles);
 
 function ListtoOrder(props) {
   const classes = useStyles();
   const patientData = props.patientData;
-
+  const [investigationList, setInvestigationList] = React.useState(props.investigationList);
   const [procedureinvestigationorder, setProcedureInvestigationOrder] =
     useState();
   const [passpatientdata, setPassPatientData] = useState();
@@ -78,13 +79,22 @@ function ListtoOrder(props) {
   };
   const { id, param2 } = useParams();
   useEffect(() => {
-    //console.log(patientData);
+    getAPI(
+      "/concept?q=General Ward&v=custom:(answers:(uuid,display,answers:(uuid,display,datatype:(display),synonyms:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display),answers:(uuid,display,datatype:(display)))))"
+    )
+      .then((response) => {
+        var res = response.data.results[0].answers;
+        setInvestigationList(res);  
+        //console.log(res)    
+      })
+      .catch((error) => {console.log(error);  });
   }, []);
   if (procedureinvestigationorder) {
     return (
       <ProcedureInvestigationOrder
         patientData={patientData}
         serviceDetailsprops={passpatientdata}
+        investigationList = {investigationList}
       />
     );
   } else {
