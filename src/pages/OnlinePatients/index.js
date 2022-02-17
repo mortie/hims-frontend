@@ -190,7 +190,12 @@ export default function InfiniteLoadingGrid() {
     setPhoneError(false);
     setAppointData(appointData);
     setFilterAppointData(appointData);
+    setNameError(false);
+    setPhoneError(false);
+    // searchDetails["name"] = "";
+    // searchDetails["phone"] = "";
     document.getElementById("searchForm").reset();
+
     //document.getElementById("btnsearchsubmit").disabled = true;
   }
   function searchOnKey(e) {
@@ -450,7 +455,7 @@ export default function InfiniteLoadingGrid() {
                 className={clsx(classes.button, classes.field)}
                 onClick={(e) => searchOnKey(e, "clicked")}
                 disabled={
-                  searchDetails["name"] === "" ||
+                  searchDetails["name"].length === 0 ||
                   searchDetails["phone"].length < 10
                     ? true
                     : false
