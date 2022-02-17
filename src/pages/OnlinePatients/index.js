@@ -186,15 +186,16 @@ export default function InfiniteLoadingGrid() {
     }
   };
   function resetOnKey(e) {
-    setNameError(false);
-    setPhoneError(false);
-    setAppointData(appointData);
-    setFilterAppointData(appointData);
-    setNameError(false);
-    setPhoneError(false);
+    // setNameError(false);
+    // setPhoneError(false);
+    // setAppointData(appointData);
+    // setFilterAppointData(appointData);
+    // setNameError(false);
+    // setPhoneError(false);
     // searchDetails["name"] = "";
     // searchDetails["phone"] = "";
-    document.getElementById("searchForm").reset();
+    // document.getElementById("searchForm").reset();
+    window.location.reload(false);
 
     //document.getElementById("btnsearchsubmit").disabled = true;
   }
