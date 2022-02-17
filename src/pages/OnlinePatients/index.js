@@ -51,8 +51,8 @@ export default function InfiniteLoadingGrid() {
   let [appointData, setAppointData] = useState([]);
   let [filterappointData, setFilterAppointData] = React.useState([]);
   const [visitAttributeTypes, setVisitAttributeTypes] = useState();
-  const [namerror, setNameError] = React.useState(true);
-  const [phoneerror, setPhoneError] = React.useState(true);
+  const [namerror, setNameError] = React.useState(false);
+  const [phoneerror, setPhoneError] = React.useState(false);
   const [visitId, setVisitId] = useState("");
   const [gender, setGender] = React.useState("");
   var [searchDetails, setsearchDetails] = useState({
@@ -138,60 +138,29 @@ export default function InfiniteLoadingGrid() {
 
   function keyUpFun(e) {
     searchDetails[e.target.id] = e.target.value;
-    // if (searchDetails[e.target.id] !== "") {
-    //   filterappointData = filterappointData.filter(function (appointment) {
-    //     return appointment.gender === searchDetails["gender"];
-    //   });
-    //   setFilterAppointData(filterappointData);
-    // }
-    // if (filterappointData.length === 0) {
-    //   swal({
-    //     title: "Oops! Sorry Data Not found ",
-    //     text: "Please Enter Correct details",
-    //     icon: "warning",
-    //   }).then((value) => {
-    //     window.location.reload(false);
-    //   });
-    // }
-    //console.log(searchDetails[e.target.id]);
-    // if (searchDetails[e.target.id] !== "") {
-    //   let newdata = getFilteredPatientList(e.target.value.toLowerCase());
-    //   if (newdata.length > 0) {
-    //     setFilterAppointData(
-    //       getFilteredPatientList(e.target.value.toLowerCase())
-    //     );
-    //   } else {
-    //     swal({
-    //       title: "Oops! Sorry Data Not found ",
-    //       text: "Please Enter Correct details",
-    //       icon: "warning",
-    //     }).then((value) => {
-    //       window.location.reload(false);
-    //     });
-    //   }
-    // }
   }
   function handleOnchange(e) {
     setsearchDetails({ ...searchDetails, [e.target.name]: e.target.value });
-    //searchDetails[e.target.id] = e.target.value;
-    if (e.target.value === "" || e.target.value === null) {
-      setNameError(true);
+
+    if (e.target.value !== "" || e.target.value !== null) {
+      const regexname = /^[a-zA-Z\s]*$/;
+      if (!regexname.test(e.target.value)) {
+        setNameError(true);
+      } else {
+        setNameError(false);
+      }
     } else {
-      setNameError(false);
-      // setFilterAppointData(
-      //   getFilteredPatientList(e.target.value.toLowerCase())
-      // );
+      setNameError("");
     }
-    //setFilterAppointData(filterappointData);
+
     console.log(searchDetails[e.target.id]);
     //setFilterAppointData(getFilteredPatientList(e.target.value.toLowerCase()));
   }
   function handlePhoneOnchange(e) {
     setsearchDetails({ ...searchDetails, [e.target.name]: e.target.value });
-    //searchDetails[e.target.id] = e.target.value;
+
     if (e.target.value === "" || e.target.value === null) {
       setPhoneError(true);
-      // setFilterAppointData(appointData);
     } else if (e.target.value.length <= 9 || e.target.value.length > 10) {
       setPhoneError(true);
     } else {
@@ -217,8 +186,8 @@ export default function InfiniteLoadingGrid() {
     }
   };
   function resetOnKey(e) {
-    setNameError(true);
-    setPhoneError(true);
+    setNameError(false);
+    setPhoneError(false);
     setAppointData(appointData);
     setFilterAppointData(appointData);
     document.getElementById("searchForm").reset();
@@ -354,7 +323,24 @@ export default function InfiniteLoadingGrid() {
     setLoading(true);
     getAppointmentData();
   }, []);
-
+  const handleerrornamefunc = () => {
+    if (namerror === "") {
+      return "This field is required";
+    } else if (namerror === true) {
+      return "Only alphabets are allowed";
+    } else {
+      return "";
+    }
+  };
+  // const handleerrornormfunc = () => {
+  //   if (namerror === "") {
+  //     return false;
+  //   } else if (namerror === true) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // };
   return (
     <>
       <Paper className={classes.paper}>
@@ -371,7 +357,20 @@ export default function InfiniteLoadingGrid() {
                 id="name"
                 label="Name"
                 className={classes.field}
-                helperText="This field is required"
+                helperText={
+                  //handleerrornamefunc
+                  namerror === true
+                    ? "Only alphabets are allowed"
+                    : "This field is required"
+                }
+                error={
+                  namerror === true
+                    ? true
+                    : false || namerror === ""
+                    ? true
+                    : false
+                  //handleerrornormfunc
+                }
                 // onKeyUp={(e) => keyUpFun(e, "clicked")}
                 onChange={(e) => handleOnchange(e)}
               />
@@ -387,7 +386,18 @@ export default function InfiniteLoadingGrid() {
                 name="phone"
                 autoComplete="phone"
                 type="number"
-                helperText="This field is required"
+                helperText={
+                  phoneerror === true
+                    ? "Please Enter 10 Digits"
+                    : "This field is required"
+                }
+                error={
+                  phoneerror === true
+                    ? true
+                    : false || namerror === ""
+                    ? true
+                    : false
+                }
                 className={classes.field}
                 onChange={(e) => handlePhoneOnchange(e)}
                 onInput={(e) => {
@@ -439,7 +449,13 @@ export default function InfiniteLoadingGrid() {
                 color="primary"
                 className={clsx(classes.button, classes.field)}
                 onClick={(e) => searchOnKey(e, "clicked")}
-                disabled={namerror === true || phoneerror === true}
+                disabled={
+                  searchDetails["name"] === "" ||
+                  searchDetails["phone"].length < 10
+                    ? true
+                    : false
+                  // namerror === true || phoneerror === true ? true : false
+                }
                 id="btnsearchsubmit"
               >
                 Search
@@ -473,7 +489,7 @@ export default function InfiniteLoadingGrid() {
             }}
           />
         ) : (
-          <Alert severity="error">Sorry Data Not found</Alert>
+          <Alert severity="error">Sorry Data Not Available</Alert>
         )}
       </Paper>
     </>
