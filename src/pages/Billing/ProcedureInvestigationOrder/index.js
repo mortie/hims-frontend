@@ -30,7 +30,6 @@ import swal from "sweetalert";
 import PrintBillingData from "../PrintBillingData";
 import NewInvestigation from "./NewInvestigation";
 
-
 const useStyles = makeStyles(styles);
 
 function ProcedureInvestigationOrder(props) {
@@ -64,9 +63,7 @@ function ProcedureInvestigationOrder(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [payloadData, setPayLoadData] = useState("");
 
-  React.useEffect(() => {
-    
-  })
+  React.useEffect(() => {});
   //const initialDiscountRate=0.00;
 
   const [textfieldqunatityval, settextfieldqunatityval] = React.useState(
@@ -110,6 +107,7 @@ function ProcedureInvestigationOrder(props) {
   );
   const initialnetamount = total;
   const [netamount, setNetAmount] = React.useState(initialnetamount);
+  const [waiveramount, setWaiverAmount] = React.useState("");
   const handleQuantityChange = (event, position) => {
     const data = servicdetailsVal.map((item, index) => {
       return index === position
@@ -156,12 +154,14 @@ function ProcedureInvestigationOrder(props) {
 
     setTotal(totallastData);
     const amountdeducted = (totallastData * discountrate) / 100;
-    console.log(amountdeducted);
-    const leftamount = parseFloat(totallastData) - parseFloat(amountdeducted);
-    setNetAmount((totallastData - amountdeducted).toFixed(2));
+    //console.log(amountdeducted);
+    setWaiverAmount(amountdeducted.toFixed());
+    const newwaveamount = amountdeducted.toFixed();
+    const leftamount = parseFloat(totallastData) - parseFloat(newwaveamount);
+    setNetAmount((totallastData - newwaveamount).toFixed());
     const amountreurn = (
       parseFloat(formData.amountgiven) - parseFloat(leftamount)
-    ).toFixed(2);
+    ).toFixed();
     setformData({
       ...formData,
       amountreturnedtoPatient: amountreurn,
@@ -216,12 +216,13 @@ function ProcedureInvestigationOrder(props) {
     setTotal(totalPrice);
 
     const amountdeducted = (totalPrice * discountrate) / 100;
-    console.log(amountdeducted);
-    setNetAmount((totalPrice - amountdeducted).toFixed(2));
-    const leftamount = parseFloat(totalPrice) - parseFloat(amountdeducted);
+    setWaiverAmount(amountdeducted.toFixed());
+    const newwaveamount = amountdeducted.toFixed();
+    setNetAmount((totalPrice - newwaveamount).toFixed());
+    const leftamount = parseFloat(totalPrice) - parseFloat(newwaveamount);
     const amountreurn = (
       parseFloat(formData.amountgiven) - parseFloat(leftamount)
-    ).toFixed(2);
+    ).toFixed();
     setformData({
       ...formData,
       amountreturnedtoPatient: amountreurn,
@@ -230,17 +231,16 @@ function ProcedureInvestigationOrder(props) {
   const handleNewInvestigationOpen = (e) => {
     e.preventDefault();
     setOpen(true);
-  }
+  };
   const handleNewInvestigationClose = (name) => {
-    if(name === 'add'){}
+    if (name === "add") {
+    }
     setOpen(false);
-  }
+  };
   const handleSelectPriceChange = (event, position) => {
     const updatedCheckedState = checkedprice.map((item, index) =>
       index === position ? !item : item
     );
-   
-    
 
     setCheckedprice(updatedCheckedState);
 
@@ -276,12 +276,14 @@ function ProcedureInvestigationOrder(props) {
 
     setTotal(totalPrice);
     const amountdeducted = (totalPrice * discountrate) / 100;
-    console.log(amountdeducted);
-    setNetAmount((totalPrice - amountdeducted).toFixed(2));
-    const leftamount = parseFloat(totalPrice) - parseFloat(amountdeducted);
+    //console.log(amountdeducted);
+    setWaiverAmount(amountdeducted.toFixed());
+    const newwaveamount = amountdeducted.toFixed();
+    setNetAmount((totalPrice - newwaveamount).toFixed());
+    const leftamount = parseFloat(totalPrice) - parseFloat(newwaveamount);
     const amountreurn = (
       parseFloat(formData.amountgiven) - parseFloat(leftamount)
-    ).toFixed(2);
+    ).toFixed();
     setformData({
       ...formData,
       amountreturnedtoPatient: amountreurn,
@@ -295,17 +297,14 @@ function ProcedureInvestigationOrder(props) {
       );
       setDiscountRate(discountrate);
       const amountdeducted = (parseInt(total) * discountrate) / 100;
-      const leftamount = (total - amountdeducted).toFixed(2);
-      setNetAmount((total - amountdeducted).toFixed(2));
-      //console.log(typeofdiscountratedata);
-      //console.log(parseInt(total) * discountratedata);
-      // setDiscountRate(discountratedata);
-      // const totalamount = total;
-      // const discountedAmount = (totalamount * discountrate) / 100;
-      // setNetAmount((total - discountedAmount).toFixed(2));
+      setWaiverAmount(amountdeducted.toFixed());
+      const newwaveamount = amountdeducted.toFixed();
+      const leftamount = (total - newwaveamount).toFixed();
+      setNetAmount((total - newwaveamount).toFixed());
+
       const amountreurn = (
         parseFloat(formData.amountgiven) - parseFloat(leftamount)
-      ).toFixed(2);
+      ).toFixed();
       setformData({
         ...formData,
         [e.target.name]: e.target.value,
@@ -316,7 +315,7 @@ function ProcedureInvestigationOrder(props) {
       if (e.target.value !== "") {
         const newreturnedvalue = (
           parseFloat(e.target.value) - parseFloat(netamount)
-        ).toFixed(2);
+        ).toFixed();
         setformData({
           ...formData,
           amountreturnedtoPatient: newreturnedvalue,
@@ -339,7 +338,7 @@ function ProcedureInvestigationOrder(props) {
       }
     }
   };
- 
+
   const handleformDataSubmit = async (e) => {
     e.preventDefault();
     if (formData.amountgiven === "") {
@@ -395,13 +394,16 @@ function ProcedureInvestigationOrder(props) {
           2
         ),
         waiverPercentage: parseFloat(formval.elements["discountamount"].value),
+        waiverAmount: parseFloat(waiveramount).toFixed(2),
         totalAmountPayable: parseFloat(
           formval.elements["totalamountpaybale"].value
         ).toFixed(2),
-        amountGiven: parseFloat(formval.elements["amountgiven"].value),
+        amountGiven: parseFloat(formval.elements["amountgiven"].value).toFixed(
+          2
+        ),
         amountReturned: parseFloat(
           formval.elements["amountreturnedtoPatient"].value
-        ),
+        ).toFixed(2),
 
         comment: "xyz",
         billdata: [...filterdata],
@@ -467,21 +469,25 @@ function ProcedureInvestigationOrder(props) {
             titleTypographyProps={{ variant: "body1" }}
           />
           <CardContent>
-          <Grid container>
-          
-          <Grid item xs align="right">
-            <Button  variant="contained" color="primary" onClick={handleNewInvestigationOpen}>
-              Add New 
-            </Button>
+            <Grid container>
+              <Grid item xs align="right">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleNewInvestigationOpen}
+                >
+                  Add New
+                </Button>
+              </Grid>
+              {open && (
+                <NewInvestigation
+                  handleNewInvestigationClose={handleNewInvestigationClose}
+                  orderDtl={patientData}
+                  investigationList={investigationList}
+                />
+              )}
             </Grid>
-            {open && (
-              <NewInvestigation
-                handleNewInvestigationClose = {handleNewInvestigationClose}
-                orderDtl = {patientData}
-                investigationList={investigationList}/>)}
-          </Grid>
             <Grid container spacing={2}>
-
               <Grid item xs={12} sm={4}>
                 <Typography>
                   PatientId : <strong>{patientData.identifier}</strong>

@@ -174,6 +174,43 @@ function PrintBillingData(props) {
                     <strong> {billingDataresult.total}</strong>
                   </TableCell>
                 </TableRow>
+
+                <TableRow>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+
+                  <TableCell className={classes.custompaddingcellbilled}>
+                    <strong> Waiver Amount</strong>
+                  </TableCell>
+                  <TableCell className={classes.custompaddingcellbilled}>
+                    <strong> {billingDataresult.waiverAmount}</strong>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+                  <TableCell
+                    className={classes.custompaddingcellbilled}
+                  ></TableCell>
+
+                  <TableCell className={classes.custompaddingcellbilled}>
+                    <strong>Net Amount</strong>
+                  </TableCell>
+                  <TableCell className={classes.custompaddingcellbilled}>
+                    <strong>{billingDataresult.totalAmountPayable}</strong>
+                  </TableCell>
+                </TableRow>
                 <TableRow>
                   <TableCell
                     className={classes.custompaddingcellbilled}
@@ -190,42 +227,6 @@ function PrintBillingData(props) {
                   </TableCell>
                   <TableCell className={classes.custompaddingcellbilled}>
                     <strong> {billingDataresult.amountGiven}</strong>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell
-                    className={classes.custompaddingcellbilled}
-                  ></TableCell>
-                  <TableCell
-                    className={classes.custompaddingcellbilled}
-                  ></TableCell>
-                  <TableCell
-                    className={classes.custompaddingcellbilled}
-                  ></TableCell>
-
-                  <TableCell className={classes.custompaddingcellbilled}>
-                    <strong> Discount(%)</strong>
-                  </TableCell>
-                  <TableCell className={classes.custompaddingcellbilled}>
-                    {billingDataresult.waiverPercentage}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell
-                    className={classes.custompaddingcellbilled}
-                  ></TableCell>
-                  <TableCell
-                    className={classes.custompaddingcellbilled}
-                  ></TableCell>
-                  <TableCell
-                    className={classes.custompaddingcellbilled}
-                  ></TableCell>
-
-                  <TableCell className={classes.custompaddingcellbilled}>
-                    <strong>Total Amount Payable</strong>
-                  </TableCell>
-                  <TableCell className={classes.custompaddingcellbilled}>
-                    <strong>{billingDataresult.totalAmountPayable}</strong>
                   </TableCell>
                 </TableRow>
               </TableBody>
