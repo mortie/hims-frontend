@@ -231,7 +231,8 @@ function ProcedureInvestigationOrder(props) {
     e.preventDefault();
     setOpen(true);
   }
-  const handleNewInvestigationClose = () => {
+  const handleNewInvestigationClose = (name) => {
+    if(name === 'add'){}
     setOpen(false);
   }
   const handleSelectPriceChange = (event, position) => {
@@ -473,7 +474,11 @@ function ProcedureInvestigationOrder(props) {
               Add New 
             </Button>
             </Grid>
-            {open && (<NewInvestigation open={open} orderDtl = {patientData} investigationList={investigationList}/>)}
+            {open && (
+              <NewInvestigation
+                handleNewInvestigationClose = {handleNewInvestigationClose}
+                orderDtl = {patientData}
+                investigationList={investigationList}/>)}
           </Grid>
             <Grid container spacing={2}>
 

@@ -1,7 +1,7 @@
 import React,{useState} from 'react';
 import {ListItemText,ListItem,List,Checkbox} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import Labtest from './labtest';
+import BillingNewTest from './BillingNewTest';
 import { GridContainer , GridItem} from '../../../components';
 import ExpandLess from '@material-ui/icons/ArrowRightOutlined';
 import ExpandMore from '@material-ui/icons/ArrowDropDownOutlined';
@@ -16,15 +16,18 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: theme.spacing(4),
   },
 }));
-function Subconcept(props) {
+function BillingSubConcept(props) {
 
   const answers = props.answers;
   const classes = useStyles();
+  const btn = props.btnValue;
   const [test, setTest] = React.useState(null);
   const open = props.open;
   const close = props.close;
 
+  
   const openLabTest = (name) => {
+    console.log(btn);
     if(test === name){
       setTest(null);
     }
@@ -48,7 +51,7 @@ function Subconcept(props) {
                   <ListItemText primary={item.display} />
                 </ListItem>
               </List>
-              {test === item.display && ( <Labtest answers={item.answers} orderDtl ={props.orderDtl}/>)}
+              {test === item.display && ( <BillingNewTest answers={item.answers} orderDtl ={props.orderDtl} btnValue={props.btnValue}/>)}
               
           </GridItem>
         </GridContainer>
@@ -58,4 +61,4 @@ function Subconcept(props) {
     )
 }
 
-export default Subconcept
+export default BillingSubConcept

@@ -11,6 +11,7 @@ import AvailableTimeSlots from "./components/AvailableTimeSlots";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import moment from "moment";
+import swal from "sweetalert";
 
 import {
   Paper,
@@ -910,7 +911,15 @@ else {
         setFormErrors({ ...formErrors, [name]: "Only 12 digits are allowed" });
       }
       else if(duplicateAadhar){
-        setFormErrors({ ...formErrors, [name]: "Please Enter Unique Aadhar Number" });
+        swal({
+          title: "Error",
+          text: "Please Enter Unique Aadhar Number",
+          icon: "error",
+        }).then((value) => {
+          setFormErrors({ ...formErrors, [name]: value });
+        });
+        
+        //setFormErrors({ ...formErrors, [name]: "Please Enter Unique Aadhar Number" });
       }
   }
   function getduplicateAadhar(value){    

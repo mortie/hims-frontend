@@ -7,7 +7,7 @@ import ExpandLess from '@material-ui/icons/ArrowRightOutlined';
 import ExpandMore from '@material-ui/icons/ArrowDropDownOutlined';
 
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Subconcept from './subconcept';
+import BillingSubConcept from './BillingSubConcept';
 import Grid from '@material-ui/core/Grid';import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
@@ -30,14 +30,14 @@ const useStyles = makeStyles({
 });
 export default function NewInvestigation(props) {
   const classes = useStyles();
+  const { handleNewInvestigationClose, investigationList, orderDtl } =
+    props;
   const [open, setOpen] = React.useState(true);
   const [listopen, setListOpen] = React.useState(null);
-  const investigationList = props.investigationList;
  
-  const handleClose = () => {
-    setOpen(false);
-  };
+  
   const handleFirstClick = (name) => {
+    setOpen(true);
     if(listopen === name){
       setListOpen(null);
     }
@@ -53,8 +53,8 @@ export default function NewInvestigation(props) {
     <div>
       
       <Dialog
-        open={open === props.open?true:false}
-        onClose={handleClose}
+        open={open}
+        onClose={handleNewInvestigationClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         className={classes.root}
@@ -71,7 +71,7 @@ export default function NewInvestigation(props) {
                       </ListItem>
                       
                           <Collapse in={listopen === answer.display} timeout="auto" unmountOnExit>
-                            <Subconcept answers={answer.answers} orderDtl ={props.orderDtl}/>
+                            <BillingSubConcept answers={answer.answers} orderDtl ={orderDtl} />
                           </Collapse>
                     
                       </Grid>
@@ -80,10 +80,10 @@ export default function NewInvestigation(props) {
             
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={() =>handleNewInvestigationClose('add')} color="primary" value="add">
             Add
           </Button>
-          <Button onClick={handleClose} color="primary" autoFocus>
+          <Button onClick={() =>handleNewInvestigationClose('cancel')} color="primary" autoFocus value="cancel">
             Cancel
           </Button>
         </DialogActions>

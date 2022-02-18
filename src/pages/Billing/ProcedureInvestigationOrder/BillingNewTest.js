@@ -7,6 +7,7 @@ import {
   ListItemText,
   makeStyles,
 }from "@material-ui/core";
+
 import { GridContainer , GridItem} from '../../../components';
 
   const useStyles = makeStyles({
@@ -16,35 +17,37 @@ import { GridContainer , GridItem} from '../../../components';
   }); 
   
 
-function Labtest(props) {
+function BillingNewTest(props) {
   const classes = useStyles();
   const answers = props.answers;
-  //const [formValues, setFormValues] = useState([]);
+  const [open, setOpen] = useState(true);
   const [addInvestigation, setAddInvestigation] = useState([]);
 
   
   const saveValues = (e) => {
     e.preventDefault();
     
+   
+  }
+  const handleChecked = (event,uuid) => {
     let orderpayload = {
-      patient: props.id,
-      location: props.extraData[0].locationUuid,
+      patient: props.orderDtl.id,
+      location: props.orderDtl.extraData[0].locationUuid,
       investigations: addInvestigation,
       procedures: [],
   }
+    if(!addInvestigation.includes(uuid)){
+      orderpayload.investigations = uuid;
+    }
+    console.log(props.orderDtl);
+    
     postAPI("/orders/patient",orderpayload).then((res)=>
       console.log(res)
     ).catch((e)=>console.log(e))
-  }
-  const handleChecked = (event,uuid) => {
-    if(!addInvestigation.includes(uuid)){
-      addInvestigation.add(uuid);
-    }
   };
+ 
     return (
-      
-    <Grid > 
-    
+   
     <GridContainer className={classes.test}>
         {answers.map((item,key) =>
           
@@ -52,7 +55,7 @@ function Labtest(props) {
             <GridItem item className={classes.test}>
             <Checkbox
             id={"checked_"+item.uuid} 
-            onChange={() =>handleChecked(item.uuid)}
+            onChange={(e) =>handleChecked(e,item.uuid)}
             size="small"
             inputProps={{ 'aria-label': 'checkbox with small size' }} 
             />
@@ -64,11 +67,9 @@ function Labtest(props) {
             
             </GridContainer>
             )}
-        
-        </GridContainer>
+    </GridContainer>
    
-    </Grid>
     )
 }
 
-export default Labtest
+export default BillingNewTest

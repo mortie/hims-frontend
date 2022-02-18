@@ -45,7 +45,7 @@ function Labtest(props) {
       concepts["serviceConUuid"] = ename ;
       concepts["priceCategoryConUuid"] = locationType ;
       concepts["price"] = e.target.value ;
-      concepts["enable"] = false ;
+      concepts["enable"] = true ;
       console.log(e.target.value);
       let billservice = {
         "servicesDetails":[
@@ -69,8 +69,8 @@ function Labtest(props) {
   const handleChecked = (event) => {
     let cheChk = [];
     setChecked(event.target.checked);
-    cheChk["checked_"+event.target.id] = event.target.checked;
-    setCheckedVal(cheChk);
+    //cheChk["checked_"+event.target.id] = event.target.checked;
+    //setCheckedVal(cheChk);
   };
   
   React.useEffect(() => {
@@ -108,7 +108,6 @@ function Labtest(props) {
             <GridItem item >
             <Checkbox
             id={"checked_"+item.uuid} 
-            checked={false}
             onChange={handleChecked}
             size="small"
             inputProps={{ 'aria-label': 'checkbox with small size' }} 
@@ -121,10 +120,10 @@ function Labtest(props) {
                 margin="dense"
                 fullWidth
                 label={item.display}
-                disabled={checkedVal["checked_"+item.uuid] && true}
                 name={item.uuid}
                 defaultValue ={formValues[item.uuid]?formValues[item.uuid].price:""}
                 className={classes.field}
+                disabled = {formValues[item.uuid]?formValues[item.uuid].enable:false}
                 onChange={saveValues}
             />
             </GridItem>
