@@ -5,30 +5,29 @@ import {
   Select,
   FormControl,
   MenuItem,
+  Icon,
   List,
   ListItem,
   Paper,
   Button,
   Grid,
   LinearProgress,
-  ListSubheader} from "@material-ui/core/";
+  ListSubheader} from '@material-ui/core/';
 import styles from "../../styles";
 import { Location } from '../../../../../services/data';
-
-function Locations(locations) {
-}
+import { getAPI } from '../../../../../services';
 
 const useStyles = makeStyles(styles);
 function ManageLocation() {
-  var [view, setView] = useState("general");
+  var [category, setCategory] = useState("general");
   var [locationsLoaded, setLocationsLoaded] = useState(false);
   var [unassignedLocations, setUnassignedLocations] = useState(null);
-  let [currentViewLocations, setCurrentViewLocations] = useState([]);
+  let [currentCategoryLocations, setCurrentCategoryLocations] = useState([]);
   let [assignedLocations, setAssignedLocations] = useState({});
 
   function updateAssignedLocations() {
     let newLocations = {...assignedLocations};
-    newLocations[view] = [...currentViewLocations];
+    newLocations[category] = [...currentCategoryLocations];
     setAssignedLocations(newLocations);
   }
 
@@ -53,26 +52,26 @@ function ManageLocation() {
     if (idx < 0) return;
     unassignedLocations.splice(idx, 1);
     sortAndSetLocations(setUnassignedLocations, unassignedLocations);
-    currentViewLocations.push(location);
-    sortAndSetLocations(setCurrentViewLocations, currentViewLocations);
+    currentCategoryLocations.push(location);
+    sortAndSetLocations(setCurrentCategoryLocations, currentCategoryLocations);
   }
 
   function removeLocation(location) {
-    let idx = currentViewLocations.indexOf(location);
+    let idx = currentCategoryLocations.indexOf(location);
     if (idx < 0) return;
-    currentViewLocations.splice(idx, 1);
-    sortAndSetLocations(setCurrentViewLocations, currentViewLocations);
+    currentCategoryLocations.splice(idx, 1);
+    sortAndSetLocations(setCurrentCategoryLocations, currentCategoryLocations);
     unassignedLocations.push(location);
     sortAndSetLocations(setUnassignedLocations, unassignedLocations);
   }
 
-  function changeView(newView) {
+  function changeCategory(newCategory) {
     updateAssignedLocations();
-    setView(newView);
-    if (assignedLocations[newView]) {
-      setCurrentViewLocations([...assignedLocations[newView]]);
+    setCategory(newCategory);
+    if (assignedLocations[newCategory]) {
+      setCurrentCategoryLocations([...assignedLocations[newCategory]]);
     } else {
-      setCurrentViewLocations([]);
+      setCurrentCategoryLocations([]);
     }
   }
 
@@ -90,7 +89,9 @@ function ManageLocation() {
                   divider={idx != unassignedLocations.length - 1}
                 >
                   {location.display}
-                  <Button onClick={() => addLocation(location)}>&gt;</Button>
+                  <Button onClick={() => addLocation(location)}>
+                    <Icon className="fa fa-chevron-right" />
+                  </Button>
                 </ListItem>
               ))}
             </List>
@@ -98,15 +99,17 @@ function ManageLocation() {
         </Grid>
         <Grid item style={{flexGrow: 1, width: "50%"}}>
           <Paper>
-            <List subheader={<ListSubheader>Locations assigned to {view}</ListSubheader>}>
-              {currentViewLocations.length == 0 && <ListItem>No items</ListItem>}
-              {currentViewLocations.map((location, idx) => (
+            <List subheader={<ListSubheader>Locations assigned to {category}</ListSubheader>}>
+              {currentCategoryLocations.length == 0 && <ListItem>No items</ListItem>}
+              {currentCategoryLocations.map((location, idx) => (
                 <ListItem
                   key={location.uuid}
                   style={{justifyContent: "space-between"}}
-                  divider={idx != currentViewLocations.length - 1}
+                  divider={idx != currentCategoryLocations.length - 1}
                 >
-                  <Button onClick={() => removeLocation(location)}>&lt;</Button>
+                  <Button onClick={() => removeLocation(location)}>
+                    <Icon className="fa fa-chevron-left" />
+                  </Button>
                   {location.display}
                 </ListItem>
               ))}
@@ -135,12 +138,12 @@ function ManageLocation() {
         margin="dense"
         className={classes.field}
       >
-        <InputLabel id="view">View</InputLabel>
+        <InputLabel id="category">Category</InputLabel>
         <Select
-          labelId="viewLabel"
-          label="View"
-          value={view}
-          onChange={(e) => changeView(e.target.value)}
+          labelId="categoryLabel"
+          label="Category"
+          value={category}
+          onChange={(e) => changeCategory(e.target.value)}
         >
           <MenuItem value="general">General</MenuItem>
           <MenuItem value="private">Private</MenuItem>
