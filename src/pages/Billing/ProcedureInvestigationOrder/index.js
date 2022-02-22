@@ -60,6 +60,7 @@ function ProcedureInvestigationOrder(props) {
   const [discountrate, setDiscountRate] = React.useState(0);
   const [errors, seterrors] = React.useState(false);
   const [commenterror, setCommenterror] = React.useState(false);
+  // const [txtcommenterror, settxtcommenterror] = React.useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [payloadData, setPayLoadData] = useState("");
 
@@ -248,6 +249,7 @@ function ProcedureInvestigationOrder(props) {
       (sum, currentState, index) => {
         if (currentState === true) {
           //setCommentTextfield(false);
+          setCommenterror(false);
           // textfieldqunatityval[index] = "1";
           quantitymultiplyprice[index] =
             parseInt(textfieldqunatityval[index]) *
@@ -259,6 +261,11 @@ function ProcedureInvestigationOrder(props) {
           );
         } else {
           //setCommentTextfield(true);
+          if (formData["Commenttextfield"] === "") {
+            setCommenterror(true);
+          } else {
+            setCommenterror(false);
+          }
           textfieldqunatityval[index] = "0";
           quantitymultiplyprice[index] =
             parseInt(textfieldqunatityval[index]) *
@@ -291,6 +298,14 @@ function ProcedureInvestigationOrder(props) {
   };
   const handleInputchange = (e) => {
     setformData({ ...formData, [e.target.name]: e.target.value });
+    // if (e.target.name === "Commenttextfield") {
+    //   if (e.target.value !== "") {
+    //     setformData({ ...formData, [e.target.name]: e.target.value });
+    //     settxtcommenterror(false);
+    //   } else {
+    //     settxtcommenterror(true);
+    //   }
+    // }
     if (e.target.name === "discountamount") {
       const discountrate = parseInt(
         e.target.value === "" ? "0" : e.target.value
@@ -321,9 +336,9 @@ function ProcedureInvestigationOrder(props) {
           amountreturnedtoPatient: newreturnedvalue,
           amountgiven: e.target.value,
         });
-        seterrors(false);
-      } else {
         seterrors(true);
+      } else {
+        seterrors(false);
       }
     }
     if (e.target.name === "Commenttextfield") {
@@ -341,112 +356,106 @@ function ProcedureInvestigationOrder(props) {
 
   const handleformDataSubmit = async (e) => {
     e.preventDefault();
-    if (formData.amountgiven === "") {
-      seterrors(true);
-    } else {
-      seterrors(false);
-      const formval = document.getElementById("formpatientdata");
-      const getdataserviceorder = () => {
-        const data = servicdetailsVal.map((item, index) => {
-          return {
-            opdOrderId: item.opdOrderId,
-            quantity: parseInt(
-              formval.elements["textfiledQuantityid" + index].value
-            ),
-            billed: checked[index],
-          };
-        });
-        return data;
-      };
-      const dtatatoSend = servicdetailsVal.map((item, index) => {
-        if (checked[index] === true) {
-          return {
-            serviceName: item.serviceConName,
-            opdOrderId: item.opdOrderId,
-            quantity: parseInt(
-              formval.elements["textfiledQuantityid" + index].value
-            ),
-            UnitPrice: parseInt(
-              formval.elements["textfieldPriceid" + index].value
-            ),
-            totalUnitPrice: parseInt(
-              formval.elements["textfieldTotalUnitid" + index].value
-            ),
-            billed: checked[index],
-          };
-        } else {
-          return {
-            serviceName: item.serviceConName,
-            opdOrderId: item.opdOrderId,
-            quantity: 0,
-            UnitPrice: parseInt(
-              formval.elements["textfieldPriceid" + index].value
-            ),
-            totalUnitPrice: 0,
-            billed: checked[index],
-          };
-        }
+
+    const formval = document.getElementById("formpatientdata");
+    const getdataserviceorder = () => {
+      const data = servicdetailsVal.map((item, index) => {
+        return {
+          opdOrderId: item.opdOrderId,
+          quantity: parseInt(
+            formval.elements["textfiledQuantityid" + index].value
+          ),
+          billed: checked[index],
+        };
       });
-      const filterdata = dtatatoSend.filter((item) => item.billed === true);
-
-      const finalDatatosend = {
-        total: parseFloat(formval.elements["totalamountbilled"].value).toFixed(
-          2
-        ),
-        waiverPercentage: parseFloat(formval.elements["discountamount"].value),
-        waiverAmount: parseFloat(waiveramount).toFixed(2),
-        totalAmountPayable: parseFloat(
-          formval.elements["totalamountpaybale"].value
-        ).toFixed(2),
-        amountGiven: parseFloat(formval.elements["amountgiven"].value).toFixed(
-          2
-        ),
-        amountReturned: parseFloat(
-          formval.elements["amountreturnedtoPatient"].value
-        ).toFixed(2),
-
-        comment: "xyz",
-        billdata: [...filterdata],
-      };
-      const payload = {
-        total: parseFloat(formval.elements["totalamountbilled"].value),
-        waiverPercentage: parseFloat(formval.elements["discountamount"].value),
-        totalAmountPayable: parseFloat(
-          formval.elements["totalamountpaybale"].value
-        ),
-        amountGiven: parseFloat(formval.elements["amountgiven"].value),
-        amountReturned: parseFloat(
-          formval.elements["amountreturnedtoPatient"].value
-        ),
-
-        comment: "xyz",
-        orderServiceDetails: getdataserviceorder(),
-      };
-      //console.log(payload);
-      setPayLoadData(finalDatatosend);
-      // setPrintData(true);
-      const response = await SaveBillingPostData.saveBillingData(payload);
-      console.log(response);
-      if (response === true) {
-        swal({
-          title: "Thank You",
-          text: "Billing Data Saved Successfully",
-          icon: "success",
-        }).then((value) => {
-          setPrintData(true);
-        });
+      return data;
+    };
+    const dtatatoSend = servicdetailsVal.map((item, index) => {
+      if (checked[index] === true) {
+        return {
+          serviceName: item.serviceConName,
+          opdOrderId: item.opdOrderId,
+          quantity: parseInt(
+            formval.elements["textfiledQuantityid" + index].value
+          ),
+          UnitPrice: parseInt(
+            formval.elements["textfieldPriceid" + index].value
+          ),
+          totalUnitPrice: parseInt(
+            formval.elements["textfieldTotalUnitid" + index].value
+          ),
+          billed: checked[index],
+        };
       } else {
-        swal({
-          title: "Error",
-          text: "Error saving Billing Data",
-          icon: "error",
-        }).then((value) => {
-          setTimeout(() => {
-            window.location.reload(false);
-          }, 200);
-        });
-        setPrintData(false);
+        return {
+          serviceName: item.serviceConName,
+          opdOrderId: item.opdOrderId,
+          quantity: 0,
+          UnitPrice: parseInt(
+            formval.elements["textfieldPriceid" + index].value
+          ),
+          totalUnitPrice: 0,
+          billed: checked[index],
+        };
       }
+    });
+    const filterdata = dtatatoSend.filter((item) => item.billed === true);
+
+    const finalDatatosend = {
+      total: parseFloat(formval.elements["totalamountbilled"].value),
+      waiverPercentage: parseFloat(formval.elements["discountamount"].value),
+      waiverAmount: waiveramount,
+      totalAmountPayable: parseFloat(
+        formval.elements["totalamountpaybale"].value
+      ),
+      amountGiven: parseFloat(formval.elements["amountgiven"].value),
+      amountReturned: parseFloat(
+        formval.elements["amountreturnedtoPatient"].value
+      ),
+
+      comment: "xyz",
+      billdata: [...filterdata],
+    };
+    const payload = {
+      total: parseFloat(formval.elements["totalamountbilled"].value),
+      waiverPercentage: parseFloat(formval.elements["discountamount"].value),
+      totalAmountPayable: parseFloat(
+        formval.elements["totalamountpaybale"].value
+      ),
+      amountGiven: parseFloat(formval.elements["amountgiven"].value),
+      amountReturned: parseFloat(
+        formval.elements["amountreturnedtoPatient"].value
+      ),
+
+      comment: formval.elements["Commenttextfield"]
+        ? formval.elements["Commenttextfield"].value
+        : "",
+      orderServiceDetails: getdataserviceorder(),
+    };
+    //console.log(payload);
+    setPayLoadData(finalDatatosend);
+    // setPrintData(true);
+    const response = await SaveBillingPostData.saveBillingData(payload);
+    console.log(response);
+    if (response === true) {
+      swal({
+        title: "Thank You",
+        text: "Billing Data Saved Successfully",
+        icon: "success",
+      }).then((value) => {
+        setPrintData(true);
+      });
+    } else {
+      swal({
+        title: "Error",
+        text: "Error saving Billing Data",
+        icon: "error",
+      }).then((value) => {
+        setTimeout(() => {
+          window.location.reload(false);
+        }, 200);
+      });
+      setPrintData(false);
     }
   };
   if (printdata === true) {
@@ -725,6 +734,7 @@ function ProcedureInvestigationOrder(props) {
                         <TableCell className={classes.custompaddingcell}>
                           <TextField
                             variant="outlined"
+                            error={commenterror === true ? true : false}
                             size="small"
                             value={formData.Commenttextfield}
                             id="Commenttextfield"
@@ -732,6 +742,11 @@ function ProcedureInvestigationOrder(props) {
                             onChange={(e) => {
                               handleInputchange(e);
                             }}
+                            helperText={
+                              commenterror === true
+                                ? "This field is required"
+                                : ""
+                            }
                           />
                         </TableCell>
                       </TableRow>
@@ -788,7 +803,7 @@ function ProcedureInvestigationOrder(props) {
                       </TableCell>
                       <TableCell className={classes.custompaddingcell}>
                         <TextField
-                          error={errors}
+                          error={errors === false ? true : false}
                           variant="outlined"
                           size="small"
                           value={formData.amountgiven}
@@ -798,11 +813,12 @@ function ProcedureInvestigationOrder(props) {
                           onChange={(e) => {
                             console.log(e.target.value.length);
                             if (e.target.value.length > 8) return false;
+
                             handleInputchange(e);
                           }}
                           type="number"
                           helperText={
-                            errors === true ? "This field is required" : ""
+                            errors === false ? "This field is required" : ""
                           }
                         />
                       </TableCell>
@@ -848,12 +864,17 @@ function ProcedureInvestigationOrder(props) {
                   color="primary"
                   className={classes.margin}
                   type="submit"
+                  id="btnsubmit"
+                  name="btnsubmit"
                   disabled={
-                    (errors === true ? true : false) ||
-                    (checkboxstatus === true ? true : false)
+                    (errors === false ? true : false) ||
+                    (checkboxstatus === true ? true : false) ||
+                    commenterror === true
+                      ? true
+                      : false
                   }
                 >
-                  Save Bill
+                  Submit
                 </Button>
                 <Button
                   variant="contained"
