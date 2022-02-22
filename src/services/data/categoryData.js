@@ -5,7 +5,7 @@ import {
 export class Category {
 
     /**
-     * returns all Locations with a paging and fields specified.
+     * returns all Categories with a paging and fields specified.
      * @param {object} fields what fields should be returned. If none is chosen, uuid and display are sent
      */
     static getAll = async ({
