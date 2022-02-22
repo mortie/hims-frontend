@@ -83,15 +83,6 @@ function ManageLocation() {
     }
   }
 
-  function changeCategoryUUID(uuid) {
-    for (let cat of categories) {
-      if (cat.uuid == uuid) {
-        changeCategory(cat);
-        return;
-      }
-    }
-  }
-
   function Locations() {
     return (
       <Grid container spacing={1}>
@@ -160,7 +151,7 @@ function ManageLocation() {
           labelId="categoryLabel"
           label="Category"
           value={category.uuid || ""}
-          onChange={(e) => changeCategoryUUID(e.target.value)}
+          onChange={(e) => changeCategory(categories[e.target.value])}
         >
           {categories.map(cat =>
             <MenuItem key={cat.uuid} value={cat.uuid}>{cat.display}</MenuItem>)}

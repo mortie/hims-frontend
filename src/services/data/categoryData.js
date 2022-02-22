@@ -16,10 +16,10 @@ export class Category {
     }) => {
         let categories = (await getAPI(
             `/concept?q=services%20ordered&v=custom:(answers:(${fields.join()}))`
-        )).data.results;
+        )).data.results[0].answers;
 
         remapArrayWithField(categories, 'uuid');
-        return categories[0].answers;
+        return categories;
 
     }
 
