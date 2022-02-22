@@ -1,3 +1,5 @@
+import { Category } from "./categoryData";
+
 import { Location } from "./locationData";
 
 import { Visit } from "./visitData";
@@ -19,6 +21,7 @@ import { TestOrderDetails } from "./TestOrderDetails";
 import { SaveBillingPostData } from "./SaveBillingPostData";
 
 export {
+  Category,
   Location,
   Visit,
   Concept,

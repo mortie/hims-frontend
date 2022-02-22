@@ -14,12 +14,14 @@ import {
   LinearProgress,
   ListSubheader} from '@material-ui/core/';
 import styles from "../../styles";
-import { Location } from '../../../../../services/data';
+import { Location, Category } from '../../../../../services/data';
 import { getAPI } from '../../../../../services';
 
 const useStyles = makeStyles(styles);
 function ManageLocation() {
-  var [category, setCategory] = useState("general");
+  var [category, setCategory] = useState({});
+  var [categories, setCategories] = useState([]);
+  var [categoriesLoaded, setCategoriesLoaded] = useState(false);
   var [locationsLoaded, setLocationsLoaded] = useState(false);
   var [unassignedLocations, setUnassignedLocations] = useState(null);
   let [currentCategoryLocations, setCurrentCategoryLocations] = useState([]);
@@ -27,7 +29,7 @@ function ManageLocation() {
 
   function updateAssignedLocations() {
     let newLocations = {...assignedLocations};
-    newLocations[category] = [...currentCategoryLocations];
+    newLocations[category.uuid] = [...currentCategoryLocations];
     setAssignedLocations(newLocations);
   }
 
@@ -44,6 +46,12 @@ function ManageLocation() {
     Location.getAll({}).then(locations => {
       sortAndSetLocations(setUnassignedLocations, locations);
       setLocationsLoaded(true);
+    });
+
+    Category.getAll({}).then(categories => {
+      setCategory({...categories[0]});
+      setCategories(categories);
+      setCategoriesLoaded(true);
     });
   }, []);
 
@@ -66,12 +74,21 @@ function ManageLocation() {
   }
 
   function changeCategory(newCategory) {
+    setCategory({...newCategory});
     updateAssignedLocations();
-    setCategory(newCategory);
-    if (assignedLocations[newCategory]) {
-      setCurrentCategoryLocations([...assignedLocations[newCategory]]);
+    if (assignedLocations[newCategory.uuid]) {
+      setCurrentCategoryLocations([...assignedLocations[newCategory.uuid]]);
     } else {
       setCurrentCategoryLocations([]);
+    }
+  }
+
+  function changeCategoryUUID(uuid) {
+    for (let cat of categories) {
+      if (cat.uuid == uuid) {
+        changeCategory(cat);
+        return;
+      }
     }
   }
 
@@ -99,7 +116,7 @@ function ManageLocation() {
         </Grid>
         <Grid item style={{flexGrow: 1, width: "50%"}}>
           <Paper>
-            <List subheader={<ListSubheader>Locations assigned to {category}</ListSubheader>}>
+            <List subheader={<ListSubheader>Locations assigned to {category.display}</ListSubheader>}>
               {currentCategoryLocations.length == 0 && <ListItem>No items</ListItem>}
               {currentCategoryLocations.map((location, idx) => (
                 <ListItem
@@ -142,16 +159,15 @@ function ManageLocation() {
         <Select
           labelId="categoryLabel"
           label="Category"
-          value={category}
-          onChange={(e) => changeCategory(e.target.value)}
+          value={category.uuid || ""}
+          onChange={(e) => changeCategoryUUID(e.target.value)}
         >
-          <MenuItem value="general">General</MenuItem>
-          <MenuItem value="private">Private</MenuItem>
-          <MenuItem value="emergency">Emergency</MenuItem>
+          {categories.map(cat =>
+            <MenuItem key={cat.uuid} value={cat.uuid}>{cat.display}</MenuItem>)}
         </Select>
       </FormControl>
 
-      {locationsLoaded
+      {locationsLoaded && categoriesLoaded
         ? Locations()
         : <LinearProgress />
       }
