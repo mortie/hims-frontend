@@ -41,6 +41,9 @@ export default function PcRevisit(props) {
   var paidUuid = props.paidUuid;
   var prUuid = props.prUuid;
   var freeUuid = props.freeUuid;
+  var patientC = props.patientC
+  var patientC1 = props.patientC1
+  var patientC2 = props.patientC2
     //   var dataType = props.answer.datatype.display
     var pc_level_1 = patientCategoryTypes;
 
@@ -140,14 +143,15 @@ export default function PcRevisit(props) {
         props.onChange(event,cVal)
 
   }
-      const handleChange = (event,cVal) => {
+
+  const handleChange = (event,cVal) => {
     var btnid = event.target.id
     var btnvalue = event.target.value
     var cVal = {
       "attributeType": pcUuid,
       "value":btnvalue
     }
-        if (btnvalue == PAID_CATEGORY) {
+  if (btnvalue == PAID_CATEGORY) {
       setParentID(paidUuid)
       setShowPc(true);
         setShowPrograms(false);
@@ -307,12 +311,17 @@ export default function PcRevisit(props) {
 
 
           <FormControl component="fieldset">
-          <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
+              <RadioGroup row aria-label="gender"
+                name="row-radio-buttons-group"
+                defaultValue={patientC}
+              >
           {patientCategoryTypes.map((smoker, index) => (
           <FormControlLabel
           value={smoker.display}
-          control={<Radio id={smoker.uuid}
+          control={<Radio
+          id={smoker.uuid}
           onChange={handleChange}
+
           />}
           label={smoker.display}
           className="yesClass"
@@ -323,7 +332,9 @@ export default function PcRevisit(props) {
 
 
 
-          <RadioGroup row aria-label="yes" name="row-radio-buttons-group">
+              <RadioGroup row aria-label="yes"
+                defaultValue={patientC1}
+                name="row-radio-buttons-group">
           {showPc &&
           pcDetails.map((item2, index) => (
           <FormControlLabel

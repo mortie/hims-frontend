@@ -40,7 +40,8 @@
     "redux": "^4.1.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "rrule": "^2.6.8"
+    "rrule": "^2.6.8",
+    "sweetalert": "^2.1.2"
   },
   "scripts": {
     "start": "set PORT=3006 && react-scripts start",

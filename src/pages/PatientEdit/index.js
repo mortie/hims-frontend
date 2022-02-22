@@ -11,6 +11,7 @@ import AvailableTimeSlots from "./components/AvailableTimeSlots";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import moment from "moment";
+import swal from "sweetalert";
 
 import {
   Paper,
@@ -82,6 +83,7 @@ export default function PatientEdit(props) {
   let [mrsList, setMrsList] = useState([]);
   let [nation, setNation] = useState([])
   let [rela, setRela] = useState([]);
+  const [duplicateAadhar, setDuplicateAadhar] = useState(false);
   const [value, setValue] = useState();
     const { enqueueSnackbar } = useSnackbar();
 
@@ -340,6 +342,14 @@ else {
           formValues["Relative Name*"] = pResponse.person_attributes["Relative Name*"]
 
         }
+        if (pResponse.person_attributes["Email"]) {
+          formValues["Email"] = pResponse.person_attributes["Email"]
+        }
+        if (pResponse.person_attributes["Address"]) {
+          formValues["Address"] = pResponse.person_attributes["Address"]
+
+        }
+
 
 
         formValues["Town/City"] = { name: pResponse.address["City Village"] }
@@ -896,10 +906,30 @@ else {
   }
   function validateAadhar(name,value)
   {
-
+    getduplicateAadhar(value);
      if (value.length  > 12 || value.length < 12) {
         setFormErrors({ ...formErrors, [name]: "Only 12 digits are allowed" });
       }
+      else if(duplicateAadhar){
+        swal({
+          title: "Error",
+          text: "Please Enter Unique Aadhar Number",
+          icon: "error",
+        }).then((value) => {
+          setFormErrors({ ...formErrors, [name]: value });
+        });
+        
+        //setFormErrors({ ...formErrors, [name]: "Please Enter Unique Aadhar Number" });
+      }
+  }
+  function getduplicateAadhar(value){    
+    const dob = moment(formValues["Date of Birth"]).format("DD-MM-YYYY");
+    var url = '/aadhaarValidation/patient?aadhaarNo='+value+'&dob='+dob
+    getAPI(url).then((res) =>{
+      setDuplicateAadhar(false); 
+    }).catch((error) =>{
+      setDuplicateAadhar(true);
+    })
   }
   function validateEmail(e) {
     const { name, value } = e.target;

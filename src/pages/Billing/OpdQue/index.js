@@ -13,6 +13,8 @@ import {
   useMediaQuery,
   DialogContentText,
   LinearProgress,
+  Icon,
+  InputAdornment,
 } from "@material-ui/core/";
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 import styles from "./styles";
@@ -37,7 +39,8 @@ import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
 import { useHistory } from "react-router-dom";
-import ListtoOrder from "../ListtoOrder"
+import ListtoOrder from "../ListtoOrder";
+import { calculateAge } from "../../../utils/commons";
 
 const useStyles = makeStyles(styles);
 function createData(name, calories, fat, carbs, protein) {
@@ -68,25 +71,35 @@ export default function OpdQue() {
   const [loading, setLoading] = useState(true);
 
   const [filteredPatientList, setFilteredPatientList] = useState([]);
+  const [patientsList, setPatientsList] = useState([]);
   const [patientnameorid, setPatientnameorid] = React.useState("");
   const [orderrowdetails, setOrderRowDetails] = useState([]);
   const [countrow, setCountRow] = useState(0);
+  const [searchKey, setSearchKey] = useState("");
+  const [pageSize, setPageSize] = React.useState(5);
   const history = useHistory();
+  const calculateAgeFunction = (dateval) => {
+    const valueresult = dateval.split("-");
+    const dobj = new Date(
+      parseInt(valueresult[2]),
+      parseInt(valueresult[1]) - 1,
+      parseInt(valueresult[0])
+    );
+    return moment(dobj).format();
+  };
   const createPatientList = (results, orderdate) => {
     const patientList = results.map((result, index) => {
+      //console.log(moment(result.birthDate).format());
       return {
         slno: index + 1,
         identifier: result.patientId,
         patientName: result.patientName,
         gender: result.gender,
-        age: result.age,
+        age: calculateAge(calculateAgeFunction(result.birthDate)),
         orderdate: orderdate,
         id: result.patientUuid,
-        encounterUuid: result.encounterUuid,
-        locationUuid: result.locationUuid,
-        locationName: result.locationName,
+        extraData: result.serviceDetailsForTestOrder,
         patientCategory: result.patientCategory,
-        billableServiceDetails: result.billableServiceDetails,
       };
     });
 
@@ -95,17 +108,21 @@ export default function OpdQue() {
   useEffect(() => {
     //console.log(moment().format("DD-MM-YYYY"));
     async function fetchData() {
-      const request = await TestOrderDetails.TestOnlySelectDateFunc(
-        actualorderdate
-      );
-      console.log(request);
-      const patientList = createPatientList(
-        request.testOrderDetails,
-        actualorderdate
-      );
-      console.log(patientList);
-      setFilteredPatientList(patientList);
-      setLoading(false);
+      try {
+        const request = await TestOrderDetails.TestOnlySelectDateFunc(
+          actualorderdate
+        );
+        //console.log(request);
+        const patientList = createPatientList(
+          request.testOrderDetails,
+          actualorderdate
+        );
+        setPatientsList(patientList);
+        setFilteredPatientList(patientList);
+        setLoading(false);
+      } catch (err) {
+        return null;
+      }
     }
     fetchData();
   }, [actualorderdate]);
@@ -129,26 +146,32 @@ export default function OpdQue() {
   };
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(value);
-    //   setFormValues({...formValues,[name]:value});
-    // if(!value)
-    // {
-    //   setformErrors({"patientname":"Name or Id is required"});
-    // }
-    // if(value.length < 1)
-    // {
-    //   setformErrors({"patientname":"Name or Id is required"});
-    // }
-    // else{
-    //   const errors = formerrors;
-    //   delete errors[name];
-    //   setformErrors(errors);
-    // }
-    setPatientnameorid(e.target.value);
+    setLoading(true);
+    // setPatientnameorid(value);
+    setSearchKey(value);
+    setFilteredPatientList(getFilteredPatientList(value.toLowerCase()));
+    //console.log(data);
+    // const data = getFilteredPatientList(value.toLowerCase());
+    // console.log(data);
+    setLoading(false);
   };
-
-  const handleDateChange = (date) => {
-    setActualOrderdate(moment(date["_d"]).format("DD-MM-YYYY"));
+  const getFilteredPatientList = (key) => {
+    if (key.length >= 3) {
+      const newitem = patientsList.filter(
+        (item) =>
+          item.identifier.toLowerCase().includes(key) ||
+          item.patientName.toLowerCase().includes(key)
+      );
+      return newitem;
+    } else {
+      return patientsList;
+    }
+  };
+  const handleDateChange = (date, value) => {
+    // console.log(date);
+    // console.log(value);
+    //setActualOrderdate(moment(date["_d"]).format("DD-MM-YYYY"));
+    setActualOrderdate(value);
     setSelectedDate(date);
   };
 
@@ -171,7 +194,6 @@ export default function OpdQue() {
     {
       field: "age",
       headerName: "Age",
-      type: "number",
       width: 100,
     },
     {
@@ -181,9 +203,10 @@ export default function OpdQue() {
     },
     {
       field: "orderdate",
-      headerName: "Date",
+      headerName: "Order Date",
       width: 220,
     },
+
     {
       field: "id",
       headerName: "patientUuid",
@@ -191,32 +214,8 @@ export default function OpdQue() {
       hide: true,
     },
     {
-      field: "patientCategory",
-      headerName: "patientCategory",
-      width: 220,
-      hide: true,
-    },
-    {
-      field: "encounterUuid",
-      headerName: "encounterUuid",
-      width: 220,
-      hide: true,
-    },
-    {
-      field: "locationUuid",
-      headerName: "locationUuid",
-      width: 220,
-      hide: true,
-    },
-    {
-      field: "locationName",
-      headerName: "locationName",
-      width: 220,
-      hide: true,
-    },
-    {
-      field: "billableServiceDetails",
-      headerName: "billableServiceDetails",
+      field: "extraData",
+      headerName: "extraData",
       width: 220,
       hide: true,
     },
@@ -280,171 +279,182 @@ export default function OpdQue() {
   //   return orderrowdetails;
   // }
 
-  if(showListToOrder)
-  {return (<ListtoOrder patientData = {patientData}/>)}
-  else{
-    return( 
-    <>
-      <BillingNavbar></BillingNavbar>
-      <VerticalTabComponent></VerticalTabComponent>
-      {!currentRow && (
-        <div mt={2}>
-          <Typography variant="h5">Outdoor Patient Queue</Typography>
-          <Card className={classes.root}>
-            <CardHeader
-              title="Get Queue"
-              className={classes.title}
-              titleTypographyProps={{ variant: "body1" }}
-            />
-            <CardContent>
-              <form noValidate id="searchForm" onSubmit={submitHandler}>
-                <div
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    flexWrap: "wrap",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Box flexGrow={0.4}>
-                    <TextField
-                      id="patientname"
-                      name="patientname"
-                      label="Name"
-                      variant="outlined"
-                      className={classes.field}
-                      onChange={handleChange}
-                      value={patientnameorid}
-                      error={formerrors["patientname"] ? true : false}
-                      helperText={formerrors["patientname"]}
-                      fullWidth
-                      autoFocus
-                    />
-                  </Box>
-                  <Box flexGrow={0.4}>
-                    <MuiPickersUtilsProvider utils={MomentUtils}>
-                      <KeyboardDatePicker
-                        fullWidth
-                        name="orderdate"
-                        style={{ marginTop: 8 }}
-                        disableFuture
-                        allowKeyboardControl
-                        autoOk
-                        inputVariant="outlined"
-                        format="DD-MM-yyyy"
-                        label="Date"
-                        views={["year", "month", "date"]}
-                        onChange={handleDateChange}
-                        value={selectedDate}
+  if (showListToOrder) {
+    return <ListtoOrder patientData={patientData} />;
+  } else {
+    return (
+      <>
+        <BillingNavbar></BillingNavbar>
+        <VerticalTabComponent></VerticalTabComponent>
+        {!currentRow && (
+          <div mt={2}>
+            <Typography variant="h5">Outdoor Patient Queue</Typography>
+            <Card className={classes.root}>
+              <CardHeader
+                title="Get Queue"
+                className={classes.title}
+                titleTypographyProps={{ variant: "body1" }}
+              />
+              <CardContent>
+                <form noValidate id="searchForm" onSubmit={submitHandler}>
+                  <div
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      flexWrap: "wrap",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Box flexGrow={0.5}>
+                      <TextField
+                        id="patientname"
+                        name="patientname"
+                        label="Search patient by name or ID"
+                        variant="outlined"
                         className={classes.field}
+                        onChange={handleChange}
+                        // value={patientnameorid}
+                        type="search"
+                        error={formerrors["patientname"] ? true : false}
+                        helperText={formerrors["patientname"]}
+                        fullWidth
+                        autoFocus
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <Icon className="fas fa-search" />
+                            </InputAdornment>
+                          ),
+                        }}
                       />
-                    </MuiPickersUtilsProvider>
-                  </Box>
-                  <Box>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      className={classes.field}
-                      type="submit"
-                    >
-                      Get Patient
-                    </Button>
-                  </Box>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+                    </Box>
+                    <Box flexGrow={0.4}>
+                      <MuiPickersUtilsProvider utils={MomentUtils}>
+                        <KeyboardDatePicker
+                          fullWidth
+                          name="orderdate"
+                          style={{ marginTop: 8 }}
+                          disableFuture
+                          allowKeyboardControl
+                          autoOk
+                          inputVariant="outlined"
+                          format="DD-MM-yyyy"
+                          label="Date"
+                          views={["year", "month", "date"]}
+                          onChange={handleDateChange}
+                          value={selectedDate}
+                          className={classes.field}
+                        />
+                      </MuiPickersUtilsProvider>
+                    </Box>
+                    {/* <Box>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.field}
+                        type="submit"
+                      >
+                        Get Patient
+                      </Button>
+                    </Box> */}
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
-      <Paper style={{ marginTop: 4 }}>
-        <DataGrid
-          rows={filteredPatientList}
-          loading={loading}
-          disableColumnMenu
-          columns={columns}
-          autoHeight
-          rowHeight={40}
-          headerHeight={40}
-          pageSize={10}
-          onCellClick={handleOpen}
-          components={{
-            LoadingOverlay: CustomLoadingOverlay,
-            NoRowsOverlay: CustomNoRowsOverlay,
-          }}
-        />
-      </Paper>
-
-      {currentRow && (
-        <div>
-          <Typography variant="h4">List Of Orders</Typography>
-          <Typography variant="body1"> Date : {currentRow.date} </Typography>
-          <Typography variant="body1">PatientId: {currentRow.id}</Typography>
-          <Typography variant="body1">Name: {currentRow.name}</Typography>
-          <Typography variant="body1">Gender: {currentRow.gender}</Typography>
-          <Typography variant="body1">Age: {currentRow.age}</Typography>
-          <Typography variant="body1" style={{ marginBottom: "1rem" }}>
-            Patient Category: Paying
-          </Typography>
+        <Paper style={{ marginTop: 4 }}>
           <DataGrid
-            rows={orderrowdetails}
-            columns={columns1}
+            rows={filteredPatientList}
+            loading={loading}
+            disableColumnMenu
+            columns={columns}
             autoHeight
             rowHeight={40}
             headerHeight={40}
-            className={classes.table}
-            pageSize={10}
+            pageSize={5}
+            // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            // rowsPerPageOptions={[5]}
+            // pagination
+            onCellClick={handleOpen}
             components={{
               LoadingOverlay: CustomLoadingOverlay,
               NoRowsOverlay: CustomNoRowsOverlay,
             }}
           />
-        </div>
-        // <Dialog open={showDialog}  onClose={handleModalClose}  maxWidth="lg" fullWidth  >
-        //   <DialogTitle>List Of Orders</DialogTitle>
-        //   <DialogContent dividers>
-        //     <DialogContentText>
-        //     <Typography variant="body1" gutterBottom>
-        //     <Typography variant="h5"> Date : {currentRow.date} </Typography>
-        //     </Typography>
-        //     <Typography variant="body1" gutterBottom>
-        //     <Typography variant="h5">PatientId: {currentRow.id}</Typography>
-        //     </Typography>
-        //     <Typography variant="body1" gutterBottom>
-        //     <Typography variant="h5">Name: {currentRow.name}</Typography>
-        //     </Typography>
-        //     <Typography variant="body1" gutterBottom>
-        //     <Typography variant="h5">Gender: {currentRow.gender}</Typography>
-        //     </Typography>
-        //     <Typography variant="body1" gutterBottom>
-        //     <Typography variant="h5">Age: {currentRow.age}</Typography>
-        //     </Typography>
-        //     <Typography variant="body1" gutterBottom>
-        //     <Typography variant="h5">Patient Category: Paying</Typography>
-        //     </Typography>
-        //     <Typography variant="body1" gutterBottom>
-        //     <Typography variant="h5">File No.</Typography>
-        //     </Typography>
+        </Paper>
 
-        //         <DataGrid
-        //           rows={rows1}
-        //           columns={columns1}
-        //           autoHeight
-        //           rowHeight={40}
-        //           headerHeight={40}
-        //           className={classes.table}
-        //           pageSize={10}
-        //           components={{
-        //             LoadingOverlay: CustomLoadingOverlay,
-        //             NoRowsOverlay: CustomNoRowsOverlay,
-        //           }}
+        {currentRow && (
+          <div>
+            <Typography variant="h4">List Of Orders</Typography>
+            <Typography variant="body1"> Date : {currentRow.date} </Typography>
+            <Typography variant="body1">PatientId: {currentRow.id}</Typography>
+            <Typography variant="body1">Name: {currentRow.name}</Typography>
+            <Typography variant="body1">Gender: {currentRow.gender}</Typography>
+            <Typography variant="body1">Age: {currentRow.age}</Typography>
+            <Typography variant="body1" style={{ marginBottom: "1rem" }}>
+              Patient Category: Paying
+            </Typography>
+            <DataGrid
+              rows={orderrowdetails}
+              columns={columns1}
+              autoHeight
+              rowHeight={40}
+              headerHeight={40}
+              className={classes.table}
+              components={{
+                LoadingOverlay: CustomLoadingOverlay,
+                NoRowsOverlay: CustomNoRowsOverlay,
+              }}
+            />
+          </div>
+          // <Dialog open={showDialog}  onClose={handleModalClose}  maxWidth="lg" fullWidth  >
+          //   <DialogTitle>List Of Orders</DialogTitle>
+          //   <DialogContent dividers>
+          //     <DialogContentText>
+          //     <Typography variant="body1" gutterBottom>
+          //     <Typography variant="h5"> Date : {currentRow.date} </Typography>
+          //     </Typography>
+          //     <Typography variant="body1" gutterBottom>
+          //     <Typography variant="h5">PatientId: {currentRow.id}</Typography>
+          //     </Typography>
+          //     <Typography variant="body1" gutterBottom>
+          //     <Typography variant="h5">Name: {currentRow.name}</Typography>
+          //     </Typography>
+          //     <Typography variant="body1" gutterBottom>
+          //     <Typography variant="h5">Gender: {currentRow.gender}</Typography>
+          //     </Typography>
+          //     <Typography variant="body1" gutterBottom>
+          //     <Typography variant="h5">Age: {currentRow.age}</Typography>
+          //     </Typography>
+          //     <Typography variant="body1" gutterBottom>
+          //     <Typography variant="h5">Patient Category: Paying</Typography>
+          //     </Typography>
+          //     <Typography variant="body1" gutterBottom>
+          //     <Typography variant="h5">File No.</Typography>
+          //     </Typography>
 
-        //         />
-        //     </DialogContentText>
-        //   </DialogContent>
-        // </Dialog>
-      )}
-    </>
-  )}
+          //         <DataGrid
+          //           rows={rows1}
+          //           columns={columns1}
+          //           autoHeight
+          //           rowHeight={40}
+          //           headerHeight={40}
+          //           className={classes.table}
+          //           pageSize={10}
+          //           components={{
+          //             LoadingOverlay: CustomLoadingOverlay,
+          //             NoRowsOverlay: CustomNoRowsOverlay,
+          //           }}
+
+          //         />
+          //     </DialogContentText>
+          //   </DialogContent>
+          // </Dialog>
+        )}
+      </>
+    );
+  }
 }

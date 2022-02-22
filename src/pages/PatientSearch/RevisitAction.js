@@ -38,14 +38,24 @@ import { useSnackbar } from "notistack";
 const useStyles = makeStyles(styles);
 
 
-export default function RevisitAction({ data,mlc }) {
+export default function RevisitAction({ data }) {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const [open, setOpen] = React.useState(true);
   const history = useHistory();
   const ref = useRef();
   const { appointmentData, visitData } = data;
-  const { registrationDate, departmentName,reportingPlace,doctorName,reportingTime } = visitData.data;
+  const { registrationDate,
+    departmentName,
+    reportingPlace,
+    doctorName,
+    reportingTime,
+    patientCategory,
+    patientSubCategory1,
+    patientSubCategory2,
+    mlc,
+    mlcSubCategory,
+  } = visitData.data;
   const [appointmentTypes, setAppointmentTypes] = useState([]);
   const [mlcTypes, setMlcTypes] = useState([]);
   const [mlcYesTypes, setmlcYesTypes] = useState([]);
@@ -62,8 +72,8 @@ export default function RevisitAction({ data,mlc }) {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [timeSlotsLoading, setTimeSlotsLoading] = useState(false);
   const [timeSlots, setTimeSlots] = useState([]);
-  const [isMlc, setIsMlc] = useState(false)
-  const [isPc, setIsPc] = useState(false)
+  const [isMlc, setIsMlc] = useState(mlc ? true : false)
+  const [isPc, setIsPc] = useState(patientCategory ? true : false)
   const [visitAttributeTypes, setVisitAttributeTypes] = useState();
   const [registrationSuccessData, setRegistrationSuccessData] = useState(null);
 
@@ -405,7 +415,9 @@ const getAge = (birthdate) => {
 
 
           <MlcRevisit
-            visitAttributeTypes = {visitAttributeTypes}
+            visitAttributeTypes={visitAttributeTypes}
+            mlc={mlc}
+            mlcSubCategory = {mlcSubCategory}
             mlcUuid = {mlcUuid}
             mlcTypes={mlcTypes}
             mlcYesUuid = {mlcYesUuid}
@@ -429,6 +441,10 @@ const getAge = (birthdate) => {
             onAutocompleteChange={onAutocompleteChange}
             validateAutocomplete={validateAutocomplete}
             onChange={handleRevisitChange}
+            patientC={patientCategory}
+            patientC1={patientSubCategory1}
+            patientC2 = {patientSubCategory2}
+
           />
 
           <DepartmentRevisit
@@ -524,7 +540,7 @@ const getAge = (birthdate) => {
                 <Typography>REPORTING TIME</Typography>
               </TableCell>
               <TableCell >
-                <Typography>&nbsp;&nbsp;&nbsp;{ reportingTime }</Typography>
+                <Typography>&nbsp;&nbsp;&nbsp;{ reportingTime ? reportingTime : "N/A"  }</Typography>
             </TableCell>
             </TableRow>
         </TableBody>

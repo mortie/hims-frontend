@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from "react";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
+import moment from "moment";
 import {
   Button,
   TextField,
@@ -21,10 +22,9 @@ import {
 import { DataGrid } from "@material-ui/data-grid";
 import AddIcon from "@material-ui/icons/Add";
 import { GridContainer, GridItem } from "../../components/Grid";
-import {ADRESSBASE_URL_API} from "../../utils/constants"
 
 import CustomizedMenus from "./ActionButton";
-import { getAPI, postAPI, getaddressAPI } from "../../services/index";
+import { getAPI,getaddressAPI, postAPI } from "../../services/index";
 
 import axios from "axios";
 import styles from "./styles";
@@ -73,19 +73,24 @@ export default function PatientSearch(props) {
     phoneData: true,
     nameData: true,
     identifierData: true,
+    ageData:true,
   });
   var [isDataPresent, setisDataPresent] = useState(false);
   var [phoneData, setphoneData] = useState(false);
   var [nameData, setnameData] = useState(false);
+  var [ageData, setAgeData] = useState(false);
   var [apihit, setapihit] = useState(false);
   var [charErrorMsj, setcharErrorMsj] = useState("");
   var isEnter = "Enter";
   var [PhoneErrorMsj, setPhoneErrorMsj] = useState();
   var [NameErrorMsj, setNameErrorMsj] = useState();
+  var [ageErrorMsj, setAgeErrorMsj] = useState();
   var [IdenErrorMsj, setIdenErrorMsj] = useState();
   const [appointmentTypes, setAppointmentTypes] = useState([]);
   const [patientCategoryTypes, setPatientCategoryTypes] = useState([]);
   const [mlcResp, setMlcResp] = useState([]);
+  const [formErrors, setFormErrors] = useState({});
+
 
   const columns = [
     { field: "uuid", hide:true },
@@ -130,7 +135,37 @@ export default function PatientSearch(props) {
     },
   ];
 
+  const getAgeYear = ( age,ageV )=> {
+    const lastCharacter = age[age.length - 1];
+    let dob = moment().format("DD/MM/yyyy");
+    console.log(lastCharacter)
+    console.log(ageV)
+    switch (lastCharacter.toLowerCase()) {
+      case "y":
+        dob = moment().subtract(ageV, "years");
+        break;
+      case "m":
+        dob = moment().subtract(ageV, "months");
+        break;
+      case "w":
+        dob = moment().subtract(ageV, "weeks");
+        break;
+      case "d":
+        dob = moment().subtract(ageV, "days");
+        break;
+      default:
+        break;
+    }
+    console.log(dob)
+  var a = moment();
+  var b = moment(dob, 'YYYY');  
+  var diff = a.diff(b, 'years'); // calculates patient's age in years
+  console.log(diff);
+   // this prints out the age
+   return diff;
+  }
   const isEnteredPressed = (charLen, event, name, eventName) => {
+    
     if (
       (event.key === isEnter && event.target.value.length > charLen) ||
       (event.key === isEnter && name == "age")
@@ -153,7 +188,9 @@ export default function PatientSearch(props) {
           setNameErrorMsj("Name is required");
         }
       }
+      if(name === "age"){
 
+      }
       if (name == "phone") {
         setErrors({ phoneData: !phone ? false : true });
         if (phone) {
@@ -279,6 +316,13 @@ export default function PatientSearch(props) {
     }
   };
 
+function Equals(a, b) {
+    return Array.isArray(a) &&
+        Array.isArray(b) &&
+        a.length === b.length &&
+        a.every((val, index) => val === b[index]);
+  }
+
   var multiFilter = (products, filters, isExactLvd, isApproxLvd) => {
     return products.filter((product) => {
       return Object.entries(filters).every(([filterProperty, filterValues]) => {
@@ -336,14 +380,17 @@ export default function PatientSearch(props) {
               }
             } else if (filterProperty != "name") {
               return filterValues.includes(product[filterProperty]);
-            } else {
+            }
+            else {
               var searchTokens = filterValues[0].split(" ");
               var searchString = product[filterProperty];
               var searchRegex = new RegExp(searchTokens.join("|"), "g");
               var numOfMatches = searchString.match(searchRegex);
               if (numOfMatches != null) {
-                return true;
-              } else {
+                var checkE = Equals(searchTokens, numOfMatches)
+                return checkE;
+              }
+              else {
                 return false;
               }
             }
@@ -456,11 +503,37 @@ export default function PatientSearch(props) {
     return param;
   }
 
+  function validateName(name,value)
+  {
+   const regexname = /^[a-zA-Z\s]*$/;
+     if (!regexname.test(value)) {
+        setFormErrors({ ...formErrors, [name]: "Only alphabets are allowed" });
+    }
+     else {
+      setFormErrors({ ...formErrors, [name]: "" });
+    }
+  }
+  function validateAge(name,value)
+  {
+    const regex = /^[0-9]+(y|Y|m|M|w|W|d|D)$/;
+      
+     if (!regex.test(value)) {
+      setAgeErrorMsj(true);
+        setFormErrors({ ...formErrors, [age]: "Please enter age in given format (20y /20m/ 20d)" });
+    }
+     else {
+      setAgeErrorMsj(false);
+      setFormErrors({ ...formErrors, [age]: "" });
+      setAgeData(false);
+    }
+  }
+
   const searchOnKey = (event, name, eventName) => {
     var searchValue = event.target.value;
-
+    
     if (name == "firstName") {
       setfirstName(searchValue);
+      validateName(name, searchValue)
     }
     if (name == "phone") {
       setphone(searchValue);
@@ -469,6 +542,7 @@ export default function PatientSearch(props) {
       setidentifier(searchValue);
     }
     if (name == "age") {
+      validateName(name, searchValue)
       setage(searchValue);
     }
     if (name == "lvd") {
@@ -551,8 +625,11 @@ export default function PatientSearch(props) {
       if (isDataAlready) {
         if (name == "age") {
           if (ageRange) {
-            minageRange = Number(event.target.value) - Number(ageRange);
-            maxageRange = Number(event.target.value) + Number(ageRange);
+            var ageactual = event.target.value;
+            var ageV = ageactual.slice(0, -1);
+            const dif = getAgeYear(ageactual,ageV);
+            minageRange = Number(dif) - Number(ageRange);
+            maxageRange = Number(dif) + Number(ageRange);
             for (let k = minageRange; k <= maxageRange; k++) {
               rangeToSend.push(String(k));
             }
@@ -562,6 +639,9 @@ export default function PatientSearch(props) {
           }
         } else if (age) {
           if (ageRange) {
+            //var ageact = age;
+            //var ageVa = ageact.slice(0, -1);
+            //const dif = getAgeYear(ageact,ageVa);
             minageRange = Number(age) - Number(ageRange);
             maxageRange = Number(age) + Number(ageRange);
             for (let k = minageRange; k <= maxageRange; k++) {
@@ -622,8 +702,7 @@ export default function PatientSearch(props) {
           setLoading(false);
         } else {
           let param = firstNameValue;
-          var username = "bhavana";
-          var password = "Admin123";
+          
           param = checkData(
             param,
             firstNameValue,
@@ -638,12 +717,8 @@ export default function PatientSearch(props) {
             setnameData(false);
             setphoneData(false);
 
-            const headers = {
-              Authorization: "Basic " + btoa(`${username}:${password}`),
-            };
-            const url = `${ADRESSBASE_URL_API}/patient_search?name=${param}`;
-            axios
-              .get(url, { headers: headers })
+            const url = `/patient_search?name=${param}`;
+            getaddressAPI(url)
               .then((response) => {
                 setapihit(true);
                 var phoneNo = "";
@@ -705,8 +780,11 @@ export default function PatientSearch(props) {
                     setsearchData([]);
                     if (age) {
                       if (ageRange) {
-                        minageRange = Number(age) - Number(ageRange);
-                        maxageRange = Number(age) + Number(ageRange);
+                      var ageactual = age;
+                      var ageV = ageactual.slice(0, -1);
+                      const dif = getAgeYear(ageactual,ageV);
+                        minageRange = Number(dif) - Number(ageRange);
+                        maxageRange = Number(dif) + Number(ageRange);
                         for (let i = minageRange; i <= maxageRange; i++) {
                           rangeToSend.push(String(i));
                         }
@@ -771,8 +849,7 @@ export default function PatientSearch(props) {
         }
       } else {
         let param = firstNameValue;
-        var username = "bhavana";
-        var password = "Admin123";
+       
         param = checkData(
           param,
           firstNameValue,
@@ -787,12 +864,8 @@ export default function PatientSearch(props) {
           setnameData(false);
           setphoneData(false);
 
-          const headers = {
-            Authorization: "Basic " + btoa(`${username}:${password}`),
-          };
-          const url = `${ADRESSBASE_URL_API}/patient_search?name=${param}`;
-          axios
-            .get(url, { headers: headers })
+          const url = `/patient_search?name=${param}`;
+          getaddressAPI(url)
             .then((response) => {
               setapihit(true);
               var phoneNo = "";
@@ -855,8 +928,13 @@ export default function PatientSearch(props) {
                   setsearchData([]);
                   if (ageValue) {
                     if (ageRange) {
-                      minageRange = Number(age) - Number(ageRange);
-                      maxageRange = Number(age) + Number(ageRange);
+                      var ageactual = age;
+                      var ageV = ageactual.slice(0, -1);
+                      console.log(ageV);
+                      const dif = getAgeYear(ageactual,ageV);
+                      console.log(dif)
+                      minageRange = Number(dif) - Number(ageRange);
+                      maxageRange = Number(dif) + Number(ageRange);
                       for (let i = minageRange; i <= maxageRange; i++) {
                         rangeToSend.push(String(i));
                       }
@@ -933,12 +1011,13 @@ export default function PatientSearch(props) {
     setphone("");
     setage("");
     setlvd("");
-    setresultAge("");
+    setresultAge(0);
     setidentifier("");
     setsearchData([]);
     setisDataPresent(false);
     setIdenErrorMsj("");
     setNameErrorMsj("");
+    setAgeErrorMsj("");
     setPhoneErrorMsj("");
     setLoading(false);
     setErrors({ phoneData: true, nameData: true, identifierData: true });
@@ -1011,16 +1090,18 @@ export default function PatientSearch(props) {
             <GridItem item xs={12} sm={6} md={3}>
               <TextField
                 error={
-                  !errors.phoneData &&
+                  (!errors.phoneData &&
                   !errors.nameData &&
-                  !errors.identifierData
+                    !errors.identifierData)
+                  || (formErrors["firstName"] ? true : false)
                 }
                 helperText={
                   (!errors.phoneData &&
                     !errors.nameData &&
                     !errors.identifierData &&
                     NameErrorMsj) ||
-                  (errors.nameData && NameErrorMsj)
+                  (errors.nameData && NameErrorMsj) ||
+                  (formErrors["firstName"])
                 }
                 name="firstName"
                 variant="outlined"
@@ -1137,21 +1218,23 @@ export default function PatientSearch(props) {
                 </Select>
               </FormControl>
             </GridItem>
-            <GridItem item xs={12} sm={6} md={3}>
-              <GridContainer>
-                <GridItem item xs={12} sm={6} md={6}>
+            
+                <GridItem item xs={12} sm={6} md={3}>
                   <TextField
                     id="standard-number"
                     variant="outlined"
                     fullWidth
                     margin="dense"
                     label="Age"
-                    type="number"
+                    placeholder="Enter age in 20y or 10m or 20d"                    
                     className={classes.field}
                     onKeyUp={(e) => searchOnKey(e, "age", "press")}
+                    onBlur={validateAge}
+                    //error={!errors.ageData || formErrors["Age*"] ? true : false}
+                    //helperText={!errors.ageData ? "Invalid Input" : formErrors["Age*"]}
                   />
                 </GridItem>
-                <GridItem item xs={12} sm={6} md={6}>
+                <GridItem item xs={12} sm={6} md={3}>
                   <FormControl
                     variant="outlined"
                     fullWidth
@@ -1164,6 +1247,7 @@ export default function PatientSearch(props) {
                       label="Range"
                       value={resultAge}
                       onChange={(e) => searchOnKey(e, "range", "press")}
+                      defaultValue={resultAge}
                     >
                       <MenuItem value={0}>0</MenuItem>
                       <MenuItem value={1}>1</MenuItem>
@@ -1174,8 +1258,7 @@ export default function PatientSearch(props) {
                     </Select>
                   </FormControl>
                 </GridItem>
-              </GridContainer>
-            </GridItem>
+              
             <GridItem item xs={12} sm={6} md={3}>
               <FormControl component="fieldset">
                 <FormLabel
@@ -1208,6 +1291,7 @@ export default function PatientSearch(props) {
                 </RadioGroup>
               </FormControl>
             </GridItem>
+            <GridContainer>
             <GridItem item xs={12} sm={6} md={3}>
               <Button
                 variant="contained"
@@ -1225,6 +1309,8 @@ export default function PatientSearch(props) {
                 Reset
               </Button>
             </GridItem>
+            </GridContainer>
+            
           </GridContainer>
         </form>
         {loading && (
