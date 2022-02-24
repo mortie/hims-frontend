@@ -118,9 +118,6 @@ function ManageLocation() {
     movement.to = category.uuid;
     if (movement.to == movement.from) {
       movement = null;
-    }
-
-    if (movement.to == movement.from) {
       delete movements[location.uuid];
     } else {
       movements[location.uuid] = movement;
