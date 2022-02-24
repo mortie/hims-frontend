@@ -75,6 +75,8 @@ export default function PatientSearch(props) {
     identifierData: true,
     ageData:true,
   });
+  var today = moment().format("YYYY-MM-DD");
+  console.log(today+"")
   var [isDataPresent, setisDataPresent] = useState(false);
   var [phoneData, setphoneData] = useState(false);
   var [nameData, setnameData] = useState(false);
@@ -90,12 +92,13 @@ export default function PatientSearch(props) {
   const [patientCategoryTypes, setPatientCategoryTypes] = useState([]);
   const [mlcResp, setMlcResp] = useState([]);
   const [formErrors, setFormErrors] = useState({});
+  const [pageSize, setPageSize] = React.useState(10);
 
 
   const columns = [
     { field: "uuid", hide:true },
     { field: "identifier", headerName: "Patiend ID", width: 120 },
-    { field: "name", headerName: "Name", width: 200 },
+    { field: "name", headerName: "Name",type: "string", width: 200 },
     { field: "phone", headerName: "Phone", width: 115 },
     {
       field: "gender",
@@ -135,28 +138,30 @@ export default function PatientSearch(props) {
     },
   ];
 
-  const getAgeYear = ( age,ageV )=> {
-    const lastCharacter = age[age.length - 1];
+  const calculateAge =(type, age) => {
     let dob = moment().format("DD/MM/yyyy");
-    console.log(lastCharacter)
-    console.log(ageV)
-    switch (lastCharacter.toLowerCase()) {
+    
+    switch (type.toLowerCase()) {
       case "y":
-        dob = moment().subtract(ageV, "years");
+        dob = moment().subtract(age, "years");
         break;
       case "m":
-        dob = moment().subtract(ageV, "months");
+        dob = moment().subtract(age, "months");
         break;
       case "w":
-        dob = moment().subtract(ageV, "weeks");
+        dob = moment().subtract(age, "weeks");
         break;
       case "d":
-        dob = moment().subtract(ageV, "days");
+        dob = moment().subtract(age, "days");
         break;
       default:
         break;
     }
-    console.log(dob)
+    return dob;
+  }
+  const getAgeYear = ( age,ageV,ageRange)=> {
+    const lastCharacter = age[age.length - 1];
+    const dob = calculateAge(lastCharacter,ageV);
   var a = moment();
   var b = moment(dob, 'YYYY');  
   var diff = a.diff(b, 'years'); // calculates patient's age in years
@@ -188,9 +193,7 @@ export default function PatientSearch(props) {
           setNameErrorMsj("Name is required");
         }
       }
-      if(name === "age"){
-
-      }
+     
       if (name == "phone") {
         setErrors({ phoneData: !phone ? false : true });
         if (phone) {
@@ -577,6 +580,7 @@ function Equals(a, b) {
       lvdValueApprox = lvdapprox;
     }
     if (name == "range") {
+      console.log(searchValue)
       ageRange = searchValue;
     } else if (resultAge) {
       ageRange = resultAge;
@@ -624,12 +628,15 @@ function Equals(a, b) {
 
       if (isDataAlready) {
         if (name == "age") {
+          console.log(ageRange)
           if (ageRange) {
             var ageactual = event.target.value;
             var ageV = ageactual.slice(0, -1);
-            const dif = getAgeYear(ageactual,ageV);
+            console.log(resultAge);
+            const dif = getAgeYear(ageactual,ageV,ageRange);
             minageRange = Number(dif) - Number(ageRange);
             maxageRange = Number(dif) + Number(ageRange);
+            
             for (let k = minageRange; k <= maxageRange; k++) {
               rangeToSend.push(String(k));
             }
@@ -642,6 +649,7 @@ function Equals(a, b) {
             //var ageact = age;
             //var ageVa = ageact.slice(0, -1);
             //const dif = getAgeYear(ageact,ageVa);
+            console.log(ageRange)
             minageRange = Number(age) - Number(ageRange);
             maxageRange = Number(age) + Number(ageRange);
             for (let k = minageRange; k <= maxageRange; k++) {
@@ -697,12 +705,22 @@ function Equals(a, b) {
           alreadystoredata = filterOutput;
         }
         if (alreadystoredata.length > 0) {
+
           setsearchData(alreadystoredata);
           setisDataPresent(true);
           setLoading(false);
         } else {
-          let param = firstNameValue;
           
+          let param = firstNameValue;
+          console.log(ageRange)
+          if(ageRange === 0){
+            const lastCharacter = ageValue[ageValue.length - 1];
+            if(lastCharacter === 'y'){
+              var num = (Number(ageValue.slice(0, -1))*12 );
+              ageValue = (num)+"m";
+              ageRange = 4;
+            }
+          }
           param = checkData(
             param,
             firstNameValue,
@@ -732,7 +750,7 @@ function Equals(a, b) {
                   console.log(" SEARCH DATA ", searchdatanew[0][i])
                   let uuidID = searchdatanew[0][i]["uuid"];
                   let identifierid = searchdatanew[0][i]["identifier"];
-                  let nameval = searchdatanew[0][i]["name"].toUpperCase();
+                  let nameval = searchdatanew[0][i]["name"].indexOf(',') > -1?searchdatanew[0][i]["name"].split(',')[0].toUpperCase():searchdatanew[0][i]["name"].toUpperCase();
                   let genval = searchdatanew[0][i]["gender"];
                   let ageval = searchdatanew[0][i]["age"];
                   if (searchdatanew[0][i]["address"]) {
@@ -782,7 +800,8 @@ function Equals(a, b) {
                       if (ageRange) {
                       var ageactual = age;
                       var ageV = ageactual.slice(0, -1);
-                      const dif = getAgeYear(ageactual,ageV);
+                      console.log(ageRange)
+                      const dif = getAgeYear(ageactual,ageV,ageRange);
                         minageRange = Number(dif) - Number(ageRange);
                         maxageRange = Number(dif) + Number(ageRange);
                         for (let i = minageRange; i <= maxageRange; i++) {
@@ -849,7 +868,15 @@ function Equals(a, b) {
         }
       } else {
         let param = firstNameValue;
-       
+        
+        if(ageRange === 0){
+          const lastCharacter = ageValue[ageValue.length - 1];
+          if(lastCharacter === 'y'){
+            var num2 = (Number(ageValue.slice(0, -1))*12 );
+            ageValue = (num2)+"m";
+            ageRange = 4;
+          }
+        }
         param = checkData(
           param,
           firstNameValue,
@@ -872,7 +899,7 @@ function Equals(a, b) {
               var searchdatanew = [];
               var visitdate = "";
               setsearchData([]);
-              searchdatanew = searchData;
+              //searchdatanew = searchData;
               var storedata = [];
 
               for (let i = 0; i < response.data.length; i++) {
@@ -881,7 +908,7 @@ function Equals(a, b) {
                 console.log(" SEARCH DATA ",searchdatanew[0][i])
                 let uuidID = searchdatanew[0][i]["uuid"];
                 let identifierid = searchdatanew[0][i]["identifier"];
-                let nameval = searchdatanew[0][i]["name"].toUpperCase();
+                let nameval = searchdatanew[0][i]["name"].indexOf(',') > -1?searchdatanew[0][i]["name"].split(',')[0].toUpperCase():searchdatanew[0][i]["name"].toUpperCase();
                 let genval = searchdatanew[0][i]["gender"];
                 let ageval = searchdatanew[0][i]["age"];
                 if (searchdatanew[0][i]["address"]) {
@@ -925,13 +952,14 @@ function Equals(a, b) {
               try {
                 if (storedata.length > 0) {
                   let filterOutput = [];
+                  console.log(ageRange);
                   setsearchData([]);
                   if (ageValue) {
                     if (ageRange) {
                       var ageactual = age;
                       var ageV = ageactual.slice(0, -1);
                       console.log(ageV);
-                      const dif = getAgeYear(ageactual,ageV);
+                      const dif = getAgeYear(ageactual,ageV,ageRange);
                       console.log(dif)
                       minageRange = Number(dif) - Number(ageRange);
                       maxageRange = Number(dif) + Number(ageRange);
@@ -1184,8 +1212,7 @@ function Equals(a, b) {
                 margin="dense"
                 name="lvd"
                 id="lvd"
-                defaultValue=""
-                maxDate={new Date()}
+                inputProps={{ max: today }}
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -1247,7 +1274,7 @@ function Equals(a, b) {
                       label="Range"
                       value={resultAge}
                       onChange={(e) => searchOnKey(e, "range", "press")}
-                      defaultValue={resultAge}
+                      //defaultValue={resultAge}
                     >
                       <MenuItem value={0}>0</MenuItem>
                       <MenuItem value={1}>1</MenuItem>
@@ -1330,8 +1357,8 @@ function Equals(a, b) {
             wrap="wrap"
             rows={searchData}
             columns={columns}
-            pageSize={10}
             density="standard"
+            pagination {...searchData}
           />
         </Paper>
       )}
