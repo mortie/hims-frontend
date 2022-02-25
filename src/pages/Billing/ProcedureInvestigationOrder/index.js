@@ -262,9 +262,9 @@ function ProcedureInvestigationOrder(props) {
         } else {
           //setCommentTextfield(true);
           if (formData["Commenttextfield"] === "") {
-            setCommenterror(false);
-          } else {
             setCommenterror(true);
+          } else {
+            setCommenterror(false);
           }
           textfieldqunatityval[index] = "0";
           quantitymultiplyprice[index] =
@@ -343,9 +343,9 @@ function ProcedureInvestigationOrder(props) {
     }
     if (e.target.name === "Commenttextfield") {
       if (e.target.value === "") {
-        setCommenterror(false);
-      } else {
         setCommenterror(true);
+      } else {
+        setCommenterror(false);
         setformData({
           ...formData,
           Commenttextfield: e.target.value,
@@ -871,9 +871,11 @@ function ProcedureInvestigationOrder(props) {
                   disabled={
                     (errors === false ? true : false) ||
                     (checkboxstatus === true ? true : false) ||
-                    formData["Commenttextfield"] === ""
-                      ? true
-                      : false
+                    (checkedprice.includes(false) === true
+                      ? formData.Commenttextfield === ""
+                        ? true
+                        : false
+                      : false)
                   }
                 >
                   Submit
