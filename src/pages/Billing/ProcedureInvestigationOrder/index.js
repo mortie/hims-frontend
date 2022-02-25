@@ -262,9 +262,9 @@ function ProcedureInvestigationOrder(props) {
         } else {
           //setCommentTextfield(true);
           if (formData["Commenttextfield"] === "") {
-            setCommenterror(true);
-          } else {
             setCommenterror(false);
+          } else {
+            setCommenterror(true);
           }
           textfieldqunatityval[index] = "0";
           quantitymultiplyprice[index] =
@@ -343,9 +343,9 @@ function ProcedureInvestigationOrder(props) {
     }
     if (e.target.name === "Commenttextfield") {
       if (e.target.value === "") {
-        setCommenterror(true);
-      } else {
         setCommenterror(false);
+      } else {
+        setCommenterror(true);
         setformData({
           ...formData,
           Commenttextfield: e.target.value,
@@ -734,7 +734,9 @@ function ProcedureInvestigationOrder(props) {
                         <TableCell className={classes.custompaddingcell}>
                           <TextField
                             variant="outlined"
-                            error={commenterror === true ? true : false}
+                            error={
+                              formData["Commenttextfield"] === "" ? true : false
+                            }
                             size="small"
                             value={formData.Commenttextfield}
                             id="Commenttextfield"
@@ -743,7 +745,7 @@ function ProcedureInvestigationOrder(props) {
                               handleInputchange(e);
                             }}
                             helperText={
-                              commenterror === true
+                              formData["Commenttextfield"] === ""
                                 ? "This field is required"
                                 : ""
                             }
@@ -869,7 +871,7 @@ function ProcedureInvestigationOrder(props) {
                   disabled={
                     (errors === false ? true : false) ||
                     (checkboxstatus === true ? true : false) ||
-                    commenterror === true
+                    formData["Commenttextfield"] === ""
                       ? true
                       : false
                   }
