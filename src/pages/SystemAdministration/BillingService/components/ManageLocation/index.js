@@ -180,13 +180,11 @@ function ManageLocation() {
     }
 
     for (let categoryUUID in deletes) {
-      console.log("Deletes for", categoryUUID,
-        await postAPI("/categoryLocation/mapping", {
-          priceCategoryConUuid: categoryUUID,
-          locationUuids: deletes[categoryUUID],
-          deleted: true,
-        })
-      );
+      await postAPI("/categoryLocation/mapping", {
+        priceCategoryConUuid: categoryUUID,
+        locationUuids: deletes[categoryUUID],
+        deleted: true,
+      });
     }
 
     for (let categoryUUID in inserts) {
