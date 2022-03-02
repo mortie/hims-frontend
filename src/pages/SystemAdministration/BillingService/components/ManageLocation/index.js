@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import clsx from "clsx";
 import {
   makeStyles,
   InputLabel,
@@ -45,7 +46,58 @@ function ManageLocation() {
     setter([...locations]);
   }
 
-  useEffect(() => {
+  function setState(locations, categories, mappings) {
+    let locationsByUUID = {};
+    for (let location of locations) {
+      locationsByUUID[location.uuid] = location;
+    }
+
+    let categoriesByUUID = {};
+    for (let category of categories) {
+      categoriesByUUID[category.uuid] = category;
+    }
+
+    let locationsByCategoryUUID = {};
+    for (let categoryUUID in mappings) {
+      locationsByCategoryUUID[categoryUUID] = [];
+      for (let mapping of mappings[categoryUUID]) {
+        locationsByCategoryUUID[categoryUUID].push(locations[mapping.locationUuid]);
+      }
+    }
+
+    let mappingByLocationUUID = {};
+    for (let categoryUUID in mappings) {
+      for (let mapping of mappings[categoryUUID]) {
+        let locationUUID = mapping.locationUuid;
+        mappingByLocationUUID[locationUUID] = categoryUUID;
+      }
+    }
+
+    let unassignedLocations = [];
+    let assignedLocations = {};
+    assignedLocations[categories[0].uuid] = [];
+    for (let location of locations) {
+      if (mappingByLocationUUID[location.uuid]) {
+        let categoryUUID = mappingByLocationUUID[location.uuid];
+        if (assignedLocations[categoryUUID] == null) {
+          assignedLocations[categoryUUID] = [];
+        }
+        assignedLocations[categoryUUID].push(location);
+      } else {
+        unassignedLocations.push(location);
+      }
+    }
+
+    sortAndSetLocations(setCurrentCategoryLocations, assignedLocations[categories[0].uuid]);
+    sortAndSetLocations(setUnassignedLocations, unassignedLocations);
+    setAssignedLocations(assignedLocations);
+
+    setCategory(categories[0]);
+    setCategories(categories);
+  }
+
+  function resetState() {
+    setDataLoaded(false);
     let locations, categories, mappings;
 
     Promise.all([
@@ -54,56 +106,13 @@ function ManageLocation() {
       getAPI("/categoryLocation/mapping")
         .then(res => mappings = res.data),
     ]).then(() => {
-      let locationsByUUID = {};
-      for (let location of locations) {
-        locationsByUUID[location.uuid] = location;
-      }
-
-      let categoriesByUUID = {};
-      for (let category of categories) {
-        categoriesByUUID[category.uuid] = category;
-      }
-
-      let locationsByCategoryUUID = {};
-      for (let categoryUUID in mappings) {
-        locationsByCategoryUUID[categoryUUID] = [];
-        for (let mapping of mappings[categoryUUID]) {
-          locationsByCategoryUUID[categoryUUID].push(locations[mapping.locationUuid]);
-        }
-      }
-
-      let mappingByLocationUUID = {};
-      for (let categoryUUID in mappings) {
-        for (let mapping of mappings[categoryUUID]) {
-          let locationUUID = mapping.locationUuid;
-          mappingByLocationUUID[locationUUID] = categoryUUID;
-        }
-      }
-
-      let unassignedLocations = [];
-      let assignedLocations = {};
-      assignedLocations[categories[0].uuid] = [];
-      for (let location of locations) {
-        if (mappingByLocationUUID[location.uuid]) {
-          let categoryUUID = mappingByLocationUUID[location.uuid];
-          if (assignedLocations[categoryUUID] == null) {
-            assignedLocations[categoryUUID] = [];
-          }
-          assignedLocations[categoryUUID].push(location);
-        } else {
-          unassignedLocations.push(location);
-        }
-      }
-
-      sortAndSetLocations(setCurrentCategoryLocations, assignedLocations[categories[0].uuid]);
-      sortAndSetLocations(setUnassignedLocations, unassignedLocations);
-      setAssignedLocations(assignedLocations);
-
-      setCategory(categories[0]);
-      setCategories(categories);
-
+      setState(locations, categories, mappings);
       setDataLoaded(true);
     });
+  }
+
+  useEffect(() => {
+    resetState();
   }, []);
 
   function addLocation(location) {
@@ -192,7 +201,7 @@ function ManageLocation() {
         priceCategoryConUuid: categoryUUID,
         locationUuids: inserts[categoryUUID],
         deleted: false,
-      })
+      });
     }
 
     setMovements({});
@@ -287,19 +296,25 @@ function ManageLocation() {
           </FormControl>
         </Grid>
         <Grid item>
-          <FormControl
-            variant="outlined"
-            fullWidth
-            margin="dense"
+          <Button
+            variant="contained"
+            disabled={!hasChanged || currentlySaving}
+            onClick={resetState}
             className={classes.field}
           >
-            <Button
-              disabled={!hasChanged || currentlySaving}
-              onClick={save} variant="outlined"
-            >
-              Save
-            </Button>
-          </FormControl>
+            Reset
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!hasChanged || currentlySaving}
+            onClick={save}
+            className={clsx(classes.button, classes.field)}
+          >
+            Save
+          </Button>
         </Grid>
       </Grid>
 
@@ -311,19 +326,29 @@ function ManageLocation() {
         ? Locations()
         : <LinearProgress />}
 
-      <FormControl
-        variant="outlined"
-        fullWidth
-        margin="dense"
-        className={classes.field}
-      >
-        <Button
-          disabled={!hasChanged || currentlySaving}
-          onClick={save} variant="outlined"
-        >
-          Save
-        </Button>
-      </FormControl>
+      <Grid container spacing={1} style={{justifyContent: "flex-end"}}>
+        <Grid item>
+          <Button
+            variant="contained"
+            disabled={!hasChanged || currentlySaving}
+            onClick={resetState}
+            className={classes.field}
+          >
+            Reset
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!hasChanged || currentlySaving}
+            onClick={save}
+            className={clsx(classes.button, classes.field)}
+          >
+            Save
+          </Button>
+        </Grid>
+      </Grid>
     </List>
   )
 }
