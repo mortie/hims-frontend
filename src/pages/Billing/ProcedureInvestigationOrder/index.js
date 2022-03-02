@@ -734,7 +734,9 @@ function ProcedureInvestigationOrder(props) {
                         <TableCell className={classes.custompaddingcell}>
                           <TextField
                             variant="outlined"
-                            error={commenterror === true ? true : false}
+                            error={
+                              formData["Commenttextfield"] === "" ? true : false
+                            }
                             size="small"
                             value={formData.Commenttextfield}
                             id="Commenttextfield"
@@ -743,7 +745,7 @@ function ProcedureInvestigationOrder(props) {
                               handleInputchange(e);
                             }}
                             helperText={
-                              commenterror === true
+                              formData["Commenttextfield"] === ""
                                 ? "This field is required"
                                 : ""
                             }
@@ -869,9 +871,11 @@ function ProcedureInvestigationOrder(props) {
                   disabled={
                     (errors === false ? true : false) ||
                     (checkboxstatus === true ? true : false) ||
-                    commenterror === true
-                      ? true
-                      : false
+                    (checkedprice.includes(false) === true
+                      ? formData.Commenttextfield === ""
+                        ? true
+                        : false
+                      : false)
                   }
                 >
                   Submit
